@@ -1,11 +1,12 @@
 import "./App.css";
-import { BrowserRouter, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ListTable from "./order_item/ListTable";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route path="/board/show/:category" element={< >} /> */}
+        <Route path="/list" element={<ListTable />} />
       </Routes>
     </BrowserRouter>
   );
