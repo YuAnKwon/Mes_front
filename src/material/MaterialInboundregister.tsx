@@ -108,11 +108,12 @@ export function MaterialInboundregister() {
     },
   ];
 
+  //엑셀
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const worksheet = XLSX.utils.json_to_sheet(rows);//row는 다운받을 대상
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "원자재_입고_등록_목록.xlsx");
+    XLSX.writeFile(workbook, "원자재_입고_등록_목록.xlsx");//다운받는 엑셀 파일 이름
   };
 
   const handleRegister = () => {

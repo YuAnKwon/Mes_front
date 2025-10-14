@@ -10,7 +10,7 @@ import {
 import { FaBoxArchive } from "react-icons/fa6";
 import {
   HiChartPie,
-  HiClipboardCheck,
+  HiClipboard,
   HiClipboardList,
   HiCube,
   HiShoppingBag,
@@ -26,12 +26,17 @@ import {
 export function SideNav() {
   return (
     <Sidebar
-      className="h-screen bg-gray-900 text-white"
       aria-label="Sidebar with multi-level dropdown example"
     >
       <SidebarItems>
         <SidebarItemGroup>
-          <SidebarItem href="#" icon={HiChartPie}>
+          <SidebarItem
+            href="#"
+            icon={HiChartPie}
+            theme={{
+              base: "text-black hover:text-gray-300",
+            }}
+          >
             대시보드
           </SidebarItem>
           <SidebarCollapse icon={HiClipboardList} label="수주대상품목관리">
@@ -72,7 +77,7 @@ export function SideNav() {
             </SidebarItem>
           </SidebarCollapse>
           <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리">
-            <SidebarItem href="#" icon={HiClipboardCheck}>
+            <SidebarItem href="#" icon={HiClipboard}>
               수주대상품목
             </SidebarItem>
             <SidebarItem href="#" icon={HiCube}>

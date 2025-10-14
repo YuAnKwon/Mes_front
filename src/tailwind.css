@@ -5,9 +5,9 @@
 
 @layer components {
   .sidebar-custom a {
-    @apply text-white !important;
+    @apply text-black !important;
   }
-
+  
   .main-content {
     @apply w-full max-w-5xl !important;
   }
