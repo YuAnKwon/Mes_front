@@ -1,11 +1,29 @@
 import { Box, Button, Typography } from "@mui/material";
-
+import SearchBar from "../common/SearchBar";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import Pagination from "../common/Pagination";
 import { useState } from "react";
 import * as XLSX from "xlsx-js-style";
 
 export function MaterialInboundregister() {
+  const sampleData = [
+    "회사1",
+    "회사2",
+    "품목A",
+    "품목B",
+    "입고번호001",
+    "입고번호002",
+  ];
+
+  const searchOptions = [
+    { label: "매입처명", value: "buyer" },
+    { label: "품목번호", value: "materialNo" },
+    { label: "품목명", value: "material" },
+  ];
+  
+  const handleSearch = (criteria: string, query: string) => {
+    console.log("검색 실행:", { criteria, query });
+  };
 
   const [rows, setRows] = useState(
       Array.from({ length: 100 }, (_, i) => ({
@@ -107,16 +125,36 @@ export function MaterialInboundregister() {
     return(
         <Box sx={{ p: 2 }}>
       <h2>원자재 입고 등록</h2>
+      <Box
+  sx={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    mb: 2,
+    gap: 2,
+  }}
+>
+  {/* 공통 검색바 */}
+  <Box sx={{ flex: 1 }}>
+    <SearchBar
+      searchOptions={searchOptions}
+      autoCompleteData={sampleData}
+      onSearch={handleSearch}
+    />
+  </Box>
 
-      {/* 버튼 영역 */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mb: 2 }}>
-        <Button variant="outlined" color="success" onClick={handleExcelDownload}>
-          엑셀 다운로드
-        </Button>
-        <Button variant="outlined" color="primary" onClick={handleRegister}>
-          등록
-        </Button>
-      </Box>
+  {/* 버튼 영역 */}
+  <Box sx={{ display: "flex", gap: 1, alignItems: "center"}}>
+    <Button variant="outlined" color="success" sx={{ height: 40, fontWeight: 500,
+        px: 2.5}} onClick={handleExcelDownload}>
+      엑셀 다운로드
+    </Button>
+    <Button variant="outlined" color="primary" sx={{ height: 40,fontWeight: 500,
+        px: 2.5 }} onClick={handleRegister}>
+      등록
+    </Button>
+  </Box>
+</Box>
 
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
