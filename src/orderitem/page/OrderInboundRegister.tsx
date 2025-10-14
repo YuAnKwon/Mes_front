@@ -11,15 +11,30 @@ import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import SearchBar from "../../common/SearchBar";
-import {
-  handleSearch,
-  sampleData,
-  searchOptions,
-} from "../../material/MaterialInboundregister";
+
 import { getOrderItemInRegiList, registerInboundItem } from "../api/OrderInApi";
 import type { OrderItemInList, OrderItemInRegister } from "../type";
 
 export default function OrderInboundRegister() {
+  const sampleData = [
+    "회사1",
+    "회사2",
+    "품목A",
+    "품목B",
+    "입고번호001",
+    "입고번호002",
+  ];
+
+  const searchOptions = [
+    { label: "매입처명", value: "companyName" },
+    { label: "품목번호", value: "materialCode" },
+    { label: "품목명", value: "materialName" },
+  ];
+
+  const handleSearch = (criteria: string, query: string) => {
+    console.log("검색 실행:", { criteria, query });
+  };
+
   const navigate = useNavigate();
 
   const loadData = async () => {
@@ -148,31 +163,31 @@ export default function OrderInboundRegister() {
     XLSX.writeFile(workbook, "수주대상품목_목록.xlsx");
   };
 
-  const handleRegister = async () => {
-    // ✅ DataGrid에서 선택된 행 ID 가져오기
-    const selectedRowsMap = apiRef.current.getSelectedRows();
-    const selectedRows = Array.from(selectedRowsMap.values());
+  // const handleRegister = async () => {
+  //   // ✅ DataGrid에서 선택된 행 ID 가져오기
+  //   // const selectedRowsMap = apiRef.current.getSelectedRows();
+  //   const selectedRows = Array.from(selectedRowsMap.values());
 
-    if (selectedRows.length === 0) {
-      alert("등록할 품목을 선택해주세요.");
-      return;
-    }
+  //   if (selectedRows.length === 0) {
+  //     alert("등록할 품목을 선택해주세요.");
+  //     return;
+  //   }
 
-    const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
-      id: row.id,
-      inAmount: row.inAmount as number,
-      inDate: row.inDate as string,
-    }));
+  //   const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
+  //     id: row.id,
+  //     inAmount: row.inAmount as number,
+  //     inDate: row.inDate as string,
+  //   }));
 
-    try {
-      await registerInboundItem(payload);
-      alert("입고 등록이 완료되었습니다.");
-      navigate("/orderitem/inbound/list");
-    } catch (error) {
-      console.error(error);
-      alert("등록 중 오류가 발생하였습니다.");
-    }
-  };
+  //   try {
+  //     await registerInboundItem(payload);
+  //     alert("입고 등록이 완료되었습니다.");
+  //     navigate("/orderitem/inbound/list");
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("등록 중 오류가 발생하였습니다.");
+  //   }
+  // };
 
   return (
     <Box sx={{ p: 2 }}>
@@ -210,7 +225,7 @@ export default function OrderInboundRegister() {
             variant="outlined"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleRegister}
+            // onClick={handleRegister}
           >
             입고
           </Button>
@@ -224,9 +239,9 @@ export default function OrderInboundRegister() {
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
           checkboxSelection
-          onRowSelectionModelChange={(newSelectionModel) => {
-            setSelectedIds(newSelectionModel);
-          }}
+          // onRowSelectionModelChange={(newSelectionModel) => {
+          //   setSelectedIds(newSelectionModel);
+          // }}
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
