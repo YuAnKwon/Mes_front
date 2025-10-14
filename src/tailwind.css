@@ -1,0 +1,18 @@
+@import "flowbite";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .sidebar-custom a {
+    @apply text-white !important;
+  }
+
+  .main-content {
+    @apply w-full max-w-5xl !important;
+  }
+
+  .main-content h2 {
+    @apply text-2xl font-semibold mb-4 !important;
+  }
+}

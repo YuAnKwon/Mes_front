@@ -1,15 +1,46 @@
-import "./App.css";
+import "./tailwind.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import ListTable from "./order_item/ListTable";
-import { SideNav } from "./mater/SideNav";
+import { SideNav } from "./common/SideNav";
+import OrderInboundRegister from "./orderitem/OrderInboundRegister";
+import Sidebar from "./common/Sidebar";
 
 function App() {
   return (
     <BrowserRouter>
-      <SideNav />
-      <Routes>
-        <Route path="/list" element={<ListTable />} />
-      </Routes>
+      <div className="flex h-screen">
+        {/* 사이드바 (왼쪽 고정) */}
+        <div className="w-64">
+          <SideNav />
+        </div>
+
+        {/* 본문 (오른쪽 영역) */}
+        <div className="flex-1 p-6  ">
+          <Routes>
+            {/* 수주대상품목 */}
+            <Route
+              path="/orderitem/inbound/register"
+              element={<OrderInboundRegister />}
+            />
+            {/* <Route path="/orderitem/inbound/list" element={<OrderInboundList />} />
+            <Route path="/orderitem/outbound/register" element={<OrderOutboundRegister />} />
+            <Route path="/orderitem/outbound/list" element={<OrderOutboundList />} />
+
+            {/* 원자재 */}
+            {/* <Route path="/material/inbound/register" element={<MaterialInboundRegister />} />
+            <Route path="/material/inbound/list" element={<MaterialInboundList />} />
+            <Route path="/material/outbound/register" element={<MaterialOutboundRegister />} />
+            <Route path="/material/outbound/list" element={<MaterialOutboundList />} /> */}
+
+            {/* 기준정보관리 */}
+            {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />
+            <Route path="/master/material" element={<MasterMaterial />} />
+            <Route path="/master/routing" element={<MasterRouting />} />
+            <Route path="/master/company" element={<MasterCompany />} />  */}
+          </Routes>
+        </div>
+      </div>
     </BrowserRouter>
   );
 }

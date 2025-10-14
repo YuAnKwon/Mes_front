@@ -3,10 +3,10 @@ import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Typography } from "@mui/material";
-import Pagination from "./Pagination";
+import Pagination from "../common/Pagination";
 
 // -------------------- 입고 테이블 --------------------
-export default function InboundTable() {
+export default function OrderInboundRegister() {
   const [rows, setRows] = useState(
     Array.from({ length: 100 }, (_, i) => ({
       id: i + 1,
