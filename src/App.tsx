@@ -29,7 +29,10 @@ function App() {
             <Route path="/orderitem/outbound/list" element={<OrderOutboundList />} />
 
             {/* 원자재 */}
-            <Route path="/material/inbound/register" element={<MaterialInboundregister />} />
+            <Route
+              path="/material/inbound/register"
+              element={<MaterialInboundregister />}
+            />
             {/* // <Route path="/material/inbound/list" element={<MaterialInboundList />} />
             // <Route path="/material/outbound/register" element={<MaterialOutboundRegister />} />
             // <Route path="/material/outbound/list" element={<MaterialOutboundList />} />  */}
