@@ -2,11 +2,14 @@ import { useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Pagination from "../common/Pagination";
+import { useNavigate } from "react-router-dom";
 
 // -------------------- 입고 테이블 --------------------
 export default function OrderInboundRegister() {
+  const navigate = useNavigate();
+
   const [rows, setRows] = useState(
     Array.from({ length: 100 }, (_, i) => ({
       id: i + 1,
@@ -94,6 +97,20 @@ export default function OrderInboundRegister() {
     <Box sx={{ p: 2 }}>
       <h2>수주대상 품목 입고 등록</h2>
       <Box sx={{ height: 1200, width: "100%" }}>
+        <Box
+          display="flex"
+          justifyContent="flex-end"
+          alignItems="center"
+          mb={2}
+        >
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate("/orderitem/outbound/register")}
+          >
+            등록
+          </Button>
+        </Box>
         <DataGrid
           rows={rows}
           columns={columns}
@@ -115,6 +132,21 @@ export default function OrderInboundRegister() {
           sx={{
             "& .MuiDataGrid-columnHeaders": {
               fontWeight: "bold",
+            },
+            "& .MuiDataGrid-cell--editable": {
+              // backgroundColor: "#f", // 연한 노란색
+              position: "relative",
+            },
+            "& .MuiDataGrid-cell--editable::after": {
+              content: '"✎"', // 연필 아이콘
+              position: "absolute",
+              right: 6,
+              top: 6,
+              fontSize: "12px",
+              color: "#999",
+            },
+            "& .MuiDataGrid-cell--editing::after": {
+              content: '""', // 편집 중엔 아이콘 숨기기
             },
           }}
         />
