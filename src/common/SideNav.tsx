@@ -52,9 +52,10 @@ export function SideNav() {
             </SidebarItem>
           </SidebarCollapse>
           <SidebarCollapse icon={HiCube} label="원자재 입출고 관리">
-            <SidebarItem 
-            href="/material/inbound/register" 
-            icon={RiInboxArchiveLine}>
+            <SidebarItem
+              href="/material/inbound/register"
+              icon={RiInboxArchiveLine}
+            >
               입고 등록
             </SidebarItem>
             <SidebarItem href="#" icon={RiInboxArchiveFill}>

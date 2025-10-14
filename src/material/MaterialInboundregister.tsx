@@ -20,95 +20,95 @@ export function MaterialInboundregister() {
     { label: "품목번호", value: "materialNo" },
     { label: "품목명", value: "material" },
   ];
-  
+
   const handleSearch = (criteria: string, query: string) => {
     console.log("검색 실행:", { criteria, query });
   };
 
   const [rows, setRows] = useState(
-      Array.from({ length: 100 }, (_, i) => ({
-        id: i + 1,
-        materialName: `품목${i + 1}`,
-        materialCode: `${100 + i}`,
-        companyName: `회사${(i % 10) + 1}`,
-        type: ["방산", "자동차", "조선"][i % 3],
-        inAmount: "",
-        inDate: "",
-        remark: `비고 ${i + 1}123123`,
-      }))
-    );
-  
-    const columns: GridColDef[] = [
-      {
-        field: "materialName",
-        headerName: "품목명",
-        width: 150,
-        headerAlign: "center",
-        align: "center",
-      },
-      {
-        field: "materialCode",
-        headerName: "품목번호",
-        width: 150,
-        headerAlign: "center",
-        align: "center",
-      },
-      {
-        field: "companyName",
-        headerName: "거래처명",
-        width: 150,
-        headerAlign: "center",
-        align: "center",
-      },
-      {
-        field: "type",
-        headerName: "분류",
-        width: 120,
-        headerAlign: "center",
-        align: "center",
-      },
-      {
-        field: "inAmount",
-        headerName: "수량",
-        width: 120,
-        headerAlign: "center",
-        align: "center",
-        editable: true,
-        type: "number",
-      },
-      {
-        field: "inDate",
-        headerName: "입고일자",
-        width: 150,
-        headerAlign: "center",
-        align: "center",
-        editable: true,
-        type: "date",
-      },
-  
-      {
-        field: "remark",
-        headerName: "비고",
-        width: 250,
-        headerAlign: "center",
-        align: "left",
-        renderCell: (params) => (
-          <Typography
-            sx={{
-              whiteSpace: "normal",
-              wordBreak: "break-word",
-              maxHeight: 60,
-              overflowY: "auto",
-              p: 1,
-            }}
-          >
-            {params.value}
-          </Typography>
-        ),
-      },
-    ];
+    Array.from({ length: 100 }, (_, i) => ({
+      id: i + 1,
+      materialName: `품목${i + 1}`,
+      materialCode: `${100 + i}`,
+      companyName: `회사${(i % 10) + 1}`,
+      type: ["방산", "자동차", "조선"][i % 3],
+      inAmount: "",
+      inDate: "",
+      remark: `비고 ${i + 1}123123`,
+    }))
+  );
 
-    const handleExcelDownload = () => {
+  const columns: GridColDef[] = [
+    {
+      field: "materialName",
+      headerName: "품목명",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "materialCode",
+      headerName: "품목번호",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "companyName",
+      headerName: "거래처명",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "type",
+      headerName: "분류",
+      width: 120,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "inAmount",
+      headerName: "수량",
+      width: 120,
+      headerAlign: "center",
+      align: "center",
+      editable: true,
+      type: "number",
+    },
+    {
+      field: "inDate",
+      headerName: "입고일자",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+      editable: true,
+      type: "date",
+    },
+
+    {
+      field: "remark",
+      headerName: "비고",
+      width: 250,
+      headerAlign: "center",
+      align: "left",
+      renderCell: (params) => (
+        <Typography
+          sx={{
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+            maxHeight: 60,
+            overflowY: "auto",
+            p: 1,
+          }}
+        >
+          {params.value}
+        </Typography>
+      ),
+    },
+  ];
+
+  const handleExcelDownload = () => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -119,42 +119,48 @@ export function MaterialInboundregister() {
     // 등록 버튼 클릭 시 동작 정의
     console.log("등록 버튼 클릭됨");
   };
- 
-  
 
-    return(
-        <Box sx={{ p: 2 }}>
+  return (
+    <Box sx={{ p: 2 }}>
       <h2>원자재 입고 등록</h2>
       <Box
-  sx={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    mb: 2,
-    gap: 2,
-  }}
->
-  {/* 공통 검색바 */}
-  <Box sx={{ flex: 1 }}>
-    <SearchBar
-      searchOptions={searchOptions}
-      autoCompleteData={sampleData}
-      onSearch={handleSearch}
-    />
-  </Box>
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+          gap: 2,
+        }}
+      >
+        {/* 공통 검색바 */}
+        <Box sx={{ flex: 1 }}>
+          <SearchBar
+            searchOptions={searchOptions}
+            autoCompleteData={sampleData}
+            onSearch={handleSearch}
+          />
+        </Box>
 
-  {/* 버튼 영역 */}
-  <Box sx={{ display: "flex", gap: 1, alignItems: "center"}}>
-    <Button variant="outlined" color="success" sx={{ height: 40, fontWeight: 500,
-        px: 2.5}} onClick={handleExcelDownload}>
-      엑셀 다운로드
-    </Button>
-    <Button variant="outlined" color="primary" sx={{ height: 40,fontWeight: 500,
-        px: 2.5 }} onClick={handleRegister}>
-      등록
-    </Button>
-  </Box>
-</Box>
+        {/* 버튼 영역 */}
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <Button
+            variant="outlined"
+            color="success"
+            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
+            onClick={handleExcelDownload}
+          >
+            엑셀 다운로드
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
+            onClick={handleRegister}
+          >
+            등록
+          </Button>
+        </Box>
+      </Box>
 
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
@@ -183,5 +189,5 @@ export function MaterialInboundregister() {
         />
       </Box>
     </Box>
-    )
+  );
 }

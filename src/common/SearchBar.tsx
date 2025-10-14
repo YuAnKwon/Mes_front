@@ -1,4 +1,12 @@
-import { Autocomplete, Box, IconButton, InputAdornment, MenuItem, Select, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { GridSearchIcon } from "@mui/x-data-grid";
 import { useState } from "react";
 
@@ -8,17 +16,19 @@ interface SearchBarProps {
   onSearch: (criteria: string, query: string) => void; // 검색 실행 함수
 }
 
-export default function SearchBar({searchOptions,
+export default function SearchBar({
+  searchOptions,
   autoCompleteData,
-  onSearch}){
-    const [criteria, setCriteria] = useState(searchOptions[0].value);
+  onSearch,
+}) {
+  const [criteria, setCriteria] = useState(searchOptions[0].value);
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {
     onSearch(criteria, query);
   };
 
-  return(
+  return (
     <Box
       sx={{
         display: "flex",
@@ -26,7 +36,7 @@ export default function SearchBar({searchOptions,
         gap: 1,
         backgroundColor: "#f9f9f9",
         borderRadius: 2,
-        height: 40
+        height: 40,
       }}
     >
       {/* 드롭다운 */}
@@ -58,13 +68,12 @@ export default function SearchBar({searchOptions,
       <Autocomplete
         freeSolo
         options={autoCompleteData}
-         sx={{
+        sx={{
           flex: 1,
           height: "100%",
           "& .MuiInputBase-root": {
             height: "100%",
             paddingRight: "40px !important",
-            
           },
         }}
         onInputChange={(_, value) => setQuery(value)}
@@ -93,7 +102,6 @@ export default function SearchBar({searchOptions,
           />
         )}
       />
-      </Box>
+    </Box>
   );
-
 }
