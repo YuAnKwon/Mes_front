@@ -3,7 +3,7 @@ import "./tailwind.css";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SideNav } from "./common/SideNav";
-import OrderInboundRegister from "./orderitem/OrderInboundRegister";
+import OrderInboundRegister from "./orderitem/page/OrderInboundRegister";
 import Sidebar from "./common/Sidebar";
 import { MaterialInboundregister } from "./material/MaterialInboundregister";
 

@@ -5,26 +5,24 @@ import Pagination from "../common/Pagination";
 import { useState } from "react";
 import * as XLSX from "xlsx-js-style";
 
+export const sampleData = [
+  "회사1",
+  "회사2",
+  "품목A",
+  "품목B",
+  "입고번호001",
+  "입고번호002",
+];
+
+export const searchOptions = [
+  { label: "매입처명", value: "buyer" },
+  { label: "품목번호", value: "materialNo" },
+  { label: "품목명", value: "material" },
+];
+export const handleSearch = (criteria: string, query: string) => {
+  console.log("검색 실행:", { criteria, query });
+};
 export function MaterialInboundregister() {
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
-
-  const searchOptions = [
-    { label: "매입처명", value: "buyer" },
-    { label: "품목번호", value: "materialNo" },
-    { label: "품목명", value: "material" },
-  ];
-
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
-
   const [rows, setRows] = useState(
     Array.from({ length: 100 }, (_, i) => ({
       id: i + 1,
