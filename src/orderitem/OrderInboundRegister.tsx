@@ -5,6 +5,7 @@ import type { GridColDef } from "@mui/x-data-grid";
 import { Button, Typography } from "@mui/material";
 import Pagination from "../common/Pagination";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx-js-style";
 
 // -------------------- 입고 테이블 --------------------
 export default function OrderInboundRegister() {
@@ -93,24 +94,35 @@ export default function OrderInboundRegister() {
     },
   ];
 
+  const handleExcelDownload = () => {
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, "수주대상품목_입고_등록_목록.xlsx");
+  };
+  const handleRegister = () => {
+    // 등록 버튼 클릭 시 동작 정의
+    console.log("등록 버튼 클릭됨");
+    navigate("/orderitem/outbound/register");
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <h2>수주대상 품목 입고 등록</h2>
-      <Box sx={{ height: 1200, width: "100%" }}>
-        <Box
-          display="flex"
-          justifyContent="flex-end"
-          alignItems="center"
-          mb={2}
+      {/* 버튼 영역 */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mb: 2 }}>
+        <Button
+          variant="outlined"
+          color="success"
+          onClick={handleExcelDownload}
         >
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => navigate("/orderitem/outbound/register")}
-          >
-            등록
-          </Button>
-        </Box>
+          엑셀 다운로드
+        </Button>
+        <Button variant="outlined" color="primary" onClick={handleRegister}>
+          등록
+        </Button>
+      </Box>
+      <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
           rows={rows}
           columns={columns}
