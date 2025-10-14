@@ -2,20 +2,17 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type {
-  GridColDef,
-  GridRowId,
-  GridRowSelectionModel,
+  GridColDef
 } from "@mui/x-data-grid";
 import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
+import { getMasterOrItList } from "../api/MasterApi";
+import type { MasterOrItList } from "../type";
 import SearchBar from "../../common/SearchBar";
 
-import { getOrderItemInRegiList, registerInboundItem } from "../api/OrderInApi";
-import type { OrderItemInList, OrderItemInRegister } from "../type";
-
-export default function OrderInboundRegister() {
+export default function MasterOrderItemList() {
   const sampleData = [
     "회사1",
     "회사2",
@@ -34,28 +31,30 @@ export default function OrderInboundRegister() {
   const handleSearch = (criteria: string, query: string) => {
     console.log("검색 실행:", { criteria, query });
   };
-
+  
   const navigate = useNavigate();
 
   const loadData = async () => {
     try {
-      const oiList = await getOrderItemInRegiList();
+      const oiList = await getMasterOrItList();
 
       // 서버 데이터 → DataGrid rows 형식으로 매핑
       const mappedRows = oiList.map((item) => ({
         id: item.id,
-        itemName: item.itemName,
         itemCode: item.itemCode,
+        itemName: item.itemName,
         company: item.company,
         type: item.type,
-        inAmount: undefined, // 수량
-        inDate: "", // 입고일자
+        unitPrice: item.unitPrice,
+        color: item.color,
+        coatingMethod: item.coatingMethod,
         remark: item.remark,
+        completedStatus: item.completedStatus,
       }));
 
       setRows(mappedRows);
     } catch (error) {
-      console.error("입고 데이터 로딩 실패", error);
+      console.error("수주품목대상 데이터 조회 실패", error);
     }
   };
 
@@ -63,7 +62,7 @@ export default function OrderInboundRegister() {
     loadData();
   }, []);
 
-  const [rows, setRows] = useState<OrderItemInList[]>([]);
+  const [rows, setRows] = useState<MasterOrItList[]>([]);
   const apiRef = useGridApiRef();
   const columns: GridColDef[] = [
     {
@@ -164,31 +163,31 @@ export default function OrderInboundRegister() {
     XLSX.writeFile(workbook, "수주대상품목_목록.xlsx");
   };
 
-  // const handleRegister = async () => {
-  //   // ✅ DataGrid에서 선택된 행 ID 가져오기
-  //   // const selectedRowsMap = apiRef.current.getSelectedRows();
-  //   const selectedRows = Array.from(selectedRowsMap.values());
+  const handleRegister = async () => {
+    // ✅ DataGrid에서 선택된 행 ID 가져오기
+    // const selectedRowsMap = apiRef.current.getSelectedRows();
+    // const selectedRows = Array.from(selectedRowsMap.values());
 
-  //   if (selectedRows.length === 0) {
-  //     alert("등록할 품목을 선택해주세요.");
-  //     return;
-  //   }
+    // if (selectedRows.length === 0) {
+    //   alert("등록할 품목을 선택해주세요.");
+    //   return;
+    // }
 
-  //   const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
-  //     id: row.id,
-  //     inAmount: row.inAmount as number,
-  //     inDate: row.inDate as string,
-  //   }));
+    // const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
+    //   id: row.id,
+    //   inAmount: row.inAmount as number,
+    //   inDate: row.inDate as string,
+    // }));
 
-  //   try {
-  //     await registerInboundItem(payload);
-  //     alert("입고 등록이 완료되었습니다.");
-  //     navigate("/orderitem/inbound/list");
-  //   } catch (error) {
-  //     console.error(error);
-  //     alert("등록 중 오류가 발생하였습니다.");
-  //   }
-  // };
+    // try {
+    //   await registerInboundItem(payload);
+    //   alert("입고 등록이 완료되었습니다.");
+    //   navigate("/orderitem/inbound/list");
+    // } catch (error) {
+    //   console.error(error);
+    //   alert("등록 중 오류가 발생하였습니다.");
+    // }
+  };
 
   return (
     <Box sx={{ p: 2 }}>
@@ -211,7 +210,7 @@ export default function OrderInboundRegister() {
             onSearch={handleSearch}
           />
         </Box>
-
+    
         {/* 버튼 영역 */}
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Button
@@ -226,9 +225,9 @@ export default function OrderInboundRegister() {
             variant="outlined"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            // onClick={handleRegister}
+            onClick={handleRegister}
           >
-            입고
+            수주대상품목 등록
           </Button>
         </Box>
       </Box>

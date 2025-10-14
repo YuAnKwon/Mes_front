@@ -7,7 +7,7 @@
   .sidebar-custom a {
     @apply text-black !important;
   }
-  
+
   .main-content {
     @apply w-full max-w-5xl !important;
   }

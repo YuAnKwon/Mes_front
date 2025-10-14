@@ -33,9 +33,6 @@ export function SideNav() {
           <SidebarItem
             href="#"
             icon={HiChartPie}
-            theme={{
-              base: "text-black hover:text-gray-300",
-            }}
           >
             대시보드
           </SidebarItem>
@@ -80,7 +77,9 @@ export function SideNav() {
             </SidebarItem>
           </SidebarCollapse>
           <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리">
-            <SidebarItem href="#" icon={HiClipboard}>
+            <SidebarItem 
+            href="/master/orderitem/list"
+            icon={HiClipboard}>
               수주대상품목
             </SidebarItem>
             <SidebarItem href="#" icon={HiCube}>
