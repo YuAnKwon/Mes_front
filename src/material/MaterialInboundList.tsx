@@ -1,15 +1,14 @@
-import { Box, Button } from "@mui/material";
-import SearchBar from "../common/SearchBar";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import Pagination from "../common/Pagination";
 import { useEffect, useState } from "react";
-import * as XLSX from "xlsx-js-style";
-
 import { getMaterialData } from "./api/MaterialAddApi";
 import type { MaterialList } from "./type";
+import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { Box, Button } from "@mui/material";
+import SearchBar from "../common/SearchBar";
+import Pagination from "../common/Pagination";
+import * as XLSX from "xlsx-js-style";
 
-export function MaterialInboundregister() {
-  const [materials, setMaterials] = useState<MaterialList[]>([]);
+export function MaterialInboundList() {
+  const [materialsIn, setMaterialsIn] = useState<MaterialList[]>([]);
   const sampleData = [
     "회사1",
     "회사2",
@@ -32,7 +31,7 @@ export function MaterialInboundregister() {
   const fetchMaterialData = async () => {
     try {
       const response = await getMaterialData();
-      setMaterials(response);
+      setMaterialsIn(response);
     } catch (error) {
       console.error("데이터 로딩 실패", error);
       alert("원자재 데이터를 불러오지 못했습니다.");
@@ -110,12 +109,11 @@ export function MaterialInboundregister() {
     },
   ];
 
-  //엑셀
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(materials);
+    const worksheet = XLSX.utils.json_to_sheet(materialsIn);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "원자재_입고_등록_목록.xlsx"); //다운받는 엑셀 파일 이름
+    XLSX.writeFile(workbook, "원자재_입고_등록_목록.xlsx");
   };
 
   const handleRegister = () => {
@@ -167,7 +165,7 @@ export function MaterialInboundregister() {
 
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
-          rows={materials}
+          rows={materialsIn}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick

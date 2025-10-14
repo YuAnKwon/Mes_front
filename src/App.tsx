@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SideNav } from "./common/SideNav";
 import OrderInboundRegister from "./orderitem/page/OrderInboundRegister";
 import { MaterialInboundregister } from "./material/MaterialInboundregister";
+import { MaterialInboundList } from "./material/MaterialInboundList";
 
 function App() {
   return (
@@ -32,9 +33,12 @@ function App() {
               path="/material/inbound/register"
               element={<MaterialInboundregister />}
             />
-            {/* // <Route path="/material/inbound/list" element={<MaterialInboundList />} />
-            // <Route path="/material/outbound/register" element={<MaterialOutboundRegister />} />
-            // <Route path="/material/outbound/list" element={<MaterialOutboundList />} />  */}
+            <Route
+              path="/material/inbound/list"
+              element={<MaterialInboundList />}
+            />
+            {/* <Route path="/material/outbound/register" element={<MaterialOutboundRegister />} />
+            <Route path="/material/outbound/list" element={<MaterialOutboundList />} />  */}
 
             {/* 기준정보관리 */}
             {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />
