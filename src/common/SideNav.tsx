@@ -58,7 +58,10 @@ export function SideNav() {
             >
               입고 등록
             </SidebarItem>
-            <SidebarItem href="#" icon={RiInboxArchiveFill}>
+            <SidebarItem
+              href="/material/inbound/list"
+              icon={RiInboxArchiveFill}
+            >
               입고 조회
             </SidebarItem>
             <SidebarItem href="#" icon={RiInboxUnarchiveLine}>

@@ -17,10 +17,10 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({
-  searchOptions,
-  autoCompleteData,
+  searchOptions = [],
+  autoCompleteData = [],
   onSearch,
-}) {
+}: SearchBarProps) {
   const [criteria, setCriteria] = useState(searchOptions[0].value);
   const [query, setQuery] = useState("");
 
@@ -86,6 +86,7 @@ export default function SearchBar({
               "& .MuiInputBase-input": {
                 py: 0, // ✅ 높이 균일화
                 height: "100%",
+                width: 300,
               },
             }}
             InputProps={{
