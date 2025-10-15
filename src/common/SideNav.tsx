@@ -88,7 +88,9 @@ export function SideNav() {
             <SidebarItem href="#" icon={HiOutlineArrowsUpDown}>
               라우팅
             </SidebarItem>
-            <SidebarItem href="#" icon={HiMiniBuildingLibrary}>
+            <SidebarItem 
+            href="/master/company/list"
+            icon={HiMiniBuildingLibrary}>
               업체
             </SidebarItem>
           </SidebarCollapse>

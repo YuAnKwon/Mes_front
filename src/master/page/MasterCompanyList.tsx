@@ -7,54 +7,31 @@ import type {
 import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
-import * as XLSX from "xlsx-js-style";
-import { getMasterOrItList } from "../api/MasterApi";
-import type { MasterOrItList } from "../type";
-import SearchBar from "../../common/SearchBar";
+import type { MasterCpList } from "../type";
+import { getMasterCpList } from "../api/MasterApi";
 
-export default function MasterOrderItemList() {
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
-
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-  ];
-
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
+export default function MasterCompanyList() {
   
   const navigate = useNavigate();
 
   const loadData = async () => {
     try {
-      const oiList = await getMasterOrItList();
+      const oiList = await getMasterCpList();
 
       // 서버 데이터 → DataGrid rows 형식으로 매핑
       const mappedRows = oiList.map((item) => ({
         id: item.id,
-        itemCode: item.itemCode,
-        itemName: item.itemName,
-        company: item.company,
-        type: item.type,
-        unitPrice: item.unitPrice,
-        color: item.color,
-        coatingMethod: item.coatingMethod,
+        companyName: item.companyName,
+        companyType: item.companyType,
+        ceoName: item.ceoName,
+        address: item.address,
         remark: item.remark,
-        completedStatus: item.completedStatus,
+        businessYn: item.businessYn,
       }));
 
       setRows(mappedRows);
     } catch (error) {
-      console.error("수주품목대상 데이터 조회 실패", error);
+      console.error("업체 데이터 조회 실패", error);
     }
   };
 
@@ -62,9 +39,9 @@ export default function MasterOrderItemList() {
     loadData();
   }, []);
 
-  const [rows, setRows] = useState<MasterOrItList[]>([]);
+  const [rows, setRows] = useState<MasterCpList[]>([]);
   const apiRef = useGridApiRef();
-  const columns: GridColDef[] = [
+  const columns: GridColDef[] = [ 
     {
       field: "itemName",
       headerName: "품목명",
@@ -88,16 +65,24 @@ export default function MasterOrderItemList() {
               cursor: "pointer",
               fontSize: "inherit",
             }}
-            onClick={() => navigate(`/master/orderitem/detail/${params.row.id}`)}
+            onClick={() => navigate(`/master/company/detail/${params.row.id}`)}
           >
             {params.value}
           </Typography>
         </Box>
       ),
     },
+// id: item.id,
+// companyName: item.companyName,
+// companyType: item.companyType,
+// ceoName: item.ceoName,
+// address: item.address,
+// remark: item.remark,
+// businessYn: item.businessYn, 
+
     {
-      field: "itemCode",
-      headerName: "품목번호",
+      field: "companyType",
+      headerName: "업체 유형",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -110,37 +95,23 @@ export default function MasterOrderItemList() {
       align: "center",
     },
     {
-      field: "type",
-      headerName: "분류",
-      width: 120,
+      field: "ceoName",
+      headerName: "대표명",
+      width: 150,
       headerAlign: "center",
       align: "center",
     },
     {
-      field: "unitPrice",
-      headerName: "품목단가",
-      width: 120,
+      field: "address",
+      headerName: "기업 주소",
+      width: 150,
       headerAlign: "center",
       align: "center",
     },
     {
-      field: "color",
-      headerName: "색상",
-      width: 120,
-      headerAlign: "center",
-      align: "center",
-    },
-    {
-      field: "coatingMethod",
-      headerName: "도장방식",
-      width: 120,
-      headerAlign: "center",
-      align: "center",
-    },
-    {
-      field: "completedStatus",
-      headerName: "거래상태",
-      width: 120,
+      field: "businessYn",
+      headerName: "거래 상태",
+      width: 150,
       headerAlign: "center",
       align: "center",
     },
@@ -166,12 +137,6 @@ export default function MasterOrderItemList() {
     },
   ];
 
-  const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "수주대상품목_목록.xlsx");
-  };
 
   const handleRegister = async () => {
     // ✅ DataGrid에서 선택된 행 ID 가져오기
@@ -201,7 +166,7 @@ export default function MasterOrderItemList() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상품목 조회</h2>
+      <h2>업체 조회</h2>
       {/* 버튼 영역 */}
       <Box
         sx={{
@@ -212,32 +177,16 @@ export default function MasterOrderItemList() {
           gap: 2,
         }}
       >
-        {/* 공통 검색바 */}
-        <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
-            onSearch={handleSearch}
-          />
-        </Box>
     
         {/* 버튼 영역 */}
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Button
-            variant="outlined"
-            color="success"
-            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleExcelDownload}
-          >
-            엑셀 다운로드
-          </Button>
           <Button
             variant="outlined"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleRegister}
           >
-            수주대상품목 등록
+            업체 등록
           </Button>
         </Box>
       </Box>

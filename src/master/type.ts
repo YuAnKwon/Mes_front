@@ -61,7 +61,7 @@ export type MasterCompany ={
 }
 
 //업체 조회
-export type MastercpList = MasterCompany & {
+export type MasterCpList = MasterCompany & {
   id: number;
   businessYn: string;//거래상태 
 }
