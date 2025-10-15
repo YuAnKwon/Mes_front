@@ -6,7 +6,7 @@ export type MaterialList = {
 
   manufacturer: string;
   remark: string;
-  idDate: string;
+  inDate: string;
   specAndScale: string;
   manufactureDate: string;
   inAmount: string;
@@ -23,4 +23,14 @@ export type MaterialInList = {
   manufacturer: string;
   inDate: string;
   manufactureDate: string;
+};
+
+export type MaterialOut = {
+  materialName: string;
+  materialCode: string;
+  companyName: string;
+  inAmount: number;
+  manufacturer: string;
+  outAmount: number;
+  outDate: string;
 };

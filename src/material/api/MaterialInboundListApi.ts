@@ -16,3 +16,7 @@ export const updateMaterialIn = async (
   const response = await axios.put(`${BASE_URL}/material/in/${id}`, data);
   return response.data;
 };
+
+export const softDeleteMaterialIn = (id: number) => {
+  return axios.delete(`${BASE_URL}/material/in/${id}`);
+};

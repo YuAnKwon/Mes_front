@@ -2,16 +2,13 @@ import { Box, Button } from "@mui/material";
 import SearchBar from "../../common/SearchBar";
 import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
-import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-
-import { getMaterialData } from "../api/MaterialInboundListApi";
-import type { MaterialList } from "../type";
+import type { MaterialOut } from "../type";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { postMaterialInData } from "../api/MaterialInboundregisterApi";
 
-export function MaterialInboundregister() {
-  const [materials, setMaterials] = useState<MaterialList[]>([]);
+export function MaterialOutboundRegister() {
+  const [materialout, setMaterialout] = useState<MaterialOut[]>([]);
   const apiRef = useGridApiRef();
   const sampleData = [
     "회사1",
@@ -21,69 +18,11 @@ export function MaterialInboundregister() {
     "입고번호001",
     "입고번호002",
   ];
-
   const searchOptions = [
     { label: "매입처명", value: "companyName" },
     { label: "품목번호", value: "materialCode" },
     { label: "품목명", value: "materialName" },
   ];
-
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
-  const handleRegister = async () => {
-    // :흰색_확인_표시: DataGrid에서 선택된 행 정보 가져오기
-    const selectedRowsMap = apiRef.current.getSelectedRows();
-    const selectedRows = Array.from(selectedRowsMap.values());
-    if (selectedRows.length === 0) {
-      alert("등록할 품목을 선택해주세요.");
-      return;
-    }
-    // 선택된 행
-    const payload: MaterialList[] = selectedRows.map((row) => ({
-      id: row.id,
-      materialCode: row.materialCode,
-      materialName: row.materialName,
-      inAmount: row.inAmount as number,
-      inDate: row.inDate as string,
-      manufactureDate: row.manufactureDate as string,
-    }));
-    // 유효성 검사
-    for (const row of payload) {
-      if (!row.inAmount || !row.inDate || !row.manufactureDate) {
-        alert("입고 수량과 입고일자 제조 일자를 모두 입력해주세요.");
-        return;
-      }
-      console.log(payload);
-    }
-
-    try {
-      await postMaterialInData(payload);
-      console.log(payload);
-      alert("입고 등록이 완료되었습니다.");
-      navigate("/material/inbound/list");
-    } catch (error) {
-      console.error(error);
-      alert("등록 중 오류가 발생하였습니다.");
-    }
-  };
-
-  const navigate = useNavigate();
-
-  const fetchMaterialData = async () => {
-    try {
-      const response = await getMaterialData();
-      setMaterials(response);
-    } catch (error) {
-      console.error("데이터 로딩 실패", error);
-      alert("원자재 데이터를 불러오지 못했습니다.");
-    }
-  };
-
-  useEffect(() => {
-    fetchMaterialData();
-  }, []);
-
   const columns: GridColDef[] = [
     {
       field: "materialName",
@@ -151,12 +90,55 @@ export function MaterialInboundregister() {
   ];
 
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(materials);
+    const worksheet = XLSX.utils.json_to_sheet(materialout);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     XLSX.writeFile(workbook, "원자재_입고_등록_목록.xlsx");
   };
 
+  //검색
+  const handleSearch = (criteria: string, query: string) => {
+    console.log("검색 실행:", { criteria, query });
+  };
+
+  const handleRegister = async () => {
+    // :흰색_확인_표시: DataGrid에서 선택된 행 정보 가져오기
+    const selectedRowsMap = apiRef.current.getSelectedRows();
+    const selectedRows = Array.from(selectedRowsMap.values());
+    if (selectedRows.length === 0) {
+      alert("등록할 품목을 선택해주세요.");
+      return;
+    }
+    // 선택된 행
+    const payload: MaterialOut[] = selectedRows.map((row) => ({
+      id: row.id,
+      materialCode: row.materialCode,
+      materialName: row.materialName,
+      inAmount: row.inAmount as number,
+      inDate: row.inDate as string,
+      manufactureDate: row.manufactureDate as string,
+    }));
+    // 유효성 검사
+    for (const row of payload) {
+      if (!row.inAmount || !row.inDate || !row.manufactureDate) {
+        alert("입고 수량과 입고일자 제조 일자를 모두 입력해주세요.");
+        return;
+      }
+      console.log(payload);
+    }
+
+    try {
+      //   await postMaterialInData(payload);
+      console.log(payload);
+      alert("입고 등록이 완료되었습니다.");
+      navigate("/material/inbound/list");
+    } catch (error) {
+      console.error(error);
+      alert("등록 중 오류가 발생하였습니다.");
+    }
+  };
+
+  const navigate = useNavigate();
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 입고 등록</h2>
@@ -201,7 +183,7 @@ export function MaterialInboundregister() {
 
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
-          rows={materials}
+          rows={materialout}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick

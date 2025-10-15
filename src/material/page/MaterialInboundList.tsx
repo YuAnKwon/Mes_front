@@ -12,7 +12,10 @@ import SearchBar from "../../common/SearchBar";
 import Pagination from "../../common/Pagination";
 import * as XLSX from "xlsx";
 import { getMaterialInData } from "../api/MaterialInboundregisterApi";
-import { updateMaterialIn } from "../api/MaterialInboundListApi";
+import {
+  softDeleteMaterialIn,
+  updateMaterialIn,
+} from "../api/MaterialInboundListApi";
 
 export function MaterialInboundList() {
   const [materialsIn, setMaterialsIn] = useState<MaterialInList[]>([]);
@@ -61,7 +64,7 @@ export function MaterialInboundList() {
     if (!confirmDelete) return;
     try {
       // API 호출 예시
-      // await deleteOrderItem(id);
+      await softDeleteMaterialIn(id);
       // 성공 시 로컬 상태에서 삭제
       setMaterialsIn((prev) => prev.filter((row) => row.id !== id));
       // 편집 상태도 초기화
@@ -272,7 +275,7 @@ export function MaterialInboundList() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>원자재 입고 등록</h2>
+      <h2>원자재 입고 등록조회</h2>
       <Box
         sx={{
           display: "flex",
