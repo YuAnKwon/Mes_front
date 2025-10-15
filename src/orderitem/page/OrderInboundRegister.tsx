@@ -119,8 +119,8 @@ export default function OrderInboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
-      editable: true,//수정연필
-      type: "number",//타입(ex날짜)
+      editable: true, //수정연필
+      type: "number", //타입(ex날짜)
     },
     {
       field: "inDate",
