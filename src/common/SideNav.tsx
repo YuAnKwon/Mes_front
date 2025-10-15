@@ -77,7 +77,7 @@ export function SideNav() {
               재고 현황
             </SidebarItem>
           </SidebarCollapse>
-          <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리">
+          <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리" open>
             <SidebarItem href="/master/orderitem/list" icon={HiClipboard}>
               수주대상품목
             </SidebarItem>

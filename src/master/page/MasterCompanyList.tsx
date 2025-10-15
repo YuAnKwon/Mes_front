@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
-import type {
-  GridColDef
-} from "@mui/x-data-grid";
+import type { GridColDef } from "@mui/x-data-grid";
 import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +9,6 @@ import type { MasterCpList } from "../type";
 import { getMasterCpList } from "../api/MasterApi";
 
 export default function MasterCompanyList() {
-  
   const navigate = useNavigate();
 
   const loadData = async () => {
@@ -41,7 +38,14 @@ export default function MasterCompanyList() {
 
   const [rows, setRows] = useState<MasterCpList[]>([]);
   const apiRef = useGridApiRef();
-  const columns: GridColDef[] = [ 
+  const columns: GridColDef[] = [
+    {
+      field: "id",
+      headerName: "id",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
     {
       field: "companyType",
       headerName: "업체 유형",
@@ -121,7 +125,6 @@ export default function MasterCompanyList() {
     },
   ];
 
-
   const handleRegister = async () => {
     navigate("/master/company/register");
   };
@@ -139,17 +142,16 @@ export default function MasterCompanyList() {
           gap: 2,
         }}
       >
-    
         {/* 버튼 영역 */}
         <Box sx={{ ml: "auto" }}>
-            <Button
+          <Button
             variant="outlined"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleRegister}
-            >
+          >
             업체 등록
-            </Button>
+          </Button>
         </Box>
       </Box>
       <Box sx={{ height: 1200, width: "100%" }}>
@@ -159,7 +161,6 @@ export default function MasterCompanyList() {
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
-          checkboxSelection
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
