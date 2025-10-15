@@ -169,9 +169,6 @@ export default function MasterCompanyList() {
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
           checkboxSelection
-          // onRowSelectionModelChange={(newSelectionModel) => {
-          //   setSelectedIds(newSelectionModel);
-          // }}
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
