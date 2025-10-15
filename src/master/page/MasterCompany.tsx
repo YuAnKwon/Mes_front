@@ -2,7 +2,7 @@ import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import Button from "@mui/material/Button";
 import DaumPostcode from 'react-daum-postcode';
 import { useState } from 'react';
@@ -13,11 +13,13 @@ const FormGrid = styled(Grid)(() => ({
 }));
 
 export default function MasterCompany() {
+    const [zipcode, setZipcode] = useState('');
     const [address, setAddress] = useState('');
     const [addressDetail, setAddressDetail] = useState('');
     const [openPostcode, setOpenPostcode] = useState(false);
 
     const handleComplete = (data) => {//data는 주소 검색 전체 결과 객체
+        setZipcode(data.zonecode);
         setAddress(data.address); // 선택된 주소 저장
         setOpenPostcode(false);   // 검색창 닫기
     };
@@ -25,6 +27,17 @@ export default function MasterCompany() {
     const handleClickAddress = () => {
         setOpenPostcode(true);
     };
+
+// id: item.id,
+//         companyName: item.companyName,
+//         companyType: item.companyType,
+//         ceoName: item.ceoName,
+//         zipcode: item.zipcode,
+//         addressBase: item.addressBase,
+//         addressDetail: item.addressDetail,
+//         remark: item.remark,
+
+
 
   return (
     <Box sx={{ p: 2 }}>
@@ -52,7 +65,7 @@ export default function MasterCompany() {
                 <OutlinedInput
                 id="businessNum"
                 name="businessNum"
-                type="number"
+                type="text"
                 placeholder="사업자 등록번호"
                 autoComplete="businessNum"
                 required
@@ -94,7 +107,7 @@ export default function MasterCompany() {
                 <OutlinedInput
                 id="ceoPhone"
                 name="ceoPhone"
-                type="number"
+                type="text"
                 placeholder="01012345678"
                 autoComplete="ceoPhone"
                 required
@@ -157,43 +170,67 @@ export default function MasterCompany() {
                 size="small"
                 />
             </FormGrid>
-            <FormGrid size={{ xs: 12 }} sx={{ gap: 2}}>
+            <FormGrid size={{ xs: 12 }} sx={{ gap: 2 }}>
                 <FormLabel htmlFor="address" required>기업 주소</FormLabel>
+                <Grid container spacing={2} alignItems="center">
+                    {/* 우편번호 */}
+                    <Grid item xs={12} md={6}>
+                        <OutlinedInput
+                            id="zipcode"
+                            name="zipcode"
+                            type="text"
+                            placeholder="우편번호"
+                            value={zipcode}
+                            onChange={(e) => setZipcode(e.target.value)}
+                            required
+                            size="small"
+                        />
+                    </Grid>
+                
 
-                {/* 주소 입력창 */}
-                <OutlinedInput
-                    id="address"
-                    name="address"
-                    type="text"
-                    placeholder="주소를 클릭해 검색하세요"
-                    value={address}
-                    onClick={handleClickAddress}
-                    readOnly
-                    required
-                    size="small"
-                    sx={{ cursor: 'pointer' }}
-                />
+                    {/* 주소 검색 버튼 */}
+                    <Button
+                        variant="outlined"
+                        onClick={handleClickAddress}
+                        sx={{ height: '40px' }}
+                    >
+                        주소 검색
+                    </Button>
+                </Grid>
 
-                {/* 주소 검색창 (모달처럼 띄우기) */}
-                {openPostcode && (
-                    <Box sx={{ position: 'relative', zIndex: 10, mt: 2 }}>
-                    <DaumPostcode onComplete={handleComplete} />
-                    </Box>
-                )}
+                    {/* 📌 주소 검색 모달 */}
+                    <Dialog open={openPostcode} onClose={() => setOpenPostcode(false)} fullWidth maxWidth="sm">
+                        <DialogTitle>주소 검색</DialogTitle>
+                        <DialogContent>
+                        <DaumPostcode onComplete={handleComplete} />
+                        </DialogContent>
+                    </Dialog>
 
-                {/* 상세 주소 입력창 */}
-                <OutlinedInput
-                    id="addressDetail"
-                    name="addressDetail"
-                    type="text"
-                    placeholder="상세주소를 입력하세요"
-                    value={addressDetail}
-                    onChange={(e) => setAddressDetail(e.target.value)}
-                    required
-                    size="small"
-                />
+
+                    {/* 기본 주소 */}
+                    <OutlinedInput
+                        id="addressBase"
+                        name="addressBase"
+                        type="text"
+                        placeholder="주소"
+                        value={address}
+                        readOnly
+                        required
+                        size="small"
+                    />
+
+                    {/* 상세 주소 */}
+                    <OutlinedInput
+                        id="addressDetail"
+                        name="addressDetail"
+                        type="text"
+                        placeholder="상세주소를 입력하세요"
+                        value={addressDetail}
+                        onChange={(e) => setAddressDetail(e.target.value)}
+                        required
+                        size="small"
+                    />
             </FormGrid>
-
         </Grid>
       </Box>
       {/* 버튼 영역 */}
@@ -202,6 +239,7 @@ export default function MasterCompany() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          mt: 12,
           mb: 2,
         }}
       >
@@ -209,10 +247,11 @@ export default function MasterCompany() {
         {/* 버튼 영역 */}
         <Box sx={{ ml: "auto" }}>
             <Button
-            variant="outlined"
-            color="primary"
-            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            type='submit'
+                variant="outlined"
+                color="primary"
+                sx={{ height: 40, fontWeight: 500, px: 2.5 }}
+                type='submit'
+                // onClick={handleSave}
             >
             업체 등록
             </Button>

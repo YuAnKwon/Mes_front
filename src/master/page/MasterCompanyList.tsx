@@ -24,7 +24,8 @@ export default function MasterCompanyList() {
         companyName: item.companyName,
         companyType: item.companyType,
         ceoName: item.ceoName,
-        address: item.address,
+        addressBase: item.addressBase,
+        addressDetail: item.addressDetail,
         remark: item.remark,
         businessYn: item.businessYn,
       }));

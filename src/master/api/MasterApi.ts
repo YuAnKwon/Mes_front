@@ -10,7 +10,7 @@ export const getMasterOrItList = async (): Promise<MasterOrItList[]> => {
   return response.data;
 };
 
-export const registerOrderItem = async (data: MasterOrItRegister[]) => {
+export const registerOrderItem = async (data: MasterOrItRegister) => {
   const response = await axios.post(`${BASE_URL}/master/orderitem/register`, data);
   return response.data;
 };
@@ -22,7 +22,7 @@ export const getMasterCpList = async (): Promise<MasterCpList[]> => {
   return response.data;
 };
 
-export const registerCompany = async (data: MasterCpRegister[]) => {
+export const registerCompany = async (data: MasterCpRegister) => {
   const response = await axios.post(`${BASE_URL}/master/company/register`, data);
   return response.data;
 };
