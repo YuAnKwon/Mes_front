@@ -11,13 +11,14 @@ import * as XLSX from "xlsx-js-style";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
-  deleteOrderItemIn,
+  deleteOrderItemOut,
   getOrderItemInList,
-  updateOrderItemIn,
+  getOrderItemOutList,
+  updateOrderItemOut,
 } from "../api/OrderInApi";
 import type { OrderItemList } from "../type";
 
-export default function OrderInboundList() {
+export default function OrderOutboundList() {
   const navigate = useNavigate();
   const apiRef = useGridApiRef();
   const sampleData = [
@@ -41,20 +42,20 @@ export default function OrderInboundList() {
 
   const loadData = async () => {
     try {
-      const oiList = await getOrderItemInList();
+      const oiList = await getOrderItemOutList();
 
       // 서버 데이터 → DataGrid rows 형식으로 매핑
       const mappedRows = oiList.map((item) => ({
         id: item.id,
-        lotNum: item.lotNum,
+        outNum: item.outNum,
         itemName: item.itemName,
         itemCode: item.itemCode,
         company: item.company,
         type: item.type,
-        inAmount: item.inAmount,
-        inDate: item.inDate
+        outAmount: item.outAmount,
+        outDate: item.outDate
           ? (() => {
-              const [datePart, timePart] = item.inDate.split(" ");
+              const [datePart, timePart] = item.outDate.split(" ");
               const [year, month, day] = datePart.split("-").map(Number);
               const [hour, minute, second] = timePart.split(":").map(Number);
               return new Date(year, month - 1, day, hour, minute, second);
@@ -66,7 +67,7 @@ export default function OrderInboundList() {
 
       setRows(mappedRows);
     } catch (error) {
-      console.error("입고 데이터 로딩 실패", error);
+      console.error("출고 데이터 로딩 실패", error);
     }
   };
 
@@ -79,12 +80,11 @@ export default function OrderInboundList() {
 
   const handleEditRow = async (row: OrderItemList) => {
     try {
-      await updateOrderItemIn(row.id, {
-        inAmount: row.inAmount!,
-        inDate: row.inDate as string,
+      await updateOrderItemOut(row.id, {
+        outAmount: row.outAmount!,
+        outDate: row.outDate as string,
       });
 
-      // 저장 완료 후 체크 표시 or 토스트
       alert("수정 완료");
 
       // 편집 상태 초기화
@@ -100,7 +100,7 @@ export default function OrderInboundList() {
     if (!confirmDelete) return;
 
     try {
-      await deleteOrderItemIn(id);
+      await deleteOrderItemOut(id);
 
       // 성공 시 로컬 상태에서 삭제
       setRows((prev) => prev.filter((row) => row.id !== id));
@@ -115,39 +115,17 @@ export default function OrderInboundList() {
       alert("삭제 완료");
     } catch (error) {
       console.error("삭제 실패", error);
-      alert("삭제 실패");
+      alert("삭제에 실패했습니다.");
     }
   };
 
   const columns: GridColDef[] = [
     {
-      field: "lotNum",
-      headerName: "LOT번호",
+      field: "outNum",
+      headerName: "출고번호",
       width: 200,
       headerAlign: "center",
       align: "center",
-      renderCell: (params) => (
-        <Box
-          sx={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography
-            sx={{
-              textDecoration: "underline",
-              cursor: "pointer",
-              fontSize: "inherit",
-            }}
-            onClick={() => navigate(`/orderitem/process/${params.row.id}`)}
-          >
-            {params.value}
-          </Typography>
-        </Box>
-      ),
     },
     {
       field: "itemName",
@@ -178,8 +156,8 @@ export default function OrderInboundList() {
       align: "center",
     },
     {
-      field: "inAmount",
-      headerName: "입고수량 (개)",
+      field: "outAmount",
+      headerName: "출고수량 (개)",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -187,8 +165,8 @@ export default function OrderInboundList() {
       type: "number",
     },
     {
-      field: "inDate",
-      headerName: "입고일자",
+      field: "outDate",
+      headerName: "출고일자",
       width: 200,
       headerAlign: "center",
       align: "center",
@@ -205,8 +183,8 @@ export default function OrderInboundList() {
       },
     },
     {
-      field: "workOrder",
-      headerName: "작업지시서",
+      field: "shipReceipt",
+      headerName: "출하증",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -215,10 +193,10 @@ export default function OrderInboundList() {
           variant="outlined"
           size="small"
           onClick={() => {
-            navigate(`/workorder/${params.row.id}`);
+            navigate(`/shipReceipt/${params.row.id}`);
           }}
         >
-          작업지시서
+          출하증
         </Button>
       ),
     },
@@ -230,7 +208,6 @@ export default function OrderInboundList() {
       align: "center",
       renderCell: (params: GridRenderCellParams) => {
         const isEdited = editedRows[params.row.id] || false;
-
         return (
           <Box
             sx={{
@@ -271,12 +248,12 @@ export default function OrderInboundList() {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "수주대상품목_입고_목록.xlsx");
+    XLSX.writeFile(workbook, "수주대상품목_출고_목록.xlsx");
   };
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상 품목 입고 조회</h2>
+      <h2>수주대상 품목 출고 조회</h2>
       {/* 버튼 영역 */}
       <Box
         sx={{
@@ -321,7 +298,7 @@ export default function OrderInboundList() {
             sorting: {
               sortModel: [
                 {
-                  field: "lotNum",
+                  field: "outNum",
                   sort: "desc",
                 },
               ],
@@ -330,8 +307,8 @@ export default function OrderInboundList() {
           processRowUpdate={(newRow, oldRow) => {
             // 값이 바뀌면 editedRows 활성화
             if (
-              newRow.inAmount !== oldRow.inAmount ||
-              newRow.inDate?.toString() !== oldRow.inDate?.toString()
+              newRow.outAmount !== oldRow.outAmount ||
+              newRow.outDate?.toString() !== oldRow.outDate?.toString()
             ) {
               setEditedRows((prev) => ({ ...prev, [newRow.id]: true }));
             }
