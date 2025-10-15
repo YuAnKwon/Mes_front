@@ -4,8 +4,8 @@ import "./tailwind.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SideNav } from "./common/SideNav";
 import OrderInboundRegister from "./orderitem/page/OrderInboundRegister";
-import { MaterialInboundregister } from "./material/MaterialInboundregister";
-import { MaterialInboundList } from "./material/MaterialInboundList";
+import { MaterialInboundregister } from "./material/page/MaterialInboundregister";
+import { MaterialInboundList } from "./material/page/MaterialInboundList";
 
 function App() {
   return (

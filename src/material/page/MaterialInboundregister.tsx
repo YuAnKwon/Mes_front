@@ -1,15 +1,17 @@
-import { Box, Button } from "@mui/material";
-import SearchBar from "../common/SearchBar";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import Pagination from "../common/Pagination";
+import { Box, Button, Typography } from "@mui/material";
+import SearchBar from "../../common/SearchBar";
+import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
+import Pagination from "../../common/Pagination";
 import { useEffect, useState } from "react";
-import * as XLSX from "xlsx-js-style";
+import * as XLSX from "xlsx";
 
-import { getMaterialData } from "./api/MaterialAddApi";
-import type { MaterialList } from "./type";
+import { getMaterialData } from "../api/MaterialAddApi";
+import type { MaterialList } from "../type";
+import { useNavigate } from "react-router-dom";
 
 export function MaterialInboundregister() {
   const [materials, setMaterials] = useState<MaterialList[]>([]);
+  const apiRef = useGridApiRef();
   const sampleData = [
     "회사1",
     "회사2",
@@ -28,6 +30,40 @@ export function MaterialInboundregister() {
   const handleSearch = (criteria: string, query: string) => {
     console.log("검색 실행:", { criteria, query });
   };
+  const handleRegister = async () => {
+    // :흰색_확인_표시: DataGrid에서 선택된 행 정보 가져오기
+    const selectedRowsMap = apiRef.current.getSelectedRows();
+    const selectedRows = Array.from(selectedRowsMap.values());
+    if (selectedRows.length === 0) {
+      alert("등록할 품목을 선택해주세요.");
+      return;
+    }
+    // 선택된 행
+    const payload: MaterialList[] = selectedRows.map((row) => ({
+      id: row.id,
+      inAmount: row.inAmount as number,
+      inDate: row.inDate as string,
+    }));
+    // 유효성 검사
+    for (const row of payload) {
+      if (!row.inAmount || !row.inDate) {
+        alert("입고 수량과 입고일자를 모두 입력해주세요.");
+        return;
+      }
+      console.log(payload);
+    }
+    try {
+      await setMaterials(payload);
+      console.log(payload);
+      alert("입고 등록이 완료되었습니다.");
+      navigate("/orderitem/inbound/list");
+    } catch (error) {
+      console.error(error);
+      alert("등록 중 오류가 발생하였습니다.");
+    }
+  };
+
+  const navigate = useNavigate();
 
   const fetchMaterialData = async () => {
     try {
@@ -44,6 +80,35 @@ export function MaterialInboundregister() {
   }, []);
 
   const columns: GridColDef[] = [
+    {
+      field: "materialCode",
+      headerName: "입고번호",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => (
+        <Box
+          sx={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography
+            sx={{
+              textDecoration: "underline",
+              cursor: "pointer",
+              fontSize: "inherit",
+            }}
+            onClick={() => navigate(`/orderitem/detail/${params.row.id}`)}
+          >
+            {params.value}
+          </Typography>
+        </Box>
+      ),
+    },
     {
       field: "materialName",
       headerName: "품목명",
@@ -66,20 +131,19 @@ export function MaterialInboundregister() {
       align: "center",
     },
     {
-      field: "scal",
+      field: "specAndScale",
       headerName: "원자재 규격",
       width: 120,
       headerAlign: "center",
       align: "center",
     },
     {
-      field: "maker",
+      field: "manufacturer",
       headerName: "제조사",
       width: 120,
       headerAlign: "center",
       align: "center",
-      editable: true,
-      type: "number",
+      type: "string",
     },
     {
       field: "inAmount",
@@ -110,17 +174,11 @@ export function MaterialInboundregister() {
     },
   ];
 
-  //엑셀
   const handleExcelDownload = () => {
     const worksheet = XLSX.utils.json_to_sheet(materials);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "원자재_입고_등록_목록.xlsx"); //다운받는 엑셀 파일 이름
-  };
-
-  const handleRegister = () => {
-    // 등록 버튼 클릭 시 동작 정의
-    console.log("등록 버튼 클릭됨");
+    XLSX.writeFile(workbook, "원자재_입고_등록_목록.xlsx");
   };
 
   return (
@@ -171,6 +229,7 @@ export function MaterialInboundregister() {
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
+          apiRef={apiRef}
           checkboxSelection
           pagination
           pageSizeOptions={[10, 20, 30]}
@@ -187,6 +246,20 @@ export function MaterialInboundregister() {
           sx={{
             "& .MuiDataGrid-columnHeaders": {
               fontWeight: "bold",
+            },
+            "& .MuiDataGrid-cell--editable": {
+              position: "relative",
+            },
+            "& .MuiDataGrid-cell--editable::after": {
+              content: '"✎"',
+              position: "absolute",
+              right: 6,
+              top: 6,
+              fontSize: "12px",
+              color: "#999",
+            },
+            "& .MuiDataGrid-cell--editing::after": {
+              content: '""',
             },
           }}
         />
