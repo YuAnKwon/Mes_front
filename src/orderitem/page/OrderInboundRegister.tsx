@@ -115,12 +115,12 @@ export default function OrderInboundRegister() {
     },
     {
       field: "inAmount",
-      headerName: "입고수량(개)",
+      headerName: "입고수량 (개)",
       width: 150,
       headerAlign: "center",
       align: "center",
-      editable: true,//수정연필
-      type: "number",//타입(ex날짜)
+      editable: true,
+      type: "number",
     },
     {
       field: "inDate",
