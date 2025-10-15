@@ -26,3 +26,8 @@ export const registerCompany = async (data: MasterCpRegister) => {
   const response = await axios.post(`${BASE_URL}/master/company/register`, data);
   return response.data;
 };
+
+export const updateCompanyState = async (id: number, updatedState: string) => {
+  const response = await axios.patch(`${BASE_URL}/master/company/${id}/state`, {updatedState});
+  return response.data;
+};

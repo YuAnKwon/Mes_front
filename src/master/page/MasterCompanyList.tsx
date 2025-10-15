@@ -6,17 +6,17 @@ import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import type { MasterCpList } from "../type";
-import { getMasterCpList } from "../api/MasterApi";
+import { getMasterCpList, updateCompanyState } from "../api/MasterApi";
 
 export default function MasterCompanyList() {
   const navigate = useNavigate();
 
   const loadData = async () => {
     try {
-      const oiList = await getMasterCpList();
+      const mcList = await getMasterCpList();
 
       // 서버 데이터 → DataGrid rows 형식으로 매핑
-      const mappedRows = oiList.map((item) => ({
+      const mappedRows = mcList.map((item) => ({
         id: item.id,
         companyName: item.companyName,
         companyType: item.companyType,
@@ -106,6 +106,7 @@ export default function MasterCompanyList() {
     {
       field: 'actions',
       headerName: '', // 헤더 텍스트 없음
+      width: 150,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
@@ -143,27 +144,23 @@ export default function MasterCompanyList() {
   ];
 
   const handleState = async (row) => {
-    const updatedState = row.tradeState === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-
-    try {
-      const response = await fetch(`/api/master/company/${row.id}/state`, {
-        method: 'PATCH', // 또는 PUT
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tradeState: updatedState }),
-      });
-
-      if (response.ok) {
+    const updatedState = row.businessYn === 'Y' ? 'N' : 'Y';
+      try {
+        await updateCompanyState(row.id, updatedState);
+        // 상태 업데이트
+        setRows(prev =>
+          prev.map(item =>
+            item.id === row.id ? { ...item, businessYn: updatedState } : item
+          )
+        );
         alert('거래 상태가 변경되었습니다');
-        // ✅ UI 갱신: 예를 들어 rows 다시 불러오기
-        // await fetchRows(); 또는 setRows(prev => ...)
-      } else {
+        // TODO: rows 갱신 또는 상태 업데이트
+      } catch (error) {
+        console.error(error);
         alert('상태 변경 실패');
       }
-    } catch (error) {
-      console.error(error);
-      alert('에러 발생');
-    }
   };
+
 
   const handleRegister = async () => {
     navigate("/master/company/register");
