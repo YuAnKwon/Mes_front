@@ -1,4 +1,4 @@
-export type OrderItemInList = {
+export type OrderItemList = {
   id: number;
   lotNum?: number;
   outNum?: number;
