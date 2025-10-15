@@ -8,6 +8,7 @@ import DaumPostcode from 'react-daum-postcode';
 import { useState } from 'react';
 import { CloseIcon } from 'flowbite-react';
 import { Select } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 
 const FormGrid = styled(Grid)(() => ({
@@ -43,6 +44,8 @@ export default function MasterCompany() {
     const [addressBase, setAddressBase] = useState('');
     const [addressDetail, setAddressDetail] = useState('');
 
+    const navigate = useNavigate();
+
     const handleSave = async () => {
         const payload = {
             companyName,
@@ -68,6 +71,7 @@ export default function MasterCompany() {
 
             if (response.ok) {
             alert('업체 등록 완료!');
+            navigate('/master/company/list');
             } else {
             alert('등록 실패');
             }
