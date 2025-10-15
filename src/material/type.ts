@@ -9,6 +9,7 @@ export type MaterialList = {
   idDate: string;
   specAndScale: string;
   manufactureDate: string;
+  inAmount: string;
 };
 
 export type MaterialInList = {

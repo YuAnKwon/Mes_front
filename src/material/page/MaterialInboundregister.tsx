@@ -5,9 +5,10 @@ import Pagination from "../../common/Pagination";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
-import { getMaterialData } from "../api/MaterialAddApi";
+import { getMaterialData } from "../api/MaterialInboundListApi";
 import type { MaterialList } from "../type";
 import { useNavigate } from "react-router-dom";
+import { postMaterialInData } from "../api/MaterialInboundregisterApi";
 
 export function MaterialInboundregister() {
   const [materials, setMaterials] = useState<MaterialList[]>([]);
@@ -41,22 +42,26 @@ export function MaterialInboundregister() {
     // 선택된 행
     const payload: MaterialList[] = selectedRows.map((row) => ({
       id: row.id,
+      materialCode: row.materialCode,
+      materialName: row.materialName,
       inAmount: row.inAmount as number,
       inDate: row.inDate as string,
+      manufactureDate: row.manufactureDate as string,
     }));
     // 유효성 검사
     for (const row of payload) {
-      if (!row.inAmount || !row.inDate) {
-        alert("입고 수량과 입고일자를 모두 입력해주세요.");
+      if (!row.inAmount || !row.inDate || !row.manufactureDate) {
+        alert("입고 수량과 입고일자 제조 일자를 모두 입력해주세요.");
         return;
       }
       console.log(payload);
     }
+
     try {
-      await setMaterials(payload);
+      await postMaterialInData(payload);
       console.log(payload);
       alert("입고 등록이 완료되었습니다.");
-      navigate("/orderitem/inbound/list");
+      navigate("/material/inbound/list");
     } catch (error) {
       console.error(error);
       alert("등록 중 오류가 발생하였습니다.");
@@ -80,35 +85,6 @@ export function MaterialInboundregister() {
   }, []);
 
   const columns: GridColDef[] = [
-    {
-      field: "materialCode",
-      headerName: "입고번호",
-      width: 150,
-      headerAlign: "center",
-      align: "center",
-      renderCell: (params) => (
-        <Box
-          sx={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography
-            sx={{
-              textDecoration: "underline",
-              cursor: "pointer",
-              fontSize: "inherit",
-            }}
-            onClick={() => navigate(`/orderitem/detail/${params.row.id}`)}
-          >
-            {params.value}
-          </Typography>
-        </Box>
-      ),
-    },
     {
       field: "materialName",
       headerName: "품목명",
@@ -164,7 +140,7 @@ export function MaterialInboundregister() {
       type: "date",
     },
     {
-      field: "makeDate",
+      field: "manufactureDate",
       headerName: "제조 일자",
       width: 250,
       headerAlign: "center",

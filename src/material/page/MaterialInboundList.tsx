@@ -11,7 +11,8 @@ import { Box, Button } from "@mui/material";
 import SearchBar from "../../common/SearchBar";
 import Pagination from "../../common/Pagination";
 import * as XLSX from "xlsx";
-import { getMaterialInData } from "../api/MaterialInboundListApi";
+import { getMaterialInData } from "../api/MaterialInboundregisterApi";
+import { updateMaterialIn } from "../api/MaterialInboundListApi";
 
 export function MaterialInboundList() {
   const [materialsIn, setMaterialsIn] = useState<MaterialInList[]>([]);
@@ -30,8 +31,8 @@ export function MaterialInboundList() {
     { label: "매입처명", value: "companyName" },
     { label: "품목번호", value: "materialCode" },
     { label: "품목명", value: "materialName" },
-    { label: "입고번호", value: "materialInCode" },
-    { label: "입고일자", value: "materialInDate" },
+    { label: "입고번호", value: "inNum" },
+    { label: "입고일자", value: "inDate" },
   ];
 
   const handleSearch = (criteria: string, query: string) => {
@@ -41,10 +42,11 @@ export function MaterialInboundList() {
   const handleSaveRow = async (row: MaterialInList) => {
     try {
       // API 호출
-      // await updateOrderItem(row.id, {
-      //   inAmount: row.inAmount,
-      //   inDate: row.inDate,
-      // });
+      await updateMaterialIn(row.id, {
+        inAmount: row.inAmount,
+        inDate: row.inDate,
+        manufactureDate: row.manufactureDate,
+      });
       // 저장 완료 후 체크 표시 or 토스트
       alert("저장 완료");
       // 편집 상태 초기화
@@ -119,6 +121,13 @@ export function MaterialInboundList() {
     {
       field: "materialName",
       headerName: "품목명",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "materialCode",
+      headerName: "품목번호",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -309,7 +318,9 @@ export function MaterialInboundList() {
             // 값이 바뀌면 editedRows 활성화
             if (
               newRow.inAmount !== oldRow.inAmount ||
-              newRow.inDate?.toString() !== oldRow.inDate?.toString()
+              newRow.inDate?.toString() !== oldRow.inDate?.toString() ||
+              newRow.manufactureDate?.toString() !==
+                oldRow.manufactureDate?.toString()
             ) {
               setEditedRows((prev) => ({ ...prev, [newRow.id]: true }));
             }
