@@ -72,14 +72,6 @@ export default function MasterCompanyList() {
         </Box>
       ),
     },
-// id: item.id,
-// companyName: item.companyName,
-// companyType: item.companyType,
-// ceoName: item.ceoName,
-// address: item.address,
-// remark: item.remark,
-// businessYn: item.businessYn, 
-
     {
       field: "companyType",
       headerName: "업체 유형",
@@ -139,29 +131,7 @@ export default function MasterCompanyList() {
 
 
   const handleRegister = async () => {
-    // ✅ DataGrid에서 선택된 행 ID 가져오기
-    // const selectedRowsMap = apiRef.current.getSelectedRows();
-    // const selectedRows = Array.from(selectedRowsMap.values());
-
-    // if (selectedRows.length === 0) {
-    //   alert("등록할 품목을 선택해주세요.");
-    //   return;
-    // }
-
-    // const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
-    //   id: row.id,
-    //   inAmount: row.inAmount as number,
-    //   inDate: row.inDate as string,
-    // }));
-
-    // try {
-    //   await registerInboundItem(payload);
-    //   alert("입고 등록이 완료되었습니다.");
-    //   navigate("/orderitem/inbound/list");
-    // } catch (error) {
-    //   console.error(error);
-    //   alert("등록 중 오류가 발생하였습니다.");
-    // }
+    navigate("/master/company/register");
   };
 
   return (
@@ -179,15 +149,15 @@ export default function MasterCompanyList() {
       >
     
         {/* 버튼 영역 */}
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Button
+        <Box sx={{ ml: "auto" }}>
+            <Button
             variant="outlined"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleRegister}
-          >
+            >
             업체 등록
-          </Button>
+            </Button>
         </Box>
       </Box>
       <Box sx={{ height: 1200, width: "100%" }}>
@@ -210,26 +180,6 @@ export default function MasterCompanyList() {
               material: {
                 ActionsComponent: Pagination,
               },
-            },
-          }}
-          //연필아이콘
-          sx={{
-            "& .MuiDataGrid-columnHeaders": {
-              fontWeight: "bold",
-            },
-            "& .MuiDataGrid-cell--editable": {
-              position: "relative",
-            },
-            "& .MuiDataGrid-cell--editable::after": {
-              content: '"✎"',
-              position: "absolute",
-              right: 6,
-              top: 6,
-              fontSize: "12px",
-              color: "#999",
-            },
-            "& .MuiDataGrid-cell--editing::after": {
-              content: '""',
             },
           }}
         />
