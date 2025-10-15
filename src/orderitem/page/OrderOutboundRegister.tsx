@@ -2,19 +2,14 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import SearchBar from "../../common/SearchBar";
 
-import {
-  getOrderItemInList,
-  getOrderItemInRegiList,
-  getOrderItemOutRegiList,
-  registerInboundItem,
-} from "../api/OrderInApi";
-import type { OrderItemInRegister, OrderItemList } from "../type";
+import { getOrderItemInList, registeroutboundItem } from "../api/OrderInApi";
+import type { OrderItemList, OrderItemOutRegister } from "../type";
 
 export default function OrderOutboundRegister() {
   const sampleData = [
@@ -106,7 +101,7 @@ export default function OrderOutboundRegister() {
     },
     {
       field: "inAmount",
-      headerName: "입고수량(개)",
+      headerName: "입고수량 (개)",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -117,26 +112,28 @@ export default function OrderOutboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      renderCell: (params) => {
+        if (!params.value) return "";
+        return params.value.split(" ")[0];
+      },
     },
     {
-      field: "remark",
-      headerName: "비고",
-      width: 250,
+      field: "outAmount",
+      headerName: "출고수량 (개)",
+      width: 150,
       headerAlign: "center",
-      align: "left",
-      renderCell: (params) => (
-        <Typography
-          sx={{
-            whiteSpace: "normal",
-            wordBreak: "break-word",
-            maxHeight: 60,
-            overflowY: "auto",
-            p: 1,
-          }}
-        >
-          {params.value}
-        </Typography>
-      ),
+      align: "center",
+      editable: true,
+      type: "number",
+    },
+    {
+      field: "outDate",
+      headerName: "출고일자",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+      editable: true,
+      type: "date",
     },
   ];
 
@@ -144,11 +141,11 @@ export default function OrderOutboundRegister() {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "수주대상품목_목록.xlsx");
+    XLSX.writeFile(workbook, "수주대상품목_입고_목록.xlsx");
   };
 
   const handleRegister = async () => {
-    // ✅ DataGrid에서 선택된 행 정보 가져오기
+    // DataGrid에서 선택된 행 정보 가져오기
     const selectedRowsMap = apiRef.current.getSelectedRows();
     const selectedRows = Array.from(selectedRowsMap.values());
 
@@ -158,26 +155,26 @@ export default function OrderOutboundRegister() {
     }
 
     // 선택된 행
-    const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
+    const payload: OrderItemOutRegister[] = selectedRows.map((row) => ({
       id: row.id,
-      inAmount: row.inAmount as number,
-      inDate: row.inDate as string,
+      outAmount: row.outAmount as number,
+      outDate: row.outDate as string,
     }));
 
     // 유효성 검사
     for (const row of payload) {
-      if (!row.inAmount || !row.inDate) {
-        alert("입고 수량과 입고일자를 모두 입력해주세요.");
+      if (!row.outAmount || !row.outDate) {
+        alert("출고 수량과 출고일자를 모두 입력해주세요.");
         return;
       }
       console.log(payload);
     }
 
     try {
-      await registerInboundItem(payload);
+      await registeroutboundItem(payload);
       console.log(payload);
-      alert("입고 등록이 완료되었습니다.");
-      navigate("/orderitem/inbound/list");
+      alert("출고 등록이 완료되었습니다.");
+      navigate("/orderitem/outbound/list");
     } catch (error) {
       console.error(error);
       alert("등록 중 오류가 발생하였습니다.");
@@ -186,7 +183,7 @@ export default function OrderOutboundRegister() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상 품목 입고 등록</h2>
+      <h2>수주대상 품목 출고 등록</h2>
       {/* 버튼 영역 */}
       <Box
         sx={{
@@ -222,7 +219,7 @@ export default function OrderOutboundRegister() {
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleRegister}
           >
-            입고
+            출고
           </Button>
         </Box>
       </Box>
