@@ -100,6 +100,23 @@ export default function MasterCompanyList() {
       align: "center",
     },
     {
+      field: 'actions',
+      headerName: '', // 헤더 텍스트 없음
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      align: 'center',
+      renderCell: (params) => (
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => handleState(params.row)}
+        >
+          거래 상태 변경
+        </Button>
+      ),
+    },
+    {
       field: "remark",
       headerName: "비고",
       width: 250,
@@ -121,6 +138,28 @@ export default function MasterCompanyList() {
     },
   ];
 
+  const handleState = async (row) => {
+    const updatedState = row.tradeState === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+
+    try {
+      const response = await fetch(`/api/master/company/${row.id}/state`, {
+        method: 'PATCH', // 또는 PUT
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tradeState: updatedState }),
+      });
+
+      if (response.ok) {
+        alert('거래 상태가 변경되었습니다');
+        // ✅ UI 갱신: 예를 들어 rows 다시 불러오기
+        // await fetchRows(); 또는 setRows(prev => ...)
+      } else {
+        alert('상태 변경 실패');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('에러 발생');
+    }
+  };
 
   const handleRegister = async () => {
     navigate("/master/company/register");
