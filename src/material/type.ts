@@ -3,19 +3,23 @@ export type MaterialList = {
   materialName: string;
   materialCode: string;
   companyName: string;
-  spec: number;
-  scale: string;
+
   manufacturer: string;
   remark: string;
+  idDate: string;
+  specAndScale: string;
+  manufactureDate: string;
 };
 
 export type MaterialInList = {
   id: number;
+  inAmount: number;
   materialName: string;
   materialCode: string;
   companyName: string;
-  spec: number;
+  specAndScale: string;
   scale: string;
   manufacturer: string;
-  remark: string;
+  inDate: string;
+  manufactureDate: string;
 };
