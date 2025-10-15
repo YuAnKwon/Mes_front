@@ -8,10 +8,15 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import SearchBar from "../../common/SearchBar";
 
-import { getOrderItemInRegiList, registerInboundItem } from "../api/OrderInApi";
-import type { OrderItemList, OrderItemInRegister } from "../type";
+import {
+  getOrderItemInList,
+  getOrderItemInRegiList,
+  getOrderItemOutRegiList,
+  registerInboundItem,
+} from "../api/OrderInApi";
+import type { OrderItemInRegister, OrderItemList } from "../type";
 
-export default function OrderInboundRegister() {
+export default function OrderOutboundRegister() {
   const sampleData = [
     "회사1",
     "회사2",
@@ -32,64 +37,51 @@ export default function OrderInboundRegister() {
   };
 
   const navigate = useNavigate();
-
-  const loadData = async () => {
-    try {
-      const oiList = await getOrderItemInRegiList();
-
-      // 서버 데이터 → DataGrid rows 형식으로 매핑
-      const mappedRows = oiList.map((item) => ({
-        id: item.id,
-        itemName: item.itemName,
-        itemCode: item.itemCode,
-        company: item.company,
-        type: item.type,
-        inAmount: undefined, // 수량
-        inDate: "", // 입고일자
-        remark: item.remark,
-      }));
-
-      setRows(mappedRows);
-    } catch (error) {
-      console.error("수주 데이터 로딩 실패", error);
-    }
-  };
+  const apiRef = useGridApiRef();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  const loadData = async () => {
+    try {
+      const oiList = await getOrderItemInList();
+
+      // 서버 데이터 → DataGrid rows 형식으로 매핑
+      const mappedRows = oiList.map((item) => ({
+        id: item.id,
+        lotNum: item.lotNum,
+        itemName: item.itemName,
+        itemCode: item.itemCode,
+        company: item.company,
+        type: item.type,
+        inAmount: item.inAmount,
+        inDate: item.inDate,
+        outAmount: undefined,
+        outDate: "",
+      }));
+
+      setRows(mappedRows);
+    } catch (error) {
+      console.error("입고 데이터 로딩 실패", error);
+    }
+  };
+
   const [rows, setRows] = useState<OrderItemList[]>([]);
-  const apiRef = useGridApiRef();
   const columns: GridColDef[] = [
+    {
+      field: "lotNum",
+      headerName: "LOT번호",
+      width: 200,
+      headerAlign: "center",
+      align: "center",
+    },
     {
       field: "itemName",
       headerName: "품목명",
       width: 150,
       headerAlign: "center",
       align: "center",
-      renderCell: (params) => (
-        <Box
-          sx={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography
-            sx={{
-              textDecoration: "underline",
-              cursor: "pointer",
-              fontSize: "inherit",
-            }}
-            onClick={() => navigate(`/orderitem/detail/${params.row.id}`)}
-          >
-            {params.value}
-          </Typography>
-        </Box>
-      ),
     },
     {
       field: "itemCode",
@@ -118,8 +110,6 @@ export default function OrderInboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
-      editable: true,
-      type: "number",
     },
     {
       field: "inDate",
@@ -127,8 +117,6 @@ export default function OrderInboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
-      editable: true,
-      type: "date",
     },
     {
       field: "remark",
@@ -249,6 +237,14 @@ export default function OrderInboundRegister() {
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
+            sorting: {
+              sortModel: [
+                {
+                  field: "lotNum",
+                  sort: "desc",
+                },
+              ],
+            },
           }}
           slotProps={{
             basePagination: {

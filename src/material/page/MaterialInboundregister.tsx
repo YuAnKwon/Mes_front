@@ -1,12 +1,12 @@
 import { Box, Button } from "@mui/material";
-import SearchBar from "../common/SearchBar";
+import SearchBar from "../../common/SearchBar";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import Pagination from "../common/Pagination";
+import Pagination from "../../common/Pagination";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx-js-style";
 
-import { getMaterialData } from "./api/MaterialAddApi";
-import type { MaterialList } from "./type";
+import { getMaterialData } from "../api/MaterialAddApi";
+import type { MaterialList } from "../type";
 
 export function MaterialInboundregister() {
   const [materials, setMaterials] = useState<MaterialList[]>([]);

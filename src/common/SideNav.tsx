@@ -25,9 +25,7 @@ import {
 
 export function SideNav() {
   return (
-    <Sidebar
-      aria-label="Sidebar with multi-level dropdown example"
-    >
+    <Sidebar aria-label="Sidebar with multi-level dropdown example">
       <SidebarItems>
         <SidebarItemGroup>
           <SidebarItem
@@ -39,24 +37,27 @@ export function SideNav() {
           >
             대시보드
           </SidebarItem>
-          <SidebarCollapse icon={HiClipboardList} label="수주대상품목관리">
-            <SidebarItem
-              href="/orderitem/inbound/register"
-              icon={RiInboxArchiveLine}
-            >
+          <SidebarCollapse icon={HiClipboardList} label="수주대상품목관리" open>
+            <SidebarItem href="/" icon={RiInboxArchiveLine}>
               입고 등록
             </SidebarItem>
-            <SidebarItem href="#" icon={RiInboxArchiveFill}>
+            <SidebarItem
+              href="/orderitem/inbound/list"
+              icon={RiInboxArchiveFill}
+            >
               입고 조회
             </SidebarItem>
-            <SidebarItem href="#" icon={RiInboxUnarchiveLine}>
+            <SidebarItem
+              href="/orderitem/outbound/register"
+              icon={RiInboxUnarchiveLine}
+            >
               출고 등록
             </SidebarItem>
             <SidebarItem href="#" icon={RiInboxUnarchiveFill}>
               출고 조회
             </SidebarItem>
           </SidebarCollapse>
-          <SidebarCollapse icon={HiCube} label="원자재 입출고 관리">
+          <SidebarCollapse icon={HiCube} label="원자재 입출고 관리" open>
             <SidebarItem
               href="/material/inbound/register"
               icon={RiInboxArchiveLine}
@@ -79,7 +80,7 @@ export function SideNav() {
               재고 현황
             </SidebarItem>
           </SidebarCollapse>
-          <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리">
+          <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리" open>
             <SidebarItem href="#" icon={HiClipboard}>
               수주대상품목
             </SidebarItem>

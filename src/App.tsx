@@ -4,8 +4,10 @@ import "./tailwind.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SideNav } from "./common/SideNav";
 import OrderInboundRegister from "./orderitem/page/OrderInboundRegister";
-import { MaterialInboundregister } from "./material/MaterialInboundregister";
-import { MaterialInboundList } from "./material/MaterialInboundList";
+import { MaterialInboundregister } from "./material/page/MaterialInboundregister";
+import { MaterialInboundList } from "./material/page/MaterialInboundList";
+import OrderInboundList from "./orderitem/page/OrderInboundList";
+import OrderOutboundRegister from "./orderitem/page/OrderOutboundRegister";
 
 function App() {
   return (
@@ -20,13 +22,16 @@ function App() {
         <div className="flex-1 p-6  ">
           <Routes>
             {/* 수주대상품목 */}
+            <Route path="/" element={<OrderInboundRegister />} />
             <Route
-              path="/orderitem/inbound/register"
-              element={<OrderInboundRegister />}
+              path="/orderitem/inbound/list"
+              element={<OrderInboundList />}
             />
-            {/* <Route path="/orderitem/inbound/list" element={<OrderInboundList />} />
-            <Route path="/orderitem/outbound/register" element={<OrderOutboundRegister />} />
-            <Route path="/orderitem/outbound/list" element={<OrderOutboundList />} />
+            <Route
+              path="/orderitem/outbound/register"
+              element={<OrderOutboundRegister />}
+            />
+            {/*<Route path="/orderitem/outbound/list" element={<OrderOutboundList />} />
 
             {/* 원자재 */}
             <Route
