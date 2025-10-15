@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
-import type { GridColDef } from "@mui/x-data-grid";
+import type {
+  GridColDef
+} from "@mui/x-data-grid";
 import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
+import { getMasterOrItList } from "../api/MasterApi";
+import type { MasterOrItList } from "../type";
 import SearchBar from "../../common/SearchBar";
 
-import { getOrderItemInRegiList, registerInboundItem } from "../api/OrderInApi";
-import type { OrderItemList, OrderItemInRegister } from "../type";
-
-export default function OrderInboundRegister() {
+export default function MasterOrderItemList() {
   const sampleData = [
     "회사1",
     "회사2",
@@ -30,28 +31,30 @@ export default function OrderInboundRegister() {
   const handleSearch = (criteria: string, query: string) => {
     console.log("검색 실행:", { criteria, query });
   };
-
+  
   const navigate = useNavigate();
 
   const loadData = async () => {
     try {
-      const oiList = await getOrderItemInRegiList();
+      const oiList = await getMasterOrItList();
 
       // 서버 데이터 → DataGrid rows 형식으로 매핑
       const mappedRows = oiList.map((item) => ({
         id: item.id,
-        itemName: item.itemName,
         itemCode: item.itemCode,
+        itemName: item.itemName,
         company: item.company,
         type: item.type,
-        inAmount: undefined, // 수량
-        inDate: "", // 입고일자
+        unitPrice: item.unitPrice,
+        color: item.color,
+        coatingMethod: item.coatingMethod,
         remark: item.remark,
+        completedStatus: item.completedStatus,
       }));
 
       setRows(mappedRows);
     } catch (error) {
-      console.error("수주 데이터 로딩 실패", error);
+      console.error("수주품목대상 데이터 조회 실패", error);
     }
   };
 
@@ -59,7 +62,7 @@ export default function OrderInboundRegister() {
     loadData();
   }, []);
 
-  const [rows, setRows] = useState<OrderItemList[]>([]);
+  const [rows, setRows] = useState<MasterOrItList[]>([]);
   const apiRef = useGridApiRef();
   const columns: GridColDef[] = [
     {
@@ -85,7 +88,7 @@ export default function OrderInboundRegister() {
               cursor: "pointer",
               fontSize: "inherit",
             }}
-            onClick={() => navigate(`/orderitem/detail/${params.row.id}`)}
+            onClick={() => navigate(`/master/orderitem/detail/${params.row.id}`)}
           >
             {params.value}
           </Typography>
@@ -109,27 +112,37 @@ export default function OrderInboundRegister() {
     {
       field: "type",
       headerName: "분류",
-      width: 150,
+      width: 120,
       headerAlign: "center",
       align: "center",
     },
     {
-      field: "inAmount",
-      headerName: "입고수량(개)",
-      width: 150,
+      field: "unitPrice",
+      headerName: "품목단가",
+      width: 120,
       headerAlign: "center",
       align: "center",
-      editable: true,//수정연필
-      type: "number",//타입(ex날짜)
     },
     {
-      field: "inDate",
-      headerName: "입고일자",
-      width: 150,
+      field: "color",
+      headerName: "색상",
+      width: 120,
       headerAlign: "center",
       align: "center",
-      editable: true,
-      type: "date",
+    },
+    {
+      field: "coatingMethod",
+      headerName: "도장방식",
+      width: 120,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "completedStatus",
+      headerName: "거래상태",
+      width: 120,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "remark",
@@ -161,45 +174,34 @@ export default function OrderInboundRegister() {
   };
 
   const handleRegister = async () => {
-    // ✅ DataGrid에서 선택된 행 정보 가져오기
-    const selectedRowsMap = apiRef.current.getSelectedRows();
-    const selectedRows = Array.from(selectedRowsMap.values());
+    // ✅ DataGrid에서 선택된 행 ID 가져오기
+    // const selectedRowsMap = apiRef.current.getSelectedRows();
+    // const selectedRows = Array.from(selectedRowsMap.values());
 
-    if (selectedRows.length === 0) {
-      alert("등록할 품목을 선택해주세요.");
-      return;
-    }
+    // if (selectedRows.length === 0) {
+    //   alert("등록할 품목을 선택해주세요.");
+    //   return;
+    // }
 
-    // 선택된 행
-    const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
-      id: row.id,
-      inAmount: row.inAmount as number,
-      inDate: row.inDate as string,
-    }));
+    // const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
+    //   id: row.id,
+    //   inAmount: row.inAmount as number,
+    //   inDate: row.inDate as string,
+    // }));
 
-    // 유효성 검사
-    for (const row of payload) {
-      if (!row.inAmount || !row.inDate) {
-        alert("입고 수량과 입고일자를 모두 입력해주세요.");
-        return;
-      }
-      console.log(payload);
-    }
-
-    try {
-      await registerInboundItem(payload);
-      console.log(payload);
-      alert("입고 등록이 완료되었습니다.");
-      navigate("/orderitem/inbound/list");
-    } catch (error) {
-      console.error(error);
-      alert("등록 중 오류가 발생하였습니다.");
-    }
+    // try {
+    //   await registerInboundItem(payload);
+    //   alert("입고 등록이 완료되었습니다.");
+    //   navigate("/orderitem/inbound/list");
+    // } catch (error) {
+    //   console.error(error);
+    //   alert("등록 중 오류가 발생하였습니다.");
+    // }
   };
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상 품목 입고 등록</h2>
+      <h2>수주대상품목 조회</h2>
       {/* 버튼 영역 */}
       <Box
         sx={{
@@ -218,7 +220,7 @@ export default function OrderInboundRegister() {
             onSearch={handleSearch}
           />
         </Box>
-
+    
         {/* 버튼 영역 */}
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Button
@@ -235,7 +237,7 @@ export default function OrderInboundRegister() {
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleRegister}
           >
-            입고
+            수주대상품목 등록
           </Button>
         </Box>
       </Box>
@@ -247,6 +249,9 @@ export default function OrderInboundRegister() {
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
           checkboxSelection
+          // onRowSelectionModelChange={(newSelectionModel) => {
+          //   setSelectedIds(newSelectionModel);
+          // }}
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },

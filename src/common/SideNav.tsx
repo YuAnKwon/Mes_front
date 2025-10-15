@@ -28,13 +28,7 @@ export function SideNav() {
     <Sidebar aria-label="Sidebar with multi-level dropdown example">
       <SidebarItems>
         <SidebarItemGroup>
-          <SidebarItem
-            href="#"
-            icon={HiChartPie}
-            theme={{
-              base: "text-black hover:text-gray-300",
-            }}
-          >
+          <SidebarItem href="#" icon={HiChartPie}>
             대시보드
           </SidebarItem>
           <SidebarCollapse icon={HiClipboardList} label="수주대상품목관리" open>
@@ -80,8 +74,8 @@ export function SideNav() {
               재고 현황
             </SidebarItem>
           </SidebarCollapse>
-          <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리" open>
-            <SidebarItem href="#" icon={HiClipboard}>
+          <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리">
+            <SidebarItem href="/master/orderitem/list" icon={HiClipboard}>
               수주대상품목
             </SidebarItem>
             <SidebarItem href="#" icon={HiCube}>
@@ -90,7 +84,10 @@ export function SideNav() {
             <SidebarItem href="#" icon={HiOutlineArrowsUpDown}>
               라우팅
             </SidebarItem>
-            <SidebarItem href="#" icon={HiMiniBuildingLibrary}>
+            <SidebarItem
+              href="/master/company/list"
+              icon={HiMiniBuildingLibrary}
+            >
               업체
             </SidebarItem>
           </SidebarCollapse>

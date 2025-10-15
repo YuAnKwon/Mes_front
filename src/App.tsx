@@ -8,6 +8,9 @@ import { MaterialInboundregister } from "./material/page/MaterialInboundregister
 import { MaterialInboundList } from "./material/page/MaterialInboundList";
 import OrderInboundList from "./orderitem/page/OrderInboundList";
 import OrderOutboundRegister from "./orderitem/page/OrderOutboundRegister";
+import MasterOrderItemList from "./master/page/MasterOrderItemList";
+import MasterCompanyList from "./master/page/MasterCompanyList";
+import MasterCompany from "./master/page/MasterCompany";
 
 function App() {
   return (
@@ -46,6 +49,18 @@ function App() {
             <Route path="/material/outbound/list" element={<MaterialOutboundList />} />  */}
 
             {/* 기준정보관리 */}
+            <Route
+              path="/master/orderitem/list"
+              element={<MasterOrderItemList />}
+            />
+            <Route
+              path="/master/company/list"
+              element={<MasterCompanyList />}
+            />
+            <Route
+              path="/master/company/register"
+              element={<MasterCompany />}
+            />
             {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />
             <Route path="/master/material" element={<MasterMaterial />} />
             <Route path="/master/routing" element={<MasterRouting />} />
