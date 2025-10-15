@@ -11,6 +11,7 @@ import OrderOutboundRegister from "./orderitem/page/OrderOutboundRegister";
 import MasterOrderItemList from "./master/page/MasterOrderItemList";
 import MasterCompanyList from "./master/page/MasterCompanyList";
 import MasterCompany from "./master/page/MasterCompany";
+import OrderOutboundList from "./orderitem/page/OrderOutboundList";
 
 function App() {
   return (
@@ -34,7 +35,10 @@ function App() {
               path="/orderitem/outbound/register"
               element={<OrderOutboundRegister />}
             />
-            {/*<Route path="/orderitem/outbound/list" element={<OrderOutboundList />} />
+            <Route
+              path="/orderitem/outbound/list"
+              element={<OrderOutboundList />}
+            />
 
             {/* 원자재 */}
             <Route
