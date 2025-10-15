@@ -77,10 +77,6 @@ export default function MasterCompany() {
         }
     };
 
-    const FormGrid = styled(Grid)(({ theme }) => ({
-        display: 'flex',
-        flexDirection: 'column',
-    }));
 
   return (
     <Box sx={{ p: 2 }}>
@@ -96,7 +92,7 @@ export default function MasterCompany() {
                     name="companyName"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    type="name"
+                    type="text"
                     placeholder="업체명"
                     autoComplete="companyName"//뭔내용인지
                     required
