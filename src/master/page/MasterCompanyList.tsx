@@ -24,8 +24,7 @@ export default function MasterCompanyList() {
         companyName: item.companyName,
         companyType: item.companyType,
         ceoName: item.ceoName,
-        addressBase: item.addressBase,
-        addressDetail: item.addressDetail,
+        address: item.address,
         remark: item.remark,
         businessYn: item.businessYn,
       }));
@@ -44,12 +43,18 @@ export default function MasterCompanyList() {
   const apiRef = useGridApiRef();
   const columns: GridColDef[] = [ 
     {
-      field: "itemName",
-      headerName: "품목명",
+      field: "companyType",
+      headerName: "업체 유형",
       width: 150,
       headerAlign: "center",
       align: "center",
-      //언더바(상세 페이지)
+    },
+    {
+      field: "companyName",
+      headerName: "거래처명",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => (
         <Box
           sx={{
@@ -72,20 +77,6 @@ export default function MasterCompanyList() {
           </Typography>
         </Box>
       ),
-    },
-    {
-      field: "companyType",
-      headerName: "업체 유형",
-      width: 150,
-      headerAlign: "center",
-      align: "center",
-    },
-    {
-      field: "company",
-      headerName: "거래처명",
-      width: 150,
-      headerAlign: "center",
-      align: "center",
     },
     {
       field: "ceoName",

@@ -52,30 +52,33 @@ export type MasterMtRegister = MasterMaterial & {
 
 
 /* 업체 */
-export type MasterCompany ={
+
+//업체 조회
+export type MasterCpList = {
+  id: number;
   companyName: string;//거래처명
   companyType: string;//업체유형
   ceoName: string;//대표명
-  addressBase: string;//기업주소
-  addressDetail: string;//기업주소 상세
+  address: string;
+  businessYn: string;//거래상태 
   remark: string;//비고
 }
 
-//업체 조회
-export type MasterCpList = MasterCompany & {
-  id: number;
-  businessYn: string;//거래상태 
-}
-
 //업체 등록
-export type MasterCpRegister = MasterCompany & {
+export type MasterCpRegister = {
   id: number;
+  companyName: string;//거래처명
+  companyType: string;//업체유형
   businessNum: number;//사업자 등록번호 
+  ceoName: string;//대표명
   ceoPhone: number;//대표 전화번호 
   managerName: string;//담당자 
   managerPhone: number;//담당자 전화번호 
   managerEmail: string;//담당자 이메일 
   zipcode: number;//우편번호
+  addressBase: string;//기업주소
+  addressDetail: string;//기업주소 상세
+  remark: string;//비고
 }
 
 
