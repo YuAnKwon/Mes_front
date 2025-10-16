@@ -15,6 +15,7 @@ import OrderOutboundList from "./orderitem/page/OrderOutboundList";
 import ShipmentInvoice from "./orderitem/page/ShipmentInvoice";
 import { MaterialOutboundRegister } from "./material/page/MaterialOutboundRegister";
 import MasterCompanyDetail from "./master/page/MasterCompanyDetail";
+import MasterMaterialList from "./master/page/MasterMaterialList";
 
 function App() {
   return (
@@ -76,7 +77,9 @@ function App() {
               path="/master/company/detail/:id"
               element={<MasterCompanyDetail />}
             />
-            {/* <Route path="/master/material/list" element={<MasterMaterialList />} /> */}
+
+
+            <Route path="/master/material/list" element={<MasterMaterialList />} />
             {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />
             
             <Route path="/master/routing" element={<MasterRouting />} />

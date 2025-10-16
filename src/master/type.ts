@@ -26,27 +26,31 @@ export type MasterOrItRegister = MasterOrderItem & {
 
 
 /* 원자재 */
-export type MasterMaterial = {
+
+//원자재 조회
+export type MasterMtList = {
+  id: number;
   itemCode: string;//품목번호
   itemName: string;//품목명
   company: string;//매입처명
   type: string;//분류
   color: string;//색상
+  completedStatus: string;//거래상태
   remark: string;//비고
 }
 
-//원자재 조회
-export type MasterMtList = MasterMaterial & {
-  id: number;
-  completedStatus: string;//거래상태
-}
-
 //원자재 등록
-export type MasterMtRegister = MasterMaterial & {
+export type MasterMtRegister = {
   id: number;
+  itemCode: string;//품목번호
+  itemName: string;//품목명
+  company: string;//매입처명
+  type: string;//분류
+  color: string;//색상
   spec: number;//규격
   scale: string;//규격단위
   manufacturer: string;//제조사
+  remark: string;//비고
 }
 
 

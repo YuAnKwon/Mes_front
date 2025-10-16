@@ -84,7 +84,10 @@ export function SideNav() {
             <SidebarItem href="/master/orderitem/list" icon={HiClipboard}>
               수주대상품목
             </SidebarItem>
-            <SidebarItem href="#" icon={HiCube}>
+            <SidebarItem 
+            href="/master/material/list" 
+            icon={HiCube}
+            >
               원자재품목
             </SidebarItem>
             <SidebarItem href="#" icon={HiOutlineArrowsUpDown}>
