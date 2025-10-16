@@ -11,10 +11,10 @@ import { getMasterMtList, updateMaterialState } from "../api/MaterialApi";
 
 export default function MasterMaterialList() {
   const navigate = useNavigate();
-
   const loadData = async () => {
     try {
       const mcList = await getMasterMtList();
+      console.log("API 응답:", mcList); // 구조 확인
 
       // 서버 데이터 → DataGrid rows 형식으로 매핑
       const mappedRows = mcList.map((item) => ({
@@ -24,7 +24,7 @@ export default function MasterMaterialList() {
         company: item.company,
         type: item.type,
         color: item.color,
-        completedStatus: item.completedStatus,
+        useYn: item.useYn,
         remark: item.remark,
 
       }));
@@ -107,7 +107,7 @@ export default function MasterMaterialList() {
       align: "center",
     },
     {
-      field: "completedStatus",
+      field: "useYn",
       headerName: "거래상태",
       width: 150,
       headerAlign: "center",
@@ -122,7 +122,7 @@ export default function MasterMaterialList() {
       disableColumnMenu: true,
       align: 'center',
       renderCell: (params) => {
-        const isActive = params.row.businessYn === '거래 중';
+        const isActive = params.row.useYn === '거래 중';
         const buttonStyle = {
           color: isActive ? '#ee0000' : '#4169E1',
           borderColor: isActive ? '#ee0000' : '#4169E1',
@@ -164,7 +164,7 @@ export default function MasterMaterialList() {
   ];
 
   const handleState = async (row) => {
-    const updatedState = row.businessYn === '거래 중' ? 'Y' : 'N';
+    const updatedState = row.useYn === '거래 중' ? 'Y' : 'N';
       try {
         //api 호출로 백엔드에 변경 요청
         await updateMaterialState(row.id, updatedState)

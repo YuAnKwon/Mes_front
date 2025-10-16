@@ -1,5 +1,3 @@
-console.log("MasterCompanyDetail 컴포넌트 렌더링됨");
-
 import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
 import OutlinedInput from '@mui/material/OutlinedInput';

@@ -35,7 +35,7 @@ export type MasterMtList = {
   company: string;//매입처명
   type: string;//분류
   color: string;//색상
-  completedStatus: string;//거래상태
+  useYn: string;//거래상태
   remark: string;//비고
 }
 

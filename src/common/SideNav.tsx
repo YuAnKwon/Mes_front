@@ -25,7 +25,7 @@ import {
 
 export function SideNav() {
   return (
-    <Sidebar aria-label="Sidebar with multi-level dropdown example">
+    <Sidebar aria-label="Sidebar with multi-level dropdown example" >
       <SidebarItems>
         <SidebarItemGroup>
           <SidebarItem href="#" icon={HiChartPie}>

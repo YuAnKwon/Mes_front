@@ -6,7 +6,6 @@ export const BASE_URL = import.meta.env.VITE_API_URL;
 /* 업체 */
 export const getMasterCpList = async (): Promise<MasterCpList[]> => {
   const response = await axios.get(`${BASE_URL}/master/company/list`);
-  console.log(response.data);
   return response.data;
 };
 
