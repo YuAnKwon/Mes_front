@@ -6,7 +6,7 @@ import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import type { MasterCpList } from "../type";
-import { getMasterCpList, updateCompanyState } from "../api/MasterApi";
+import { getMasterCpList, updateCompanyState } from "../api/companyApi";
 
 export default function MasterCompanyList() {
   const navigate = useNavigate();

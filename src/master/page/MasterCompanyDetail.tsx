@@ -10,8 +10,8 @@ import DaumPostcode from 'react-daum-postcode';
 import { useEffect, useState } from 'react';
 import { CloseIcon } from 'flowbite-react';
 import { Select } from '@mui/material';
-import {  useParams } from 'react-router-dom';
-import { getCompanyDetail, updateCompanyDetail } from '../api/MasterApi';
+import {  useNavigate, useParams } from 'react-router-dom';
+import { getCompanyDetail, updateCompanyDetail } from '../api/companyApi';
 
 
 const FormGrid = styled(Grid)(() => ({
@@ -35,6 +35,8 @@ export default function MasterCompanyDetail() {
 
     const [address, setAddress] = useState('');
     const [openPostcode, setOpenPostcode] = useState(false);
+
+    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -97,6 +99,7 @@ export default function MasterCompanyDetail() {
         try {
             await updateCompanyDetail(id, payload);
             alert('업체 정보가 수정되었습니다');
+            navigate("/master/company/list");
         } catch (error) {
             console.error(error);
             alert('수정 실패');
