@@ -41,7 +41,7 @@ export type MasterMtList = {
 
 //원자재 등록
 export type MasterMtRegister = {
-  id: number;
+  id?: number;
   itemCode: string;//품목번호
   itemName: string;//품목명
   company: string;//매입처명

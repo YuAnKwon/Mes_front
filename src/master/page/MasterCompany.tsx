@@ -51,12 +51,12 @@ export default function MasterCompany() {
     const handleSave = async () => {
         const payload: MasterCpRegister  = {
             companyName,
-            businessNum: Number(zipcode),
+            businessNum: Number(businessNum),
             companyType,
             ceoName,
-            ceoPhone: Number(zipcode),
+            ceoPhone: Number(ceoPhone),
             managerName,
-            managerPhone: Number(zipcode),
+            managerPhone: Number(managerPhone),
             managerEmail,
             remark,
             zipcode: Number(zipcode),

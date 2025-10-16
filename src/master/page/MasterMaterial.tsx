@@ -10,6 +10,7 @@ import Button from "@mui/material/Button";
 import { useState } from 'react';
 import { Select } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { registerMaterial } from '../api/MaterialApi';
 
 
 const FormGrid = styled(Grid)(() => ({
@@ -38,28 +39,19 @@ export default function MasterMaterial() {
             company,
             type,
             color,
-            spec,
+            spec: Number(spec),
             scale,
             manufacturer,
             remark,
         };
 
         try {
-            const response = await fetch('/api/master/masterial/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            });
-
-            if (response.ok) {
-            alert('원자재 등록 완료!');
-            navigate('/master/material/list');
-            } else {
-            alert('등록 실패');
-            }
+            await registerMaterial(payload);
+            alert("원자재 등록 완료!");
+            navigate("/master/material/list");
         } catch (error) {
-            console.error(error);
-            alert('에러 발생');
+            console.error("원자재 등록 실패", error);
+            alert("등록 실패");
         }
     };
 
