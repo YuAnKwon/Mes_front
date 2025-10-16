@@ -16,11 +16,13 @@ import {
   softDeleteMaterialIn,
   updateMaterialIn,
 } from "../api/MaterialInboundListApi";
+import { useNavigate } from "react-router-dom";
 
 export function MaterialInboundList() {
   const [materialsIn, setMaterialsIn] = useState<MaterialInList[]>([]);
   const [editedRows, setEditedRows] = useState<{ [key: number]: boolean }>({});
   const apiRef = useGridApiRef();
+
   const sampleData = [
     "회사1",
     "회사2",
@@ -50,6 +52,7 @@ export function MaterialInboundList() {
         inDate: row.inDate,
         manufactureDate: row.manufactureDate,
       });
+
       // 저장 완료 후 체크 표시 or 토스트
       alert("저장 완료");
       // 편집 상태 초기화
@@ -99,7 +102,7 @@ export function MaterialInboundList() {
         manufactureDate: item.manufactureDate
           ? new Date(item.manufactureDate)
           : null,
-        stock: item.stock,
+        totalStock: item.totalStock,
       }));
 
       setMaterialsIn(mappedRows);
@@ -167,7 +170,7 @@ export function MaterialInboundList() {
       type: "number",
     },
     {
-      field: "stock",
+      field: "totalStock",
       headerName: "총량",
       width: 150,
       headerAlign: "center",
@@ -176,7 +179,8 @@ export function MaterialInboundList() {
       renderCell: (params) => {
         const { row } = params;
         const scale = row.scale || "";
-        return `${params.value}${scale}`; // 예: "500kg"
+        const value = Number(params.value) || 0;
+        return `${value.toLocaleString()}${scale}`; // 예: "500kg"
       },
     },
     {

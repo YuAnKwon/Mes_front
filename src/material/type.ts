@@ -33,4 +33,5 @@ export type MaterialOut = {
   manufacturer: string;
   outAmount: number;
   outDate: string;
+  stock: number;
 };
