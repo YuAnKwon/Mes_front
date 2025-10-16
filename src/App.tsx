@@ -90,7 +90,7 @@ function App() {
               element={<MasterMaterialList />}
             />
             <Route
-              path="/master/material/regist"
+              path="/master/material/register"
               element={<MasterMaterial />}
             />
             {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />
