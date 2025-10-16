@@ -8,7 +8,7 @@ import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
-import { getMasterOrItList } from "../api/MasterApi";
+import { getMasterOrItList } from "../api/OrderItemApi";
 import type { MasterOrItList } from "../type";
 import SearchBar from "../../common/SearchBar";
 

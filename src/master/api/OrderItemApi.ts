@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { MasterCpList, MasterCpRegister, MasterOrItList, MasterOrItRegister } from "../type";
+import type { MasterOrItList, MasterOrItRegister } from "../type";
 
 export const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -15,14 +15,5 @@ export const registerOrderItem = async (data: MasterOrItRegister) => {
   return response.data;
 };
 
-/* 업체 */
-export const getMasterCpList = async (): Promise<MasterCpList[]> => {
-  const response = await axios.get(`${BASE_URL}/master/company/list`);
-  console.log(response.data);
-  return response.data;
-};
 
-export const registerCompany = async (data: MasterCpRegister) => {
-  const response = await axios.post(`${BASE_URL}/master/company/register`, data);
-  return response.data;
-};
+
