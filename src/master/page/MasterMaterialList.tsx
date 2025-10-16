@@ -207,7 +207,7 @@ export default function MasterMaterialList() {
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleRegister}
           >
-            업체 등록
+            원자재 등록
           </Button>
         </Box>
       </Box>
