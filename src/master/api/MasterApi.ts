@@ -31,3 +31,16 @@ export const updateCompanyState = async (id: number, updatedState: string) => {
   const response = await axios.patch(`${BASE_URL}/master/company/${id}/state`, {updatedState});
   return response.data;
 };
+
+export const getCompanyDetail = async (id: number) => {
+  const response = await axios.get(`${BASE_URL}/master/company/detail/${id}`);
+  console.log(response.data);
+  return response.data;
+};
+
+export const updateCompanyDetail = async (id: number, updatedCompany: string) => {
+  const response = await axios.patch(`${BASE_URL}/master/company/detail/${id}`, updatedCompany);
+  return response.data;
+};
+
+

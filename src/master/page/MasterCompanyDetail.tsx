@@ -1,3 +1,5 @@
+console.log("MasterCompanyDetail 컴포넌트 렌더링됨");
+
 import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -5,10 +7,11 @@ import { styled } from '@mui/material/styles';
 import { Box, Dialog, DialogContent, DialogTitle, IconButton, MenuItem } from '@mui/material';
 import Button from "@mui/material/Button";
 import DaumPostcode from 'react-daum-postcode';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CloseIcon } from 'flowbite-react';
 import { Select } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import {  useParams } from 'react-router-dom';
+import { getCompanyDetail, updateCompanyDetail } from '../api/MasterApi';
 
 
 const FormGrid = styled(Grid)(() => ({
@@ -16,21 +19,7 @@ const FormGrid = styled(Grid)(() => ({
   flexDirection: 'column',
 }));
 
-export default function MasterCompany() {
-    const [address, setAddress] = useState('');
-    const [openPostcode, setOpenPostcode] = useState(false);
-
-    const handleComplete = (data) => {//data는 주소 검색 전체 결과 객체
-        setZipcode(data.zonecode);
-        setAddress(data.address); // 선택된 주소 저장
-        setAddressBase(data.address);    // 기본 주소에 저장
-        setOpenPostcode(false);   // 검색창 닫기
-    };
-
-    const handleClickAddress = () => {
-        setOpenPostcode(true);
-    };
-
+export default function MasterCompanyDetail() {
     const [companyName, setCompanyName] = useState('');
     const [businessNum, setBusinessNum] = useState('');
     const [companyType, setCompanyType] = useState('');
@@ -44,9 +33,52 @@ export default function MasterCompany() {
     const [addressBase, setAddressBase] = useState('');
     const [addressDetail, setAddressDetail] = useState('');
 
-    const navigate = useNavigate();
+    const [address, setAddress] = useState('');
+    const [openPostcode, setOpenPostcode] = useState(false);
 
-    const handleSave = async () => {
+    const { id } = useParams();
+
+
+    useEffect(() => {
+        
+        const fetchCompanyDetail = async () => {
+            try {
+            const response = await getCompanyDetail(id); // ← API 호출
+            
+            // 상태에 기존 값 채워 넣기
+            setCompanyName(response.companyName);
+            setBusinessNum(response.businessNum);
+            setCompanyType(response.companyType);
+            setCeoName(response.ceoName);
+            setCeoPhone(response.ceoPhone);
+            setManagerName(response.managerName);
+            setManagerPhone(response.managerPhone);
+            setManagerEmail(response.managerEmail);
+            setRemark(response.remark);
+            setZipcode(response.zipcode);
+            setAddressBase(response.addressBase);
+            setAddressDetail(response.addressDetail);
+            } catch (error) {
+            console.error('업체 정보 불러오기 실패:', error);
+            }
+        };
+
+        fetchCompanyDetail();
+    }, [id]);
+
+
+    const handleComplete = (data) => {//data는 주소 검색 전체 결과 객체
+        setZipcode(data.zonecode);
+        setAddress(data.address); // 선택된 주소 저장
+        setAddressBase(data.address);    // 기본 주소에 저장
+        setOpenPostcode(false);   // 검색창 닫기
+    };
+
+    const handleClickAddress = () => {
+        setOpenPostcode(true);
+    };
+
+    const handleUpdate = async () => {
         const payload = {
             companyName,
             businessNum,
@@ -63,21 +95,11 @@ export default function MasterCompany() {
         };
 
         try {
-            const response = await fetch('/api/master/company/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            });
-
-            if (response.ok) {
-            alert('업체 등록 완료!');
-            navigate('/master/company/list');
-            } else {
-            alert('등록 실패');
-            }
+            await updateCompanyDetail(id, payload);
+            alert('업체 정보가 수정되었습니다');
         } catch (error) {
             console.error(error);
-            alert('에러 발생');
+            alert('수정 실패');
         }
     };
 
@@ -135,7 +157,7 @@ export default function MasterCompany() {
                         onChange={(e) => setBusinessNum(e.target.value)}
                         type="text"
                         placeholder="사업자 등록번호"
-                        autoComplete="off"
+                        autoComplete="businessNum"
                         required
                         size="small"
                     />
@@ -199,7 +221,7 @@ export default function MasterCompany() {
                         onChange={(e) => setManagerPhone(e.target.value)}
                         type="text"
                         placeholder="01012345678"
-                        autoComplete="tel"
+                        autoComplete="managerPhone"
                         required
                         size="small"
                     />
@@ -286,8 +308,8 @@ export default function MasterCompany() {
                             id="addressBase"
                             name="addressBase"
                             type="text"
-                            placeholder="주소"
                             autoComplete="street-address"
+                            placeholder="주소"
                             value={addressBase}
                             onChange={(e) => setAddressBase(e.target.value)}
                             readOnly
@@ -327,9 +349,9 @@ export default function MasterCompany() {
                     variant="outlined"
                     color="primary"
                     sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-                    onClick={handleSave}
+                    onClick={handleUpdate}
                 >
-                업체 등록
+                수정
                 </Button>
             </Box>
         </Box>
