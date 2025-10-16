@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import type { MasterCpList } from "../type";
 import { getMasterCpList, updateCompanyState } from "../api/MasterApi";
 
-export default function MasterCompanyList() {
+export default function MasterMaterialList() {
   const navigate = useNavigate();
 
   const loadData = async () => {
@@ -111,25 +111,15 @@ export default function MasterCompanyList() {
       filterable: false,
       disableColumnMenu: true,
       align: 'center',
-      renderCell: (params) => {
-        const isActive = params.row.businessYn === 'Y';
-        const buttonStyle = {
-          color: isActive ? '#ee0000' : '#4169E1',
-          borderColor: isActive ? '#ee0000' : '#4169E1',
-        };
-        const buttonText = isActive ? '거래 종료' : '거래 재개';
-
-        return (
-          <Button
-            variant="outlined"
-            size="small"
-            style={buttonStyle}
-            onClick={() => handleState(params.row)}
-          >
-            {buttonText}
-          </Button>
-        );
-      },
+      renderCell: (params) => (
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => handleState(params.row)}
+        >
+          거래 상태 변경
+        </Button>
+      ),
     },
     {
       field: "remark",
