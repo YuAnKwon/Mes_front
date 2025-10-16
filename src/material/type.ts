@@ -26,6 +26,22 @@ export type MaterialInList = {
 };
 
 export type MaterialOut = {
+  inNum: string;
+  outNum: string;
+  materialName: string;
+  materialCode: string;
+  companyName: string;
+  inAmount: number;
+  manufacturer: string;
+  outAmount: number;
+  outDate: string;
+  stock: number;
+};
+
+export type MaterialOutList = {
+  id: number;
+  inNum: string;
+  outNum: string;
   materialName: string;
   materialCode: string;
   companyName: string;

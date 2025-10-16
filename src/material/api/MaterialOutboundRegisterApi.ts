@@ -7,3 +7,8 @@ export const getMaterialOutData = async (): Promise<MaterialOut[]> => {
   const response = await axios.get(`${BASE_URL}/material/out`);
   return response.data;
 };
+
+export const postMaterialOutData = async (data: MaterialOut[]) => {
+  const response = await axios.post(`${BASE_URL}/material/out`, data);
+  return response.data;
+};

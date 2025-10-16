@@ -1,27 +1,26 @@
-import { useEffect, useState } from "react";
+import { Box, Button } from "@mui/material";
+import SearchBar from "../../common/SearchBar";
 
-import type { MaterialInList } from "../type";
 import {
   DataGrid,
   useGridApiRef,
   type GridColDef,
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
-import { Box, Button } from "@mui/material";
-import SearchBar from "../../common/SearchBar";
 import Pagination from "../../common/Pagination";
 import * as XLSX from "xlsx";
-import { getMaterialInData } from "../api/MaterialInboundregisterApi";
+import { useEffect, useState } from "react";
+import type { MaterialOutList } from "../type";
 import {
-  softDeleteMaterialIn,
-  updateMaterialIn,
-} from "../api/MaterialInboundListApi";
+  getMaterialOutDatas,
+  softDeleteMaterialOut,
+  updateMaterialOut,
+} from "../api/MaterialOutboundListApi";
 
-export function MaterialInboundList() {
-  const [materialsIn, setMaterialsIn] = useState<MaterialInList[]>([]);
+export function MaterialOutboundList() {
+  const [materialsOuts, setMaterialsOuts] = useState<MaterialOutList[]>([]);
   const [editedRows, setEditedRows] = useState<{ [key: number]: boolean }>({});
   const apiRef = useGridApiRef();
-
   const sampleData = [
     "회사1",
     "회사2",
@@ -35,21 +34,16 @@ export function MaterialInboundList() {
     { label: "매입처명", value: "companyName" },
     { label: "품목번호", value: "materialCode" },
     { label: "품목명", value: "materialName" },
-    { label: "입고번호", value: "inNum" },
-    { label: "입고일자", value: "inDate" },
+    { label: "출고번호", value: "outNum" },
+    { label: "출고일자", value: "outDate" },
   ];
 
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
-
-  const handleSaveRow = async (row: MaterialInList) => {
+  const handleSaveRow = async (row: MaterialOutList) => {
     try {
       // API 호출
-      await updateMaterialIn(row.id, {
-        inAmount: row.inAmount,
-        inDate: row.inDate,
-        manufactureDate: row.manufactureDate,
+      await updateMaterialOut(row.id, {
+        outAmount: row.outAmount,
+        outDate: row.outDate,
       });
 
       // 저장 완료 후 체크 표시 or 토스트
@@ -66,9 +60,9 @@ export function MaterialInboundList() {
     if (!confirmDelete) return;
     try {
       // API 호출 예시
-      await softDeleteMaterialIn(id);
+      await softDeleteMaterialOut(id);
       // 성공 시 로컬 상태에서 삭제
-      setMaterialsIn((prev) => prev.filter((row) => row.id !== id));
+      setMaterialsOuts((prev) => prev.filter((row) => row.id !== id));
       // 편집 상태도 초기화
       setEditedRows((prev) => {
         const newState = { ...prev };
@@ -84,30 +78,24 @@ export function MaterialInboundList() {
 
   const fetchMaterialInData = async () => {
     try {
-      const response = await getMaterialInData();
+      const response = await getMaterialOutDatas();
       const data = Array.isArray(response) ? response : response.data || [];
 
       const mappedRows = data.map((item) => ({
         id: item.id,
-        inNum: item.inNum,
+        outNum: item.outNum,
+        outAmount: item.outAmount,
         companyName: item.companyName,
-        inAmount: item.inAmount,
-        scale: item.scale,
-        inDate: item.inDate ? new Date(item.inDate) : null, // ✅ Date 객체로 변환
+        outDate: item.outDate ? new Date(item.outDate) : null, // ✅ Date 객체로 변환
         materialName: item.materialName,
         materialCode: item.materialCode,
-        specAndScale: item.specAndScale,
         manufacturer: item.manufacturer,
-        manufactureDate: item.manufactureDate
-          ? new Date(item.manufactureDate)
-          : null,
-        totalStock: item.totalStock,
       }));
 
-      setMaterialsIn(mappedRows);
+      setMaterialsOuts(mappedRows);
     } catch (error) {
       console.error("데이터 로딩 실패", error);
-      alert("원자재 입고 데이터를 불러오지 못했습니다.");
+      alert("원자재 출고 데이터를 불러오지 못했습니다.");
     }
   };
 
@@ -115,10 +103,14 @@ export function MaterialInboundList() {
     fetchMaterialInData();
   }, []);
 
+  const handleSearch = (criteria: string, query: string) => {
+    console.log("검색 실행:", { criteria, query });
+  };
+
   const columns: GridColDef[] = [
     {
-      field: "inNum",
-      headerName: "입고번호",
+      field: "outNum",
+      headerName: "출고번호",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -140,13 +132,6 @@ export function MaterialInboundList() {
     {
       field: "companyName",
       headerName: "매입처명",
-      width: 150,
-      headerAlign: "center",
-      align: "center",
-    },
-    {
-      field: "specAndScale",
-      headerName: "원자재 규격",
       width: 120,
       headerAlign: "center",
       align: "center",
@@ -157,11 +142,11 @@ export function MaterialInboundList() {
       width: 120,
       headerAlign: "center",
       align: "center",
-      type: "number",
+      type: "string",
     },
     {
-      field: "inAmount",
-      headerName: "입고수량(개)",
+      field: "outAmount",
+      headerName: "출고 수량",
       width: 120,
       headerAlign: "center",
       align: "center",
@@ -169,47 +154,13 @@ export function MaterialInboundList() {
       type: "number",
     },
     {
-      field: "totalStock",
-      headerName: "총량",
+      field: "outDate",
+      headerName: "출고일자",
       width: 150,
       headerAlign: "center",
       align: "center",
-
-      renderCell: (params) => {
-        const { row } = params;
-        const scale = row.scale || "";
-        const value = Number(params.value) || 0;
-        return `${value.toLocaleString()}${scale}`; // 예: "500kg"
-      },
-    },
-    {
-      field: "inDate",
-      headerName: "입고일자",
-      width: 200,
-      headerAlign: "center",
       editable: true,
-      align: "center",
-      type: "date", // 실제 값은 시간 포함
-
-      renderCell: (params) => {
-        if (!params.value) return "";
-        const date = new Date(params.value);
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, "0");
-        const dd = String(date.getDate()).padStart(2, "0");
-
-        return `${yyyy}-${mm}-${dd}`;
-      },
-    },
-    {
-      field: "manufactureDate",
-      headerName: "제조일자",
-      width: 200,
-      headerAlign: "center",
-      editable: true,
-      align: "center",
       type: "date",
-
       renderCell: (params) => {
         if (!params.value) return "";
         const date = new Date(params.value);
@@ -263,22 +214,16 @@ export function MaterialInboundList() {
       },
     },
   ];
-
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(materialsIn);
+    const worksheet = XLSX.utils.json_to_sheet(materialsOuts);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "원자재_입고_등록현황.xlsx");
-  };
-
-  const handleRegister = () => {
-    // 등록 버튼 클릭 시 동작 정의
-    console.log("등록 버튼 클릭됨");
+    XLSX.writeFile(workbook, "원자재_출고_현황.xlsx");
   };
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>원자재 입고 등록조회</h2>
+      <h2>원자재 출고 등록조회</h2>
       <Box
         sx={{
           display: "flex",
@@ -307,14 +252,6 @@ export function MaterialInboundList() {
           >
             엑셀 다운로드
           </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleRegister}
-          >
-            등록
-          </Button>
         </Box>
       </Box>
 
@@ -323,20 +260,18 @@ export function MaterialInboundList() {
           processRowUpdate={(newRow, oldRow) => {
             // 값이 바뀌면 editedRows 활성화
             if (
-              newRow.inAmount !== oldRow.inAmount ||
-              newRow.inDate?.toString() !== oldRow.inDate?.toString() ||
-              newRow.manufactureDate?.toString() !==
-                oldRow.manufactureDate?.toString()
+              newRow.outAmount !== oldRow.outAmount ||
+              newRow.outDate?.toString() !== oldRow.outDate?.toString()
             ) {
               setEditedRows((prev) => ({ ...prev, [newRow.id]: true }));
             }
             // rows 상태 갱신
-            setMaterialsIn((prev) =>
+            setMaterialsOuts((prev) =>
               prev.map((row) => (row.id === newRow.id ? newRow : row))
             );
             return newRow;
           }}
-          rows={materialsIn}
+          rows={materialsOuts}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick

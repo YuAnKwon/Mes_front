@@ -15,6 +15,7 @@ import OrderOutboundList from "./orderitem/page/OrderOutboundList";
 import ShipmentInvoice from "./orderitem/page/ShipmentInvoice";
 import { MaterialOutboundRegister } from "./material/page/MaterialOutboundRegister";
 import MasterCompanyDetail from "./master/page/MasterCompanyDetail";
+import { MaterialOutboundList } from "./material/page/MaterialOutboundList";
 
 function App() {
   return (
@@ -57,7 +58,10 @@ function App() {
               path="/material/outbound/register"
               element={<MaterialOutboundRegister />}
             />
-            {/* <Route path="/material/outbound/list" element={<MaterialOutboundList />} /> */}
+            <Route
+              path="/material/outbound/list"
+              element={<MaterialOutboundList />}
+            />
 
             {/* 기준정보관리 */}
             <Route

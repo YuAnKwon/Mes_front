@@ -7,9 +7,10 @@ import type { MaterialOut } from "../type";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMaterialInData } from "../api/MaterialInboundregisterApi";
+import { postMaterialOutData } from "../api/MaterialOutboundRegisterApi";
 
 export function MaterialOutboundRegister() {
-  const [materialout, setMaterialout] = useState<MaterialList[]>([]);
+  const [materialout, setMaterialout] = useState<MaterialOut[]>([]);
   const apiRef = useGridApiRef();
   const sampleData = [
     "회사1",
@@ -54,7 +55,7 @@ export function MaterialOutboundRegister() {
       align: "center",
     },
     {
-      field: "inAmount",
+      field: "stock",
       headerName: "재고량(개)",
       width: 120,
       headerAlign: "center",
@@ -120,6 +121,7 @@ export function MaterialOutboundRegister() {
     // 선택된 행
     const payload: MaterialOut[] = selectedRows.map((row) => ({
       id: row.id,
+      inNum: row.inNum,
       materialCode: row.materialCode,
       materialName: row.materialName,
       outAmount: row.outAmount as number,
@@ -135,10 +137,10 @@ export function MaterialOutboundRegister() {
     }
 
     try {
-      //   await postMaterialInData(payload);
+      await postMaterialOutData(payload);
       console.log(payload);
       alert("출고 등록이 완료되었습니다.");
-      // navigate("/material/inbound/list");
+      navigate("/material/outbound/list");
     } catch (error) {
       console.error(error);
       alert("출고 등록 중 오류가 발생하였습니다.");

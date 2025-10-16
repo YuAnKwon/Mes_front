@@ -73,10 +73,13 @@ export function SideNav() {
             >
               출고 등록
             </SidebarItem>
-            <SidebarItem href="#" icon={RiInboxUnarchiveFill}>
+            <SidebarItem
+              href="/material/outbound/list"
+              icon={RiInboxUnarchiveFill}
+            >
               출고 조회
             </SidebarItem>
-            <SidebarItem href="#" icon={FaBoxArchive}>
+            <SidebarItem href="/material/totalstock" icon={FaBoxArchive}>
               재고 현황
             </SidebarItem>
           </SidebarCollapse>
