@@ -70,7 +70,7 @@ export type MasterCpList = {
 
 //업체 등록
 export type MasterCpRegister = {
-  id: number;
+  id?: number;
   companyName: string;//거래처명
   companyType: string;//업체유형
   businessNum: number;//사업자 등록번호 

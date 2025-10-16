@@ -9,6 +9,8 @@ import { useState } from 'react';
 import { CloseIcon } from 'flowbite-react';
 import { Select } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { registerCompany } from '../api/companyApi';
+import type { MasterCpRegister } from '../type';
 
 
 const FormGrid = styled(Grid)(() => ({
@@ -47,38 +49,30 @@ export default function MasterCompany() {
     const navigate = useNavigate();
 
     const handleSave = async () => {
-        const payload = {
+        const payload: MasterCpRegister  = {
             companyName,
-            businessNum,
+            businessNum: Number(zipcode),
             companyType,
             ceoName,
-            ceoPhone,
+            ceoPhone: Number(zipcode),
             managerName,
-            managerPhone,
+            managerPhone: Number(zipcode),
             managerEmail,
             remark,
-            zipcode,
+            zipcode: Number(zipcode),
             addressBase: address,
             addressDetail,
         };
 
         try {
-            const response = await fetch('/api/master/company/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            });
-
-            if (response.ok) {
-            alert('업체 등록 완료!');
-            navigate('/master/company/list');
-            } else {
-            alert('등록 실패');
-            }
+            await registerCompany(payload);
+            alert("업체 등록 완료!");
+            navigate("/master/company/list");
         } catch (error) {
-            console.error(error);
-            alert('에러 발생');
+            console.error("업체 등록 실패", error);
+            alert("등록 실패");
         }
+
     };
 
 
