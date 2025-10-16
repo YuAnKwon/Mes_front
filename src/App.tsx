@@ -95,7 +95,7 @@ function App() {
               element={<MasterMaterial />}
             />
             <Route
-              path="/master/material/detail"
+              path="/master/material/detail/:id"
               element={<MasterMaterialDetail />}
             />
             {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />

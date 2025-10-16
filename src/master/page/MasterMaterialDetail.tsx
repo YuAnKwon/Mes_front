@@ -1,372 +1,269 @@
-
-
-import FormLabel from "@mui/material/FormLabel";
-import Grid from "@mui/material/Grid";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import { styled } from "@mui/material/styles";
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  MenuItem,
-} from "@mui/material";
+import FormLabel from '@mui/material/FormLabel';
+import Grid from '@mui/material/Grid';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { styled } from '@mui/material/styles';
+import { Box, MenuItem } from '@mui/material';
 import Button from "@mui/material/Button";
-import DaumPostcode from "react-daum-postcode";
-import { useEffect, useState } from "react";
-import { CloseIcon } from "flowbite-react";
-import { Select } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import { getCompanyDetail, updateCompanyDetail } from "../api/companyApi";
+import { useEffect, useState } from 'react';
+import { Select } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getMaterialDetail, registerMaterial, updateMaterialDetail } from '../api/MaterialApi';
+import type { MasterMtRegister } from '../type';
+
 
 const FormGrid = styled(Grid)(() => ({
-  display: "flex",
-  flexDirection: "column",
+  display: 'flex',
+  flexDirection: 'column',
 }));
 
 export default function MasterMaterialDetail() {
-  const [companyName, setCompanyName] = useState("");
-  const [businessNum, setBusinessNum] = useState("");
-  const [companyType, setCompanyType] = useState("");
-  const [ceoName, setCeoName] = useState("");
-  const [ceoPhone, setCeoPhone] = useState("");
-  const [managerName, setManagerName] = useState("");
-  const [managerPhone, setManagerPhone] = useState("");
-  const [managerEmail, setManagerEmail] = useState("");
-  const [remark, setRemark] = useState("");
-  const [zipcode, setZipcode] = useState("");
-  const [addressBase, setAddressBase] = useState("");
-  const [addressDetail, setAddressDetail] = useState("");
 
-  const [address, setAddress] = useState("");
-  const [openPostcode, setOpenPostcode] = useState(false);
+    const [materialCode, setMaterialCode] = useState('');
+    const [materialName, setMaterialName] = useState('');
+    const [companyName, setCompanyName] = useState('');
+    const [type, setType] = useState('');
+    const [color, setColor] = useState('');
+    const [spec, setSpec] = useState('');
+    const [scale, setScale] = useState('');
+    const [manufacturer, setManufacturer] = useState('');
+    const [remark, setRemark] = useState('');
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const { id } = useParams();
+    const { id } = useParams();
 
-  useEffect(() => {
-    const fetchCompanyDetail = async () => {
-      try {
-        const response = await getCompanyDetail(id); // ← API 호출
+    useEffect(() => {
+        const fetchMaterialDetail = async () => {
+        try {
+            const response = await getMaterialDetail(id); // ← API 호출
 
-        // 상태에 기존 값 채워 넣기
-        setCompanyName(response.companyName);
-        setBusinessNum(response.businessNum);
-        setCompanyType(response.companyType);
-        setCeoName(response.ceoName);
-        setCeoPhone(response.ceoPhone);
-        setManagerName(response.managerName);
-        setManagerPhone(response.managerPhone);
-        setManagerEmail(response.managerEmail);
-        setRemark(response.remark);
-        setZipcode(response.zipcode);
-        setAddressBase(response.addressBase);
-        setAddressDetail(response.addressDetail);
-      } catch (error) {
-        console.error("업체 정보 불러오기 실패:", error);
-      }
+            // 상태에 기존 값 채워 넣기
+            setMaterialCode(response.materialCode);
+            setMaterialName(response.materialName);
+            setCompanyName(response.companyName);
+            setType(response.type);
+            setColor(response.color);
+            setSpec(response.spec);
+            setScale(response.scale);
+            setManufacturer(response.manufacturer);
+            setRemark(response.remark);
+        } catch (error) {
+            console.error("업체 정보 불러오기 실패:", error);
+        }
+        };
+
+        fetchMaterialDetail();
+    }, [id]);
+
+    const handleUpdate = async () => {
+        const payload = {
+            materialCode,
+            materialName,
+            companyName,
+            type,
+            color,
+            spec,
+            scale,
+            manufacturer,
+            remark,
+        };
+
+        try {
+            await updateMaterialDetail(id, payload);
+            alert("원자재 수정 완료!");
+            navigate("/master/material/list");
+        } catch (error) {
+            console.error("원자재 등록 실패", error);
+            alert("등록 실패");
+        }
     };
 
-    fetchCompanyDetail();
-  }, [id]);
-
-  const handleComplete = (data) => {
-    //data는 주소 검색 전체 결과 객체
-    setZipcode(data.zonecode);
-    setAddress(data.address); // 선택된 주소 저장
-    setAddressBase(data.address); // 기본 주소에 저장
-    setOpenPostcode(false); // 검색창 닫기
-  };
-
-  const handleClickAddress = () => {
-    setOpenPostcode(true);
-  };
-
-  const handleUpdate = async () => {
-    const payload = {
-      companyName,
-      businessNum,
-      companyType,
-      ceoName,
-      ceoPhone,
-      managerName,
-      managerPhone,
-      managerEmail,
-      remark,
-      zipcode,
-      addressBase: address,
-      addressDetail,
-    };
-
-    try {
-      await updateCompanyDetail(id, payload);
-      alert("업체 정보가 수정되었습니다");
-      navigate("/master/company/list");
-    } catch (error) {
-      console.error(error);
-      alert("수정 실패");
-    }
-  };
 
   return (
-    <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>업체 등록</h2>
-
-      <Box sx={{ height: 600, width: "100%" }}>
-        <Grid container spacing={3} sx={{ mt: 4 }}>
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="companyName" required>
-              업체명
-            </FormLabel>
-            <OutlinedInput
-              id="companyName"
-              name="companyName"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              type="text"
-              placeholder="업체명"
-              autoComplete="organization"
-              required
-              size="small"
-            />
-          </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }} />
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="companyType" required>
-              업체 유형
-            </FormLabel>
-            <Select
-              id="companyType"
-              name="companyType"
-              value={companyType}
-              onChange={(e) => setCompanyType(e.target.value)}
-              displayEmpty
-              input={<OutlinedInput />}
-              size="small"
-              required
-              fullWidth
-            >
-              <MenuItem value="" disabled>
-                업체 유형 선택
-              </MenuItem>
-              <MenuItem value="CLIENT">거래처</MenuItem>
-              <MenuItem value="SUPPLIER">매입처</MenuItem>
-            </Select>
-          </FormGrid>
-
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="businessNum" required>
-              사업자 등록번호
-            </FormLabel>
-            <OutlinedInput
-              id="businessNum"
-              name="businessNum"
-              value={businessNum}
-              onChange={(e) => setBusinessNum(e.target.value)}
-              type="text"
-              placeholder="사업자 등록번호"
-              autoComplete="businessNum"
-              required
-              size="small"
-            />
-          </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="ceoName" required>
-              대표명
-            </FormLabel>
-            <OutlinedInput
-              id="ceoName"
-              name="ceoName"
-              value={ceoName}
-              onChange={(e) => setCeoName(e.target.value)}
-              type="text"
-              placeholder="홍길동"
-              autoComplete="name"
-              required
-              size="small"
-            />
-          </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="ceoPhone" required>
-              대표 전화번호
-            </FormLabel>
-            <OutlinedInput
-              id="ceoPhone"
-              name="ceoPhone"
-              value={ceoPhone}
-              onChange={(e) => setCeoPhone(e.target.value)}
-              type="text"
-              placeholder="01012345678"
-              autoComplete="tel"
-              required
-              size="small"
-            />
-          </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="managerName" required>
-              담당자명
-            </FormLabel>
-            <OutlinedInput
-              id="managerName"
-              name="managerName"
-              value={managerName}
-              onChange={(e) => setManagerName(e.target.value)}
-              type="text"
-              placeholder="홍길동"
-              autoComplete="name"
-              required
-              size="small"
-            />
-          </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="managerPhone" required>
-              담당자 전화번호
-            </FormLabel>
-            <OutlinedInput
-              id="managerPhone"
-              name="managerPhone"
-              value={managerPhone}
-              onChange={(e) => setManagerPhone(e.target.value)}
-              type="text"
-              placeholder="01012345678"
-              autoComplete="managerPhone"
-              required
-              size="small"
-            />
-          </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="managerEmail" required>
-              담당자 이메일
-            </FormLabel>
-            <OutlinedInput
-              id="managerEmail"
-              name="managerEmail"
-              value={managerEmail}
-              onChange={(e) => setManagerEmail(e.target.value)}
-              type="email"
-              placeholder="example@gmail.com"
-              autoComplete="email"
-              required
-              size="small"
-            />
-          </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="remark">비고</FormLabel>
-            <OutlinedInput
-              id="remark"
-              name="remark"
-              value={remark}
-              onChange={(e) => setRemark(e.target.value)}
-              type="text"
-              placeholder="비고"
-              autoComplete="off"
-              size="small"
-            />
-          </FormGrid>
-          <FormGrid size={{ xs: 12 }} sx={{ gap: 2 }}>
-            <FormLabel htmlFor="address" required>
-              기업 주소
-            </FormLabel>
-            <Grid container spacing={2} alignItems="center">
-              {/* 우편번호 */}
-              <Grid item xs={12} md={6}>
-                <OutlinedInput
-                  id="zipcode"
-                  name="zipcode"
-                  type="text"
-                  autoComplete="postal-code"
-                  placeholder="우편번호"
-                  value={zipcode}
-                  onChange={(e) => setZipcode(e.target.value)}
-                  required
-                  size="small"
-                />
-              </Grid>
-
-              {/* 주소 검색 버튼 */}
-              <Button
-                variant="outlined"
-                onClick={handleClickAddress}
-                sx={{ height: "40px" }}
-              >
-                주소 검색
-              </Button>
+    <Box sx={{ p: 2, maxWidth: 1200, mx: "auto"  }}>
+        <h2>원자재 등록</h2>
+        
+        <Box sx={{ height: 600, width: "100%" }}>
+            <Grid container spacing={3} sx={{ mt: 4 }}>
+                <FormGrid size={{ xs: 12, md: 6 }}>
+                    <FormLabel htmlFor="companyName" required>
+                    매입처명
+                    </FormLabel>
+                    <OutlinedInput
+                        id="companyName"
+                        name="companyName"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        type="text"
+                        placeholder="매입명"
+                        autoComplete="organization"
+                        required
+                        size="small"
+                    />
+                </FormGrid>
+                <FormGrid size={{ xs: 12, md: 6 }} />
+                <FormGrid size={{ xs: 12, md: 6 }}>
+                    <FormLabel htmlFor="materialCode" required>
+                    품목번호
+                    </FormLabel>
+                    <OutlinedInput
+                        id="materialCode"
+                        name="materialCode"
+                        value={materialCode}
+                        onChange={(e) => setMaterialCode(e.target.value)}
+                        type="text"
+                        placeholder="품목번호"
+                        autoComplete="on"
+                        required
+                        size="small"
+                    />
+                </FormGrid>
+                <FormGrid size={{ xs: 12, md: 6 }}>
+                    <FormLabel htmlFor="materialName" required>
+                    품목명
+                    </FormLabel>
+                    <OutlinedInput
+                        id="materialName"
+                        name="materialName"
+                        value={materialName}
+                        onChange={(e) => setMaterialName(e.target.value)}
+                        type="text"
+                        placeholder="품목명"
+                        autoComplete="on"
+                        required
+                        size="small"
+                    />
+                </FormGrid>
+                
+                <FormGrid  size={{ xs: 12, md: 6 }}>
+                    <FormLabel htmlFor="type" required>
+                    분류
+                    </FormLabel>
+                    <Select
+                        id="type"
+                        name="type"
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
+                        displayEmpty
+                        input={<OutlinedInput />}
+                        size="small"
+                        required
+                        fullWidth
+                    >
+                        <MenuItem value="" disabled>원자재 종류 선택</MenuItem>
+                        <MenuItem value="PAINT">페인트</MenuItem>
+                        <MenuItem value="THINNER">신나</MenuItem>
+                        <MenuItem value="CLEANER">세척제</MenuItem>
+                        <MenuItem value="HARDENER">경화제</MenuItem>
+                    </Select>
+                </FormGrid>
+                <FormGrid size={{ xs: 12, md: 6 }}>
+                    <FormLabel htmlFor="color" required>
+                    색상
+                    </FormLabel>
+                    <OutlinedInput
+                        id="color"
+                        name="color"
+                        value={color}
+                        onChange={(e) => setColor(e.target.value)}
+                        type="text"
+                        placeholder="색상"
+                        autoComplete="on"
+                        required
+                        size="small"
+                    />
+                </FormGrid>
+                <FormGrid size={{ xs: 12, md: 3 }}>
+                    <FormLabel htmlFor="spec" required>
+                    규격
+                    </FormLabel>
+                    <OutlinedInput
+                        id="spec"
+                        name="spec"
+                        value={spec}
+                        onChange={(e) => setSpec(e.target.value)}
+                        type="text"
+                        placeholder="규격"
+                        autoComplete="on"
+                        required
+                        size="small"
+                    />
+                </FormGrid>
+                <FormGrid size={{ xs: 12, md: 3 }}>
+                    <FormLabel htmlFor="scale" required>
+                    규격단위
+                    </FormLabel>
+                    <OutlinedInput
+                        id="scale"
+                        name="scale"
+                        value={scale}
+                        onChange={(e) => setScale(e.target.value)}
+                        type="text"
+                        placeholder="규격단위"
+                        autoComplete="on"
+                        required
+                        size="small"
+                    />
+                </FormGrid>
+                <FormGrid size={{ xs: 12, md: 6 }}>
+                    <FormLabel htmlFor="manufacturer" required>
+                    제조사
+                    </FormLabel>
+                    <OutlinedInput
+                        id="manufacturer"
+                        name="manufacturer"
+                        value={manufacturer}
+                        onChange={(e) => setManufacturer(e.target.value)}
+                        type="text"
+                        placeholder="제조사"
+                        autoComplete="organization"
+                        required
+                        size="small"
+                    />
+                </FormGrid>
+                <FormGrid size={{ xs: 12 }}>
+                    <FormLabel htmlFor="remark">
+                    비고
+                    </FormLabel>
+                    <OutlinedInput
+                        id="remark"
+                        name="remark"
+                        value={remark}
+                        onChange={(e) => setRemark(e.target.value)}
+                        type="text"
+                        placeholder="비고"
+                        autoComplete="off"
+                        size="small"
+                    />
+                </FormGrid>
+            
             </Grid>
-
-            {/* 📌 주소 검색 모달 */}
-            <Dialog
-              open={openPostcode}
-              onClose={() => setOpenPostcode(false)}
-              fullWidth
-              maxWidth="sm"
-            >
-              <DialogTitle>
-                주소 검색
-                <IconButton
-                  onClick={() => setOpenPostcode(false)}
-                  sx={{ position: "absolute", right: 8, top: 8 }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </DialogTitle>
-              <DialogContent>
-                <DaumPostcode onComplete={handleComplete} />
-              </DialogContent>
-            </Dialog>
-
-            {/* 기본 주소 */}
-            <OutlinedInput
-              id="addressBase"
-              name="addressBase"
-              type="text"
-              autoComplete="street-address"
-              placeholder="주소"
-              value={addressBase}
-              onChange={(e) => setAddressBase(e.target.value)}
-              readOnly
-              required
-              size="small"
-            />
-
-            {/* 상세 주소 */}
-            <OutlinedInput
-              id="addressDetail"
-              name="addressDetail"
-              type="text"
-              placeholder="상세주소를 입력하세요"
-              value={addressDetail}
-              onChange={(e) => setAddressDetail(e.target.value)}
-              required
-              size="small"
-            />
-          </FormGrid>
-        </Grid>
-      </Box>
-
-      {/* 버튼 영역 */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mt: 12,
-          mb: 2,
-        }}
-      >
-        {/* 버튼 영역 */}
-        <Box sx={{ ml: "auto" }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleUpdate}
-          >
-            수정
-          </Button>
         </Box>
-      </Box>
+
+        {/* 버튼 영역 */}
+        <Box
+            sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+            }}
+        >
+
+            {/* 버튼 영역 */}
+            <Box sx={{ ml: "auto" }}>
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    sx={{ height: 40, fontWeight: 500, px: 2.5 }}
+                    onClick={handleUpdate}
+                >
+                수정
+                </Button>
+            </Box>
+        </Box>
+        
     </Box>
   );
 }
+
