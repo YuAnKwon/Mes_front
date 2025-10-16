@@ -39,13 +39,14 @@ export type ShipInvoice = {
 };
 
 export type ProcessStatus = {
-  id: number; // 수주 입출고 id
+  id: number; // 수추입출고 라우팅 id
+  routingOrder: number;
   processCode: string;
   processName: string;
   processTime: number;
   remark: string;
-  completed_status: string;
-  start_time?: string;
+  completedStatus: string;
+  startTime?: string | Date | null;
 };
 
 export const formatDate = (dateStr: string) => {

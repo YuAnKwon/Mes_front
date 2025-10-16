@@ -131,24 +131,37 @@ export default function OrderInboundRegister() {
       editable: true,
       type: "date",
     },
+
     {
       field: "remark",
       headerName: "비고",
       width: 250,
       headerAlign: "center",
-      align: "left",
+      align: "center",
+      sortable: false,
       renderCell: (params) => (
-        <Typography
+        <Box
           sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "flex-start",
+            height: "100%", // 셀 전체 높이 기준
             whiteSpace: "normal",
             wordBreak: "break-word",
-            maxHeight: 60,
             overflowY: "auto",
             p: 1,
           }}
         >
-          {params.value}
-        </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              display: "block",
+              lineHeight: 1.4,
+            }}
+          >
+            {params.value}
+          </Typography>
+        </Box>
       ),
     },
   ];

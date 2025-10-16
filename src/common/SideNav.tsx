@@ -25,13 +25,20 @@ import {
 
 export function SideNav() {
   return (
-    <Sidebar aria-label="Sidebar with multi-level dropdown example">
+    <Sidebar
+      aria-label="Sidebar with multi-level dropdown example "
+      className="w-80"
+    >
       <SidebarItems>
         <SidebarItemGroup>
           <SidebarItem href="#" icon={HiChartPie}>
             대시보드
           </SidebarItem>
-          <SidebarCollapse icon={HiClipboardList} label="수주대상품목관리" open>
+          <SidebarCollapse
+            icon={HiClipboardList}
+            label="수주대상 입출고 관리"
+            open
+          >
             <SidebarItem href="/" icon={RiInboxArchiveLine}>
               입고 등록
             </SidebarItem>
