@@ -1,6 +1,3 @@
-console.log("컴포넌트 진입")
-
-
 import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -11,6 +8,7 @@ import { useState } from 'react';
 import { Select } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { registerMaterial } from '../api/MaterialApi';
+import type { MasterMtRegister } from '../type';
 
 
 const FormGrid = styled(Grid)(() => ({
@@ -20,9 +18,9 @@ const FormGrid = styled(Grid)(() => ({
 
 export default function MasterMaterial() {
 
-    const [itemCode, setCompanyName] = useState('');
-    const [itemName, setItemName] = useState('');
-    const [company, setCompany] = useState('');
+    const [materialCode, setMaterialCode] = useState('');
+    const [materialName, setMaterialName] = useState('');
+    const [companyName, setCompanyName] = useState('');
     const [type, setType] = useState('');
     const [color, setColor] = useState('');
     const [spec, setSpec] = useState('');
@@ -33,10 +31,10 @@ export default function MasterMaterial() {
     const navigate = useNavigate();
 
     const handleSave = async () => {
-        const payload = {
-            itemCode,
-            itemName,
-            company,
+        const payload: MasterMtRegister = {
+            materialCode,
+            materialName,
+            companyName,
             type,
             color,
             spec: Number(spec),
@@ -63,14 +61,14 @@ export default function MasterMaterial() {
         <Box sx={{ height: 600, width: "100%" }}>
             <Grid container spacing={3} sx={{ mt: 4 }}>
                 <FormGrid size={{ xs: 12, md: 6 }}>
-                    <FormLabel htmlFor="company" required>
+                    <FormLabel htmlFor="companyName" required>
                     매입처명
                     </FormLabel>
                     <OutlinedInput
-                        id="company"
-                        name="company"
-                        value={company}
-                        onChange={(e) => setCompany(e.target.value)}
+                        id="companyName"
+                        name="companyName"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
                         type="text"
                         placeholder="매입명"
                         autoComplete="organization"
@@ -80,14 +78,14 @@ export default function MasterMaterial() {
                 </FormGrid>
                 <FormGrid size={{ xs: 12, md: 6 }} />
                 <FormGrid size={{ xs: 12, md: 6 }}>
-                    <FormLabel htmlFor="itemCode" required>
+                    <FormLabel htmlFor="materialCode" required>
                     품목번호
                     </FormLabel>
                     <OutlinedInput
-                        id="itemCode"
-                        name="itemCode"
-                        value={itemCode}
-                        onChange={(e) => setCompanyName(e.target.value)}
+                        id="materialCode"
+                        name="materialCode"
+                        value={materialCode}
+                        onChange={(e) => setMaterialCode(e.target.value)}
                         type="text"
                         placeholder="품목번호"
                         autoComplete="on"
@@ -96,14 +94,14 @@ export default function MasterMaterial() {
                     />
                 </FormGrid>
                 <FormGrid size={{ xs: 12, md: 6 }}>
-                    <FormLabel htmlFor="itemName" required>
+                    <FormLabel htmlFor="materialName" required>
                     품목명
                     </FormLabel>
                     <OutlinedInput
-                        id="itemName"
-                        name="itemName"
-                        value={company}
-                        onChange={(e) => setItemName(e.target.value)}
+                        id="materialName"
+                        name="materialName"
+                        value={materialName}
+                        onChange={(e) => setMaterialName(e.target.value)}
                         type="text"
                         placeholder="품목명"
                         autoComplete="on"

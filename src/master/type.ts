@@ -30,9 +30,9 @@ export type MasterOrItRegister = MasterOrderItem & {
 //원자재 조회
 export type MasterMtList = {
   id: number;
-  itemCode: string;//품목번호
-  itemName: string;//품목명
-  company: string;//매입처명
+  materialCode: string;//품목번호
+  materialName: string;//품목명
+  companyName: string;//매입처명
   type: string;//분류
   color: string;//색상
   useYn: string;//거래상태
@@ -42,9 +42,9 @@ export type MasterMtList = {
 //원자재 등록
 export type MasterMtRegister = {
   id?: number;
-  itemCode: string;//품목번호
-  itemName: string;//품목명
-  company: string;//매입처명
+  materialCode: string;//품목번호
+  materialName: string;//품목명
+  companyName: string;//매입처명
   type: string;//분류
   color: string;//색상
   spec: number;//규격
