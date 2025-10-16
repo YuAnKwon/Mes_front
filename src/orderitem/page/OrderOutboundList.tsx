@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   deleteOrderItemOut,
-  getOrderItemInList,
   getOrderItemOutList,
   updateOrderItemOut,
 } from "../api/OrderInApi";
@@ -183,7 +182,7 @@ export default function OrderOutboundList() {
       },
     },
     {
-      field: "shipReceipt",
+      field: "shipmentInvoice",
       headerName: "출하증",
       width: 150,
       headerAlign: "center",
@@ -193,7 +192,7 @@ export default function OrderOutboundList() {
           variant="outlined"
           size="small"
           onClick={() => {
-            navigate(`/shipReceipt/${params.row.id}`);
+            navigate(`/shipmentInvoice/${params.row.id}`);
           }}
         >
           출하증
@@ -253,7 +252,9 @@ export default function OrderOutboundList() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상 품목 출고 조회</h2>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        수주대상 품목 출고 조회
+      </Typography>
       {/* 버튼 영역 */}
       <Box
         sx={{

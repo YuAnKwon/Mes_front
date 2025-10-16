@@ -3,6 +3,8 @@ import type {
   OrderItemList,
   OrderItemInRegister,
   OrderItemOutRegister,
+  ShipInvoice,
+  ProcessStatus,
 } from "../type";
 
 export const BASE_URL = import.meta.env.VITE_API_URL;
@@ -60,5 +62,21 @@ export const updateOrderItemOut = async (
 // 출고 데이터 삭제
 export const deleteOrderItemOut = async (id: number) => {
   const response = await axios.delete(`${BASE_URL}/orderitem/out/${id}`);
+  return response.data;
+};
+
+// 공정 진행현황 조회
+export const getProcessStatus = async (
+  id: number
+): Promise<ProcessStatus[]> => {
+  const response = await axios.get(`${BASE_URL}/orderitem/process/${id}`);
+  console.log(response.data);
+  return response.data;
+};
+
+// 출하증
+export const getShip = async (id: number): Promise<ShipInvoice[]> => {
+  const response = await axios.get(`${BASE_URL}/orderitem/ship/${id}`);
+  console.log(response.data);
   return response.data;
 };

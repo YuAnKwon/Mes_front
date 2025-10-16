@@ -84,7 +84,6 @@ export default function OrderInboundList() {
         inDate: row.inDate as string,
       });
 
-      // 저장 완료 후 체크 표시 or 토스트
       alert("수정 완료");
 
       // 편집 상태 초기화
@@ -115,7 +114,7 @@ export default function OrderInboundList() {
       alert("삭제 완료");
     } catch (error) {
       console.error("삭제 실패", error);
-      alert("삭제 실패");
+      alert("삭제에 실패했습니다.");
     }
   };
 
@@ -276,7 +275,10 @@ export default function OrderInboundList() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상 품목 입고 조회</h2>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        수주대상 품목 입고 조회
+      </Typography>
+
       {/* 버튼 영역 */}
       <Box
         sx={{

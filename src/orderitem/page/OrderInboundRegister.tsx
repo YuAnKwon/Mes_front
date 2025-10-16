@@ -199,7 +199,9 @@ export default function OrderInboundRegister() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상 품목 입고 등록</h2>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        수주대상 품목 입고 등록
+      </Typography>
       {/* 버튼 영역 */}
       <Box
         sx={{

@@ -12,6 +12,7 @@ import MasterOrderItemList from "./master/page/MasterOrderItemList";
 import MasterCompanyList from "./master/page/MasterCompanyList";
 import MasterCompany from "./master/page/MasterCompany";
 import OrderOutboundList from "./orderitem/page/OrderOutboundList";
+import ShipmentInvoice from "./orderitem/page/ShipmentInvoice";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
               path="/orderitem/outbound/list"
               element={<OrderOutboundList />}
             />
+            <Route path="/shipmentInvoice/:id" element={<ShipmentInvoice />} />
 
             {/* 원자재 */}
             <Route

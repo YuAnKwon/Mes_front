@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
@@ -183,7 +183,9 @@ export default function OrderOutboundRegister() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상 품목 출고 등록</h2>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        수주대상 품목 출고 등록
+      </Typography>
       {/* 버튼 영역 */}
       <Box
         sx={{
