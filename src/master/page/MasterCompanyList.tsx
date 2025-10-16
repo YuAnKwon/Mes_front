@@ -113,7 +113,7 @@ export default function MasterCompanyList() {
       disableColumnMenu: true,
       align: 'center',
       renderCell: (params) => {
-        const isActive = params.row.businessYn === 'Y';
+        const isActive = params.row.businessYn === '거래 중';
         const buttonStyle = {
           color: isActive ? '#ee0000' : '#4169E1',
           borderColor: isActive ? '#ee0000' : '#4169E1',
@@ -155,17 +155,16 @@ export default function MasterCompanyList() {
   ];
 
   const handleState = async (row) => {
-    const updatedState = row.businessYn === 'Y' ? 'N' : 'Y';
+    const updatedState = row.businessYn === '거래 중' ? 'Y' : 'N';
       try {
-        await updateCompanyState(row.id, updatedState);
-        // 상태 업데이트
-        setRows(prev =>
-          prev.map(item =>
-            item.id === row.id ? { ...item, businessYn: updatedState } : item
-          )
-        );
+        //api 호출로 백엔드에 변경 요청
+        await updateCompanyState(row.id, updatedState)
+        // 2. 변경된 전체 리스트 다시 불러오기
+        const refreshedRows = await getMasterCpList();
+        // 3. 상태 갱신
+        setRows(refreshedRows);
+
         alert('거래 상태가 변경되었습니다');
-        // TODO: rows 갱신 또는 상태 업데이트
       } catch (error) {
         console.error(error);
         alert('상태 변경 실패');

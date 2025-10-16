@@ -17,6 +17,8 @@ import { MaterialOutboundRegister } from "./material/page/MaterialOutboundRegist
 import MasterCompanyDetail from "./master/page/MasterCompanyDetail";
 import { MaterialOutboundList } from "./material/page/MaterialOutboundList";
 import OrderProcess from "./orderitem/page/OrderProcess";
+import MasterMaterialList from "./master/page/MasterMaterialList";
+import MasterMaterial from "./master/page/MasterMaterial";
 
 function App() {
   return (
@@ -82,7 +84,15 @@ function App() {
               path="/master/company/detail/:id"
               element={<MasterCompanyDetail />}
             />
-            {/* <Route path="/master/material/list" element={<MasterMaterialList />} /> */}
+
+            <Route
+              path="/master/material/list"
+              element={<MasterMaterialList />}
+            />
+            <Route
+              path="/master/material/regist"
+              element={<MasterMaterial />}
+            />
             {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />
             
             <Route path="/master/routing" element={<MasterRouting />} />
