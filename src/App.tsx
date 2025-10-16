@@ -16,13 +16,14 @@ import ShipmentInvoice from "./orderitem/page/ShipmentInvoice";
 import { MaterialOutboundRegister } from "./material/page/MaterialOutboundRegister";
 import MasterCompanyDetail from "./master/page/MasterCompanyDetail";
 import { MaterialOutboundList } from "./material/page/MaterialOutboundList";
+import OrderProcess from "./orderitem/page/OrderProcess";
 
 function App() {
   return (
     <BrowserRouter>
       <div className="flex h-screen">
         {/* 사이드바 (왼쪽 고정) */}
-        <div className="w-64">
+        <div className="w-80">
           <SideNav />
         </div>
 
@@ -44,6 +45,7 @@ function App() {
               element={<OrderOutboundList />}
             />
             <Route path="/shipmentInvoice/:id" element={<ShipmentInvoice />} />
+            <Route path="/orderitem/process/:id" element={<OrderProcess />} />
 
             {/* 원자재 */}
             <Route
