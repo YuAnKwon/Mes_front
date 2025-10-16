@@ -13,7 +13,6 @@ import MasterCompanyList from "./master/page/MasterCompanyList";
 import MasterCompany from "./master/page/MasterCompany";
 import OrderOutboundList from "./orderitem/page/OrderOutboundList";
 import MasterCompanyDetail from "./master/page/MasterCompanyDetail";
-import MasterMaterialList from "./master/page/MasterMaterialList";
 
 function App() {
   return (
@@ -59,7 +58,7 @@ function App() {
             <Route path="/master/company/list" element={<MasterCompanyList />}/>
             <Route path="/master/company/register" element={<MasterCompany />}/>
             <Route path="/master/company/detail/:id" element={<MasterCompanyDetail />}/>
-            <Route path="/master/material/list" element={<MasterMaterialList />} />
+            {/* <Route path="/master/material/list" element={<MasterMaterialList />} /> */}
             {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />
             
             <Route path="/master/routing" element={<MasterRouting />} />

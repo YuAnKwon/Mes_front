@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Button, Typography } from "@mui/material";
+import { Button, Tab, Tabs, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import type { MasterCpList } from "../type";
 import { getMasterCpList, updateCompanyState } from "../api/companyApi";
+
 
 export default function MasterCompanyList() {
   const navigate = useNavigate();
@@ -171,10 +172,24 @@ export default function MasterCompanyList() {
       }
   };
 
-
   const handleRegister = async () => {
     navigate("/master/company/register");
   };
+
+  // 탭기능
+  const [currentTab, setCurrentTab] = useState<number>(0);
+
+  const tabList = ['전체', '거래처', '매입처'];
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
+  };
+
+  const filteredRows = currentTab === 0
+    ? rows
+    : rows.filter((row) => row.companyType === tabList[currentTab]);
+
+
 
   return (
     <Box sx={{ p: 2 }}>
@@ -185,6 +200,7 @@ export default function MasterCompanyList() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          mt: 4,
           mb: 2,
           gap: 2,
         }}
@@ -201,10 +217,19 @@ export default function MasterCompanyList() {
           </Button>
         </Box>
       </Box>
+      {/* 탭 메뉴 */}
+
+      <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 2 }}>
+        {tabList.map((label, index) => (
+          <Tab key={index} label={label} />
+        ))}
+      </Tabs>
+
+      {/* 테이블 영역 */}
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
-          rows={rows}
+          rows={filteredRows}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
