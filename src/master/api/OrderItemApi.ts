@@ -11,12 +11,18 @@ export const getMasterOrItList = async (): Promise<MasterOrItList[]> => {
 };
 
 export const registerOrderItem = async (data: MasterOrItRegister) => {
-  const response = await axios.post(`${BASE_URL}/master/orderitem/register`, data);
+  const response = await axios.post(
+    `${BASE_URL}/master/orderitem/register`,
+    data
+  );
   return response.data;
 };
 
 export const updateOrItState = async (id: number, updatedState: string) => {
-  const response = await axios.patch(`${BASE_URL}/master/orderitem/${id}/state`, {updatedState});
+  const response = await axios.patch(
+    `${BASE_URL}/master/orderitem/${id}/state`,
+    { updatedState }
+  );
   return response.data;
 };
 
@@ -26,7 +32,13 @@ export const getOrItDetail = async (id: number) => {
   return response.data;
 };
 
-export const updateOrItDetail = async (id: number, updatedMaterial: string) => {
-  const response = await axios.put(`${BASE_URL}/master/orderitem/detail/${id}`, updatedMaterial);
+export const updateOrItDetail = async (
+  id: number,
+  updatedMaterial: MasterOrItRegister
+) => {
+  const response = await axios.put(
+    `${BASE_URL}/master/orderitem/detail/${id}`,
+    updatedMaterial
+  );
   return response.data;
 };
