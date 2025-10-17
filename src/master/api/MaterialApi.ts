@@ -27,6 +27,6 @@ export const getMaterialDetail = async (id: number) => {
 };
 
 export const updateMaterialDetail = async (id: number, updatedMaterial: string) => {
-  const response = await axios.patch(`${BASE_URL}/master/material/detail/${id}`, updatedMaterial);
+  const response = await axios.put(`${BASE_URL}/master/material/detail/${id}`, updatedMaterial);
   return response.data;
 };

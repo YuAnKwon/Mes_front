@@ -7,6 +7,7 @@ import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import type { MasterCpList } from "../type";
 import { getMasterCpList, updateCompanyState } from "../api/companyApi";
+import SearchBar from "../../common/SearchBar";
 
 export default function MasterCompanyList() {
   const navigate = useNavigate();
@@ -184,6 +185,25 @@ export default function MasterCompanyList() {
     setCurrentTab(newValue);
   };
 
+  const sampleData = [
+    "회사1",
+    "회사2",
+    "품목A",
+    "품목B",
+    "입고번호001",
+    "입고번호002",
+  ];
+
+  const searchOptions = [
+    { label: "매입처명", value: "companyName" },
+    { label: "품목번호", value: "materialCode" },
+    { label: "품목명", value: "materialName" },
+  ];
+
+  const handleSearch = (criteria: string, query: string) => {
+    console.log("검색 실행:", { criteria, query });
+  };
+
   const filteredRows =
     currentTab === 0
       ? rows
@@ -203,6 +223,15 @@ export default function MasterCompanyList() {
           alignItems: "center",
         }}
       >
+        {/* 공통 검색바 */}
+        <Box sx={{ flex: 1 }}>
+          <SearchBar
+            searchOptions={searchOptions}
+            autoCompleteData={sampleData}
+            onSearch={handleSearch}
+          />
+        </Box>
+
         {/* 버튼 영역 */}
         <Box sx={{ ml: "auto" }}>
           <Button

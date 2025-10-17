@@ -15,5 +15,18 @@ export const registerOrderItem = async (data: MasterOrItRegister) => {
   return response.data;
 };
 
+export const updateOrItState = async (id: number, updatedState: string) => {
+  const response = await axios.patch(`${BASE_URL}/master/orderitem/${id}/state`, {updatedState});
+  return response.data;
+};
 
+export const getOrItDetail = async (id: number) => {
+  const response = await axios.get(`${BASE_URL}/master/orderitem/detail/${id}`);
+  console.log(response.data);
+  return response.data;
+};
 
+export const updateOrItDetail = async (id: number, updatedMaterial: string) => {
+  const response = await axios.put(`${BASE_URL}/master/orderitem/detail/${id}`, updatedMaterial);
+  return response.data;
+};

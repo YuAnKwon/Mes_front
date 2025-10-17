@@ -8,7 +8,7 @@ import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
-import { getMasterOrItList } from "../api/OrderItemApi";
+import { getMasterOrItList, updateOrItState } from "../api/OrderItemApi";
 import type { MasterOrItList } from "../type";
 import SearchBar from "../../common/SearchBar";
 
@@ -49,7 +49,7 @@ export default function MasterOrderItemList() {
         color: item.color,
         coatingMethod: item.coatingMethod,
         remark: item.remark,
-        completedStatus: item.completedStatus,
+        useYn: item.useYn,
       }));
 
       setRows(mappedRows);
@@ -61,6 +61,23 @@ export default function MasterOrderItemList() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleState = async (row) => {
+      const updatedState = row.useYn === '거래 중' ? 'Y' : 'N';
+        try {
+          //api 호출로 백엔드에 변경 요청
+          await updateOrItState(row.id, updatedState)
+          // 2. 변경된 전체 리스트 다시 불러오기
+          const refreshedRows = await getMasterOrItList();
+          // 3. 상태 갱신
+          setRows(refreshedRows);
+  
+          alert('거래 상태가 변경되었습니다');
+        } catch (error) {
+          console.error(error);
+          alert('상태 변경 실패');
+        }
+    };
 
   const [rows, setRows] = useState<MasterOrItList[]>([]);
   const apiRef = useGridApiRef();
@@ -138,12 +155,40 @@ export default function MasterOrderItemList() {
       align: "center",
     },
     {
-      field: "completedStatus",
+      field: "useYn",
       headerName: "거래상태",
       width: 120,
       headerAlign: "center",
       align: "center",
     },
+    {
+          field: 'actions',
+          headerName: '', // 헤더 텍스트 없음
+          width: 150,
+          sortable: false,
+          filterable: false,
+          disableColumnMenu: true,
+          align: 'center',
+          renderCell: (params) => {
+            const isActive = params.row.useYn === '거래 중';
+            const buttonStyle = {
+              color: isActive ? '#ee0000' : '#4169E1',
+              borderColor: isActive ? '#ee0000' : '#4169E1',
+            };
+            const buttonText = isActive ? '거래 종료' : '거래 재개';
+    
+            return (
+              <Button
+                variant="outlined"
+                size="small"
+                style={buttonStyle}
+                onClick={() => handleState(params.row)}
+              >
+                {buttonText}
+              </Button>
+            );
+          },
+        },
     {
       field: "remark",
       headerName: "비고",
@@ -174,29 +219,7 @@ export default function MasterOrderItemList() {
   };
 
   const handleRegister = async () => {
-    // ✅ DataGrid에서 선택된 행 ID 가져오기
-    // const selectedRowsMap = apiRef.current.getSelectedRows();
-    // const selectedRows = Array.from(selectedRowsMap.values());
-
-    // if (selectedRows.length === 0) {
-    //   alert("등록할 품목을 선택해주세요.");
-    //   return;
-    // }
-
-    // const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
-    //   id: row.id,
-    //   inAmount: row.inAmount as number,
-    //   inDate: row.inDate as string,
-    // }));
-
-    // try {
-    //   await registerInboundItem(payload);
-    //   alert("입고 등록이 완료되었습니다.");
-    //   navigate("/orderitem/inbound/list");
-    // } catch (error) {
-    //   console.error(error);
-    //   alert("등록 중 오류가 발생하였습니다.");
-    // }
+    navigate("/master/orderitem/register");
   };
 
   return (

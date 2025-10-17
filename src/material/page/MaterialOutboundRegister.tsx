@@ -2,12 +2,13 @@ import { Box, Button } from "@mui/material";
 import SearchBar from "../../common/SearchBar";
 import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 import type { MaterialOut } from "../type";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMaterialInData } from "../api/MaterialInboundregisterApi";
 import { postMaterialOutData } from "../api/MaterialOutboundRegisterApi";
+import { createStyledWorksheet } from "../../common/ExcelUtils";
 
 export function MaterialOutboundRegister() {
   const [materialout, setMaterialout] = useState<MaterialOut[]>([]);
@@ -98,13 +99,6 @@ export function MaterialOutboundRegister() {
     },
   ];
 
-  const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(materialout);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "원자재_출고_등록_목록.xlsx");
-  };
-
   //검색
   const handleSearch = (criteria: string, query: string) => {
     console.log("검색 실행:", { criteria, query });
@@ -162,6 +156,28 @@ export function MaterialOutboundRegister() {
   }, []);
 
   const navigate = useNavigate();
+
+  const handleExcelDownload = () => {
+    if (!materialout || materialout.length === 0) {
+      alert("다운로드할 데이터가 없습니다.");
+      return; // 더 이상 진행하지 않음
+    }
+    const excelData = materialout.map((item) => ({
+      입고번호: item.inNum,
+      품목명: item.materialName,
+      품목번호: item.materialCode,
+      매입처명: item.companyName,
+      "재고량(개)": item.stock,
+      제조사: item.manufacturer,
+
+      // "거래처명": item.companyName ?? "", // null 방지
+    }));
+
+    const worksheet = createStyledWorksheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, "원자재_출고_등록_목록.xlsx");
+  };
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 출고 등록</h2>

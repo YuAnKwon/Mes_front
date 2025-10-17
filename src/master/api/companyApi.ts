@@ -26,6 +26,6 @@ export const getCompanyDetail = async (id: number) => {
 };
 
 export const updateCompanyDetail = async (id: number, updatedCompany: string) => {
-  const response = await axios.patch(`${BASE_URL}/master/company/detail/${id}`, updatedCompany);
+  const response = await axios.put(`${BASE_URL}/master/company/detail/${id}`, updatedCompany);
   return response.data;
 };
