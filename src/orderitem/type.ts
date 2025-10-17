@@ -11,6 +11,7 @@ export type OrderItemList = {
   outAmount?: number;
   outDate?: string;
   remark?: string;
+  isProcessCompleted?: string;
 };
 
 export type OrderItemInRegister = {
