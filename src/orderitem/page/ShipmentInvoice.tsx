@@ -178,118 +178,157 @@ export default function ShipmentInvoice() {
         </Box>
 
         {/* 공급자 정보 */}
-        <TableContainer
-          component={Paper}
-          sx={{
-            width: "100%",
-            mb: 2,
-            boxShadow: "none",
-            border: "1px solid #000",
-          }}
-        >
-          <Table size="small" sx={{ borderCollapse: "collapse" }}>
-            <TableBody>
-              <TableRow>
-                <TableCell
-                  rowSpan={4}
-                  sx={{ ...cellStyle, width: "6%", fontWeight: "bold" }}
-                >
-                  공<br />급<br />자
-                </TableCell>
-                <TableCell sx={{ ...cellStyle, width: "15%" }}>
-                  출고번호
-                </TableCell>
-                <TableCell sx={{ ...valueCellStyle, width: "29%" }}>
-                  {first.outNum}
-                </TableCell>
-                <TableCell sx={{ ...cellStyle, width: "12%" }}>TEL</TableCell>
-                <TableCell sx={valueCellStyle}>055-313-0716</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={cellStyle}>
-                  사업자
-                  <br />
-                  등록번호
-                </TableCell>
-                <TableCell sx={valueCellStyle}>622-81-21575</TableCell>
-                <TableCell sx={cellStyle}>상호</TableCell>
-                <TableCell sx={valueCellStyle}>대원공업(주)</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={cellStyle}>주소</TableCell>
-                <TableCell colSpan={3} sx={valueCellStyle}>
-                  경상남도 김해시 진례면 서부로 406
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            sx={{
+              fontSize: "1.3rem",
+              fontWeight: 700,
+              color: "#1f2937",
+              pb: 1,
+              display: "inline-block",
+            }}
+          >
+            공급자 정보
+          </Typography>
+          <TableContainer
+            component={Paper}
+            sx={{
+              width: "100%",
+              mb: 2,
+              boxShadow: "none",
+              border: "1px solid #000",
+            }}
+          >
+            <Table size="small" sx={{ borderCollapse: "collapse" }}>
+              <TableBody>
+                <TableRow>
+                  <TableCell
+                    rowSpan={4}
+                    sx={{ ...cellStyle, width: "6%", fontWeight: "bold" }}
+                  >
+                    공<br />급<br />자
+                  </TableCell>
+                  <TableCell sx={{ ...cellStyle, width: "15%" }}>
+                    출고번호
+                  </TableCell>
+                  <TableCell sx={{ ...valueCellStyle, width: "29%" }}>
+                    {first.outNum}
+                  </TableCell>
+                  <TableCell sx={{ ...cellStyle, width: "12%" }}>TEL</TableCell>
+                  <TableCell sx={valueCellStyle}>055-313-0716</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={cellStyle}>
+                    사업자
+                    <br />
+                    등록번호
+                  </TableCell>
+                  <TableCell sx={valueCellStyle}>622-81-21575</TableCell>
+                  <TableCell sx={cellStyle}>상호</TableCell>
+                  <TableCell sx={valueCellStyle}>대원공업(주)</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={cellStyle}>주소</TableCell>
+                  <TableCell colSpan={3} sx={valueCellStyle}>
+                    경상남도 김해시 진례면 서부로 406
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
 
         {/* 출하/납품 정보 */}
-        <TableContainer
-          component={Paper}
-          sx={{
-            width: "100%",
-            mb: 2,
-            boxShadow: "none",
-            border: "1px solid #000",
-          }}
-        >
-          <Table size="small">
-            <TableBody>
-              <TableRow>
-                <TableCell sx={{ ...cellStyle, width: "21%" }}>
-                  입고일자
-                </TableCell>
-                <TableCell sx={{ ...valueCellStyle, width: "29%" }}>
-                  {formatDate(first.inDate)}
-                </TableCell>
-                <TableCell sx={{ ...cellStyle, width: "20%" }}>
-                  출고일자
-                </TableCell>
-                <TableCell sx={valueCellStyle}>
-                  {formatDate(first.outDate)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={cellStyle}>납품지주소</TableCell>
-                <TableCell colSpan={3} sx={valueCellStyle}>
-                  {first.companyAddr}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            sx={{
+              fontSize: "1.3rem",
+              fontWeight: 700,
+              color: "#1f2937",
+              pb: 1,
+              display: "inline-block",
+            }}
+          >
+            출하 정보
+          </Typography>
+          <TableContainer
+            component={Paper}
+            sx={{
+              width: "100%",
+              mb: 2,
+              boxShadow: "none",
+              border: "1px solid #000",
+            }}
+          >
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell sx={{ ...cellStyle, width: "21%" }}>
+                    입고일자
+                  </TableCell>
+                  <TableCell sx={{ ...valueCellStyle, width: "29%" }}>
+                    {formatDate(first.inDate)}
+                  </TableCell>
+                  <TableCell sx={{ ...cellStyle, width: "20%" }}>
+                    출고일자
+                  </TableCell>
+                  <TableCell sx={valueCellStyle}>
+                    {formatDate(first.outDate)}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={cellStyle}>납품지주소</TableCell>
+                  <TableCell colSpan={3} sx={valueCellStyle}>
+                    {first.companyAddr}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
 
         {/* 품목 테이블 */}
-        <TableContainer
-          component={Paper}
-          sx={{ mb: 2, boxShadow: "none", border: "1px solid #000" }}
-        >
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                {["품목번호", "품목명", "수량"].map((label) => (
-                  <TableCell
-                    key={label}
-                    sx={{ ...cellStyle, fontWeight: "bold", width: "33%" }}
-                  >
-                    {label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {shipData.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell sx={cellStyle}>{item.itemCode}</TableCell>
-                  <TableCell sx={cellStyle}>{item.itemName}</TableCell>
-                  <TableCell sx={cellStyle}>{item.outAmount}</TableCell>
+        <Box>
+          <Typography
+            sx={{
+              fontSize: "1.3rem",
+              fontWeight: 700,
+              color: "#1f2937",
+              pb: 1,
+              display: "inline-block",
+            }}
+          >
+            출하 품목
+          </Typography>
+          <TableContainer
+            component={Paper}
+            sx={{ mb: 2, boxShadow: "none", border: "1px solid #000" }}
+          >
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  {["품목번호", "품목명", "수량"].map((label) => (
+                    <TableCell
+                      key={label}
+                      sx={{ ...cellStyle, fontWeight: "bold", width: "33%" }}
+                    >
+                      {label}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {shipData.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell sx={cellStyle}>{item.itemCode}</TableCell>
+                    <TableCell sx={cellStyle}>{item.itemName}</TableCell>
+                    <TableCell sx={cellStyle}>{item.outAmount}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Box>
 
       {/* 출력 버튼 */}

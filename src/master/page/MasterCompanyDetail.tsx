@@ -9,6 +9,7 @@ import {
   DialogTitle,
   IconButton,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import DaumPostcode from "react-daum-postcode";
@@ -110,7 +111,9 @@ export default function MasterCompanyDetail() {
 
   return (
     <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>업체 등록</h2>
+      <Typography variant="h5" sx={{ mb: 1 }}>
+        {companyName}의 상세정보
+      </Typography>
 
       <Box sx={{ height: 600, width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>

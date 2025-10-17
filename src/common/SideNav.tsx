@@ -97,7 +97,10 @@ export function SideNav() {
             <SidebarItem href="/master/material/list" icon={HiCube}>
               원자재품목
             </SidebarItem>
-            <SidebarItem href="#" icon={HiOutlineArrowsUpDown}>
+            <SidebarItem
+              href="/master/routing/list"
+              icon={HiOutlineArrowsUpDown}
+            >
               라우팅
             </SidebarItem>
             <SidebarItem

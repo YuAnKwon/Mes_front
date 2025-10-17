@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import type { MasterCpList } from "../type";
 import { getMasterCpList, updateCompanyState } from "../api/companyApi";
 
-
 export default function MasterCompanyList() {
   const navigate = useNavigate();
 
@@ -105,20 +104,20 @@ export default function MasterCompanyList() {
       align: "center",
     },
     {
-      field: 'actions',
-      headerName: '', // 헤더 텍스트 없음
+      field: "actions",
+      headerName: "", // 헤더 텍스트 없음
       width: 150,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      align: 'center',
+      align: "center",
       renderCell: (params) => {
-        const isActive = params.row.businessYn === '거래 중';
+        const isActive = params.row.businessYn === "거래 중";
         const buttonStyle = {
-          color: isActive ? '#ee0000' : '#4169E1',
-          borderColor: isActive ? '#ee0000' : '#4169E1',
+          color: isActive ? "#ee0000" : "#4169E1",
+          borderColor: isActive ? "#ee0000" : "#4169E1",
         };
-        const buttonText = isActive ? '거래 종료' : '거래 재개';
+        const buttonText = isActive ? "거래 종료" : "거래 재개";
 
         return (
           <Button
@@ -155,20 +154,20 @@ export default function MasterCompanyList() {
   ];
 
   const handleState = async (row) => {
-    const updatedState = row.businessYn === '거래 중' ? 'Y' : 'N';
-      try {
-        //api 호출로 백엔드에 변경 요청
-        await updateCompanyState(row.id, updatedState)
-        // 2. 변경된 전체 리스트 다시 불러오기
-        const refreshedRows = await getMasterCpList();
-        // 3. 상태 갱신
-        setRows(refreshedRows);
+    const updatedState = row.businessYn === "거래 중" ? "Y" : "N";
+    try {
+      //api 호출로 백엔드에 변경 요청
+      await updateCompanyState(row.id, updatedState);
+      // 2. 변경된 전체 리스트 다시 불러오기
+      const refreshedRows = await getMasterCpList();
+      // 3. 상태 갱신
+      setRows(refreshedRows);
 
-        alert('거래 상태가 변경되었습니다');
-      } catch (error) {
-        console.error(error);
-        alert('상태 변경 실패');
-      }
+      alert("거래 상태가 변경되었습니다");
+    } catch (error) {
+      console.error(error);
+      alert("상태 변경 실패");
+    }
   };
 
   const handleRegister = async () => {
@@ -178,30 +177,29 @@ export default function MasterCompanyList() {
   // 탭기능
   const [currentTab, setCurrentTab] = useState<number>(0);
 
-  const tabList = ['전체', '거래처', '매입처'];
+  const tabList = ["전체", "거래처", "매입처"];
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
 
-  const filteredRows = currentTab === 0
-    ? rows
-    : rows.filter((row) => row.companyType === tabList[currentTab]);
-
-
+  const filteredRows =
+    currentTab === 0
+      ? rows
+      : rows.filter((row) => row.companyType === tabList[currentTab]);
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>업체 조회</h2>
+      <Typography variant="h5" sx={{ mb: 1 }}>
+        업체 조회
+      </Typography>
+
       {/* 버튼 영역 */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mt: 4,
-          mb: 2,
-          gap: 2,
         }}
       >
         {/* 버튼 영역 */}
