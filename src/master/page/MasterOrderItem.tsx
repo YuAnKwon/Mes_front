@@ -9,6 +9,7 @@ import { Select } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import type { MasterOrItRegister } from "../type";
 import { registerOrderItem } from "../api/OrderItemApi";
+import { FiCamera } from "react-icons/fi";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -232,6 +233,33 @@ export default function MasterOrderItem() {
             />
           </FormGrid>
         </Grid>
+        <div className="flex items-start gap-4 flex-wrap mt-8">
+          {orderInfo.photos.map((photo, idx) => (
+            <div
+              key={idx}
+              className="w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
+            >
+              <img
+                src={photo}
+                alt={`제품 사진 ${idx + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+
+          {/* 업로드 버튼 */}
+          <label className="flex flex-col items-center justify-center w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+            <FiCamera size={32} className="text-gray-400 mb-2" />
+            <span className="text-sm text-gray-500">사진 업로드</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handlePhotoUpload}
+              className="hidden"
+            />
+          </label>
+        </div>
       </Box>
 
       {/* 버튼 영역 */}
