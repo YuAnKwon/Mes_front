@@ -51,6 +51,39 @@ export default function MasterOrderItem() {
     }
   };
 
+  const [orderInfo, setOrderInfo] = useState<{
+    photos: string[]; // 미리보기용
+    imgUrl: File[]; // 서버 전송용
+  }>({
+    photos: [],
+    imgUrl: [],
+  });
+
+  //이미지 영역
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+
+      // 미리보기용 처리
+      const fileReaders: Promise<string>[] = fileArray.map(
+        (file) =>
+          new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(file);
+          })
+      );
+
+      Promise.all(fileReaders).then((images) => {
+        setOrderInfo((prev) => ({
+          photos: [...prev.photos, ...images],
+          imgUrl: [...prev.imgUrl, ...fileArray],
+        }));
+      });
+    }
+  };
+
   return (
     <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
       <h2>수주대상등록 등록</h2>
