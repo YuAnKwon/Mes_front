@@ -15,5 +15,9 @@ export const registerOrderItem = async (data: MasterOrItRegister) => {
   return response.data;
 };
 
+export const updateOrItState = async (id: number, updatedState: string) => {
+  const response = await axios.patch(`${BASE_URL}/master/orderitem/${id}/state`, {updatedState});
+  return response.data;
+};
 
 

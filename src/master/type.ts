@@ -13,7 +13,7 @@ export type MasterOrderItem = {
 //수주품목대상 등록 조회
 export type MasterOrItList = MasterOrderItem & {
   id: number;
-  completedStatus: string;//거래상태
+  useYn: string;//거래상태
 }
 
 //수주품목대상 등록
