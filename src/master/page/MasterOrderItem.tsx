@@ -126,10 +126,10 @@ export default function MasterOrderItem() {
                         fullWidth
                     >
                         <MenuItem value="" disabled>원자재 종류 선택</MenuItem>
-                        <MenuItem value="PAINT">페인트</MenuItem>
-                        <MenuItem value="THINNER">신나</MenuItem>
-                        <MenuItem value="CLEANER">세척제</MenuItem>
-                        <MenuItem value="HARDENER">경화제</MenuItem>
+                        <MenuItem value="GENERAL">일반</MenuItem>
+                        <MenuItem value="CAR">자동차</MenuItem>
+                        <MenuItem value="SHIPBUILDING">조선</MenuItem>
+                        <MenuItem value="DEFENSE">방산</MenuItem>
                     </Select>
                 </FormGrid>
                 <FormGrid  size={{ xs: 12, md: 6 }}>
@@ -148,8 +148,8 @@ export default function MasterOrderItem() {
                         fullWidth
                     >
                         <MenuItem value="" disabled>도장 방식 선택</MenuItem>
-                        <MenuItem value="PAINT">분체</MenuItem>
-                        <MenuItem value="THINNER">액체</MenuItem>
+                        <MenuItem value="POWDER">분체</MenuItem>
+                        <MenuItem value="LIQUID">액체</MenuItem>
                     </Select>
                 </FormGrid>
                 <FormGrid size={{ xs: 12, md: 6 }}>
@@ -221,7 +221,7 @@ export default function MasterOrderItem() {
                     sx={{ height: 40, fontWeight: 500, px: 2.5 }}
                     onClick={handleSave}
                 >
-                원자재 등록
+                수주대상품목 등록
                 </Button>
             </Box>
         </Box>
