@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
-import type {
-  GridColDef
-} from "@mui/x-data-grid";
+import type { GridColDef } from "@mui/x-data-grid";
 import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +29,7 @@ export default function MasterOrderItemList() {
   const handleSearch = (criteria: string, query: string) => {
     console.log("검색 실행:", { criteria, query });
   };
-  
+
   const navigate = useNavigate();
 
   const loadData = async () => {
@@ -63,21 +61,21 @@ export default function MasterOrderItemList() {
   }, []);
 
   const handleState = async (row) => {
-      const updatedState = row.useYn === '거래 중' ? 'Y' : 'N';
-        try {
-          //api 호출로 백엔드에 변경 요청
-          await updateOrItState(row.id, updatedState)
-          // 2. 변경된 전체 리스트 다시 불러오기
-          const refreshedRows = await getMasterOrItList();
-          // 3. 상태 갱신
-          setRows(refreshedRows);
-  
-          alert('거래 상태가 변경되었습니다');
-        } catch (error) {
-          console.error(error);
-          alert('상태 변경 실패');
-        }
-    };
+    const updatedState = row.useYn === "거래 중" ? "Y" : "N";
+    try {
+      //api 호출로 백엔드에 변경 요청
+      await updateOrItState(row.id, updatedState);
+      // 2. 변경된 전체 리스트 다시 불러오기
+      const refreshedRows = await getMasterOrItList();
+      // 3. 상태 갱신
+      setRows(refreshedRows);
+
+      alert("거래 상태가 변경되었습니다");
+    } catch (error) {
+      console.error(error);
+      alert("상태 변경 실패");
+    }
+  };
 
   const [rows, setRows] = useState<MasterOrItList[]>([]);
   const apiRef = useGridApiRef();
@@ -105,7 +103,9 @@ export default function MasterOrderItemList() {
               cursor: "pointer",
               fontSize: "inherit",
             }}
-            onClick={() => navigate(`/master/orderitem/detail/${params.row.id}`)}
+            onClick={() =>
+              navigate(`/master/orderitem/detail/${params.row.id}`)
+            }
           >
             {params.value}
           </Typography>
@@ -162,33 +162,33 @@ export default function MasterOrderItemList() {
       align: "center",
     },
     {
-          field: 'actions',
-          headerName: '', // 헤더 텍스트 없음
-          width: 150,
-          sortable: false,
-          filterable: false,
-          disableColumnMenu: true,
-          align: 'center',
-          renderCell: (params) => {
-            const isActive = params.row.useYn === '거래 중';
-            const buttonStyle = {
-              color: isActive ? '#ee0000' : '#4169E1',
-              borderColor: isActive ? '#ee0000' : '#4169E1',
-            };
-            const buttonText = isActive ? '거래 종료' : '거래 재개';
-    
-            return (
-              <Button
-                variant="outlined"
-                size="small"
-                style={buttonStyle}
-                onClick={() => handleState(params.row)}
-              >
-                {buttonText}
-              </Button>
-            );
-          },
-        },
+      field: "actions",
+      headerName: "", // 헤더 텍스트 없음
+      width: 150,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      align: "center",
+      renderCell: (params) => {
+        const isActive = params.row.useYn === "거래 중";
+        const buttonStyle = {
+          color: isActive ? "#ee0000" : "#4169E1",
+          borderColor: isActive ? "#ee0000" : "#4169E1",
+        };
+        const buttonText = isActive ? "거래 종료" : "거래 재개";
+
+        return (
+          <Button
+            variant="outlined"
+            size="small"
+            style={buttonStyle}
+            onClick={() => handleState(params.row)}
+          >
+            {buttonText}
+          </Button>
+        );
+      },
+    },
     {
       field: "remark",
       headerName: "비고",
@@ -243,7 +243,7 @@ export default function MasterOrderItemList() {
             onSearch={handleSearch}
           />
         </Box>
-    
+
         {/* 버튼 영역 */}
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Button
