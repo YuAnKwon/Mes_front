@@ -207,14 +207,6 @@ export default function MasterMaterialList() {
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 조회</h2>
-      {/* 공통 검색바 */}
-        <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
-            onSearch={handleSearch}
-          />
-        </Box>
       {/* 버튼 영역 */}
       <Box
         sx={{
@@ -226,6 +218,14 @@ export default function MasterMaterialList() {
           gap: 2,
         }}
       >
+        {/* 공통 검색바 */}
+        <Box sx={{ flex: 1 }}>
+          <SearchBar
+            searchOptions={searchOptions}
+            autoCompleteData={sampleData}
+            onSearch={handleSearch}
+          />
+        </Box>
         {/* 버튼 영역 */}
         <Box sx={{ ml: "auto" }}>
           <Button

@@ -219,29 +219,7 @@ export default function MasterOrderItemList() {
   };
 
   const handleRegister = async () => {
-    // ✅ DataGrid에서 선택된 행 ID 가져오기
-    // const selectedRowsMap = apiRef.current.getSelectedRows();
-    // const selectedRows = Array.from(selectedRowsMap.values());
-
-    // if (selectedRows.length === 0) {
-    //   alert("등록할 품목을 선택해주세요.");
-    //   return;
-    // }
-
-    // const payload: OrderItemInRegister[] = selectedRows.map((row) => ({
-    //   id: row.id,
-    //   inAmount: row.inAmount as number,
-    //   inDate: row.inDate as string,
-    // }));
-
-    // try {
-    //   await registerInboundItem(payload);
-    //   alert("입고 등록이 완료되었습니다.");
-    //   navigate("/orderitem/inbound/list");
-    // } catch (error) {
-    //   console.error(error);
-    //   alert("등록 중 오류가 발생하였습니다.");
-    // }
+    navigate("/master/orderitem/register");
   };
 
   return (

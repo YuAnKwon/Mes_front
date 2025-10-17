@@ -20,6 +20,7 @@ import OrderProcess from "./orderitem/page/OrderProcess";
 import MasterMaterialList from "./master/page/MasterMaterialList";
 import MasterMaterial from "./master/page/MasterMaterial";
 import MasterMaterialDetail from "./master/page/MasterMaterialDetail";
+import MasterOrderItem from "./master/page/MasterOrderItem";
 
 function App() {
   return (
@@ -70,10 +71,6 @@ function App() {
 
             {/* 기준정보관리 */}
             <Route
-              path="/master/orderitem/list"
-              element={<MasterOrderItemList />}
-            />
-            <Route
               path="/master/company/list"
               element={<MasterCompanyList />}
             />
@@ -98,8 +95,12 @@ function App() {
               path="/master/material/detail/:id"
               element={<MasterMaterialDetail />}
             />
-            {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />
-            
+            <Route
+              path="/master/orderitem/list"
+              element={<MasterOrderItemList />}
+            />
+            <Route path="/master/orderitem/register" element={<MasterOrderItem />} />
+            {/*
             <Route path="/master/routing" element={<MasterRouting />} />
             <Route path="/master/company" element={<MasterCompany />} />  */}
           </Routes>
