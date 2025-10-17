@@ -16,6 +16,7 @@ import {
   updateOrderItemOut,
 } from "../api/OrderInApi";
 import type { OrderItemList } from "../type";
+import { createStyledWorksheet } from "../../common/ExcelUtils";
 
 export default function OrderOutboundList() {
   const navigate = useNavigate();
@@ -244,7 +245,21 @@ export default function OrderOutboundList() {
   ];
 
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
+    if (!rows || rows.length === 0) {
+      alert("다운로드할 데이터가 없습니다.");
+      return; // 더 이상 진행하지 않음
+    }
+    const excelData = rows.map((item) => ({
+      출고번호: item.outNum,
+      품목명: item.itemName,
+      품목번호: item.itemCode,
+      거래처명: item.company,
+      분류: item.type,
+      "출고수량(개)": item.outAmount,
+      출고일자: item.outDate ? new Date(item.outDate).toLocaleDateString() : "",
+    }));
+
+    const worksheet = createStyledWorksheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     XLSX.writeFile(workbook, "수주대상품목_출고_목록.xlsx");
