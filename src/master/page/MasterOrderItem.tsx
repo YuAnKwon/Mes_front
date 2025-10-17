@@ -28,6 +28,36 @@ export default function MasterOrderItem() {
 
   const navigate = useNavigate();
 
+  const [imgFiles, setImgFiles] = useState<File[]>([]);
+
+  // 파일 선택 핸들러
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = e.target.files;
+      if (files) {
+        const fileArray = Array.from(files);
+
+        // 미리보기용 처리
+        const fileReaders: Promise<string>[] = fileArray.map(
+          (file) =>
+            new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.readAsDataURL(file);
+            })
+        );
+
+        Promise.all(fileReaders).then((images) => {
+          setOrderInfo((prev) => ({
+            photos: [...prev.photos, ...images],
+            imgUrl: [...prev.imgUrl, ...fileArray],
+          }));
+        });
+      }
+      setImgFiles(Array.from(e.target.files));
+    }
+  };
+
   const handleSave = async () => {
     const payload: MasterOrItRegister = {
       itemCode: Number(itemCode),
@@ -37,7 +67,7 @@ export default function MasterOrderItem() {
       unitPrice: Number(unitPrice),
       color,
       coatingMethod,
-      imgUrl: [],
+      imgUrl: imgFiles,
       routing: [],
       remark,
     };
@@ -60,36 +90,11 @@ export default function MasterOrderItem() {
     imgUrl: [],
   });
 
-  //이미지 영역
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-
-      // 미리보기용 처리
-      const fileReaders: Promise<string>[] = fileArray.map(
-        (file) =>
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.readAsDataURL(file);
-          })
-      );
-
-      Promise.all(fileReaders).then((images) => {
-        setOrderInfo((prev) => ({
-          photos: [...prev.photos, ...images],
-          imgUrl: [...prev.imgUrl, ...fileArray],
-        }));
-      });
-    }
-  };
-
   return (
     <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
       <h2>수주대상등록 등록</h2>
 
-      <Box sx={{ height: 600, width: "100%" }}>
+      <Box sx={{ height: 800, width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="company" required>
@@ -255,7 +260,7 @@ export default function MasterOrderItem() {
               type="file"
               accept="image/*"
               multiple
-              onChange={handlePhotoUpload}
+              onChange={handleFileChange}
               className="hidden"
             />
           </label>
