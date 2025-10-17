@@ -74,6 +74,12 @@ export const getProcessStatus = async (
   return response.data;
 };
 
+// 공정 진행현황 수정 & 시작시간 수정
+export const updateProcessStatus = async (
+  id: number,
+  data: { startTime: string; processStatus: string }
+) => (await axios.put(`${BASE_URL}/orderitem/process/${id}`, data)).data;
+
 // 출하증
 export const getShip = async (id: number): Promise<ShipInvoice[]> => {
   const response = await axios.get(`${BASE_URL}/orderitem/ship/${id}`);

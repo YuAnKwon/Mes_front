@@ -121,7 +121,7 @@ export default function OrderInboundList() {
   const columns: GridColDef[] = [
     {
       field: "lotNum",
-      headerName: "LOT번호",
+      headerName: "LOT 번호",
       width: 200,
       headerAlign: "center",
       align: "center",
