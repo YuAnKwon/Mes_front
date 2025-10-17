@@ -4,10 +4,10 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import { styled } from '@mui/material/styles';
 import { Box, MenuItem } from '@mui/material';
 import Button from "@mui/material/Button";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { registerMaterial } from '../api/MaterialApi';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getMaterialDetail, registerMaterial, updateMaterialDetail } from '../api/MaterialApi';
 import type { MasterMtRegister } from '../type';
 
 
@@ -16,7 +16,7 @@ const FormGrid = styled(Grid)(() => ({
   flexDirection: 'column',
 }));
 
-export default function MasterMaterial() {
+export default function MasterMaterialDetail() {
 
     const [materialCode, setMaterialCode] = useState('');
     const [materialName, setMaterialName] = useState('');
@@ -30,22 +30,47 @@ export default function MasterMaterial() {
 
     const navigate = useNavigate();
 
-    const handleSave = async () => {
-        const payload: MasterMtRegister = {
+    const { id } = useParams();
+
+    useEffect(() => {
+        const fetchMaterialDetail = async () => {
+        try {
+            const response = await getMaterialDetail(id); // ← API 호출
+
+            // 상태에 기존 값 채워 넣기
+            setMaterialCode(response.materialCode);
+            setMaterialName(response.materialName);
+            setCompanyName(response.companyName);
+            setType(response.type);
+            setColor(response.color);
+            setSpec(response.spec);
+            setScale(response.scale);
+            setManufacturer(response.manufacturer);
+            setRemark(response.remark);
+        } catch (error) {
+            console.error("업체 정보 불러오기 실패:", error);
+        }
+        };
+
+        fetchMaterialDetail();
+    }, [id]);
+
+    const handleUpdate = async () => {
+        const payload = {
             materialCode,
             materialName,
             companyName,
             type,
             color,
-            spec: Number(spec),
+            spec,
             scale,
             manufacturer,
             remark,
         };
 
         try {
-            await registerMaterial(payload);
-            alert("원자재 등록 완료!");
+            await updateMaterialDetail(id, payload);
+            alert("원자재 수정 완료!");
             navigate("/master/material/list");
         } catch (error) {
             console.error("원자재 등록 실패", error);
@@ -231,9 +256,9 @@ export default function MasterMaterial() {
                     variant="outlined"
                     color="primary"
                     sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-                    onClick={handleSave}
+                    onClick={handleUpdate}
                 >
-                원자재 등록
+                수정
                 </Button>
             </Box>
         </Box>

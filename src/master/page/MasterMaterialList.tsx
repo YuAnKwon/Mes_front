@@ -17,16 +17,15 @@ export default function MasterMaterialList() {
       console.log("API 응답:", mcList); // 구조 확인
 
       // 서버 데이터 → DataGrid rows 형식으로 매핑
-      const mappedRows = mcList.map((item) => ({
+      const mappedRows: MasterMtList[] = mcList.map((item: any) => ({
         id: item.id,
-        itemCode: item.itemCode,
-        itemName: item.itemName,
-        company: item.company,
+        materialCode: item.code,      // API code → 타입 materialCode
+        materialName: item.name,      // API name → 타입 materialName
+        companyName: item.company,    // API company → 타입 companyName
         type: item.type,
         color: item.color,
         useYn: item.useYn,
         remark: item.remark,
-
       }));
 
       setRows(mappedRows);
@@ -50,14 +49,14 @@ export default function MasterMaterialList() {
       align: "center",
     },
     {
-      field: "itemCode",
+      field: "materialCode",
       headerName: "품목번호",
       width: 150,
       headerAlign: "center",
       align: "center",
     },
     {
-      field: "itemName",
+      field: "materialName",
       headerName: "품목명",
       width: 150,
       headerAlign: "center",
@@ -86,7 +85,7 @@ export default function MasterMaterialList() {
       ),
     },
     {
-      field: "company",
+      field: "companyName",
       headerName: "매입처명",
       width: 150,
       headerAlign: "center",
