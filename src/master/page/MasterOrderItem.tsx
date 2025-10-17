@@ -2,15 +2,13 @@ import FormLabel from "@mui/material/FormLabel";
 import Grid from "@mui/material/Grid";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { styled } from "@mui/material/styles";
-import { Autocomplete, Box, MenuItem, TextField } from "@mui/material";
+import { Box, MenuItem } from "@mui/material";
 import Button from "@mui/material/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Select } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import type { MasterOrItList, MasterOrItRegister } from "../type";
+import type { MasterOrItRegister } from "../type";
 import { registerOrderItem } from "../api/OrderItemApi";
-import { getMasterCpList } from "../api/companyApi";
-import SearchBarAutocomplete from "../../common/SearchBarAutocomplete";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -26,8 +24,6 @@ export default function MasterOrderItem() {
   const [unitPrice, setUnitPrice] = useState("");
   const [color, setColor] = useState("");
   const [remark, setRemark] = useState("");
-  const [query, setQuery] = useState("");
-  const [companyData, setCompanyData] = useState<MasterOrItList[]>([]);
 
   const navigate = useNavigate();
 
@@ -55,41 +51,27 @@ export default function MasterOrderItem() {
     }
   };
 
-  const fetchCompanyData = async () => {
-    try {
-      const response = await getMasterCpList();
-      const data = Array.isArray(response) ? response : response.data || [];
-
-      const mappedRows = data.map((item) => item.companyName);
-
-      setCompanyData(mappedRows);
-    } catch (error) {
-      console.error("데이터 로딩 실패", error);
-      alert("거래처 데이터를 불러오지 못했습니다.");
-    }
-  };
-
-  useEffect(() => {
-    fetchCompanyData();
-  }, []);
-
   return (
     <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>수주대상물품 등록</h2>
+      <h2>수주대상등록 등록</h2>
 
       <Box sx={{ height: 600, width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormGrid size={{ xs: 12, md: 6 }}>
-              <FormLabel htmlFor="company" required>
-                거래처명
-              </FormLabel>
-              <SearchBarAutocomplete
-                options={companyData}
-                value={company}
-                onChange={setCompany}
-              />
-            </FormGrid>
+            <FormLabel htmlFor="company" required>
+              거래처명
+            </FormLabel>
+            <OutlinedInput
+              id="company"
+              name="company"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              type="text"
+              placeholder="거래처명"
+              autoComplete="organization"
+              required
+              size="small"
+            />
           </FormGrid>
           <FormGrid size={{ xs: 12, md: 6 }} />
           <FormGrid size={{ xs: 12, md: 6 }}>
