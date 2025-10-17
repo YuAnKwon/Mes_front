@@ -4,19 +4,19 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import { styled } from "@mui/material/styles";
 import { Box, MenuItem } from "@mui/material";
 import Button from "@mui/material/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import type { MasterOrItRegister } from "../type";
-import { registerOrderItem } from "../api/OrderItemApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { getOrItDetail, updateOrItDetail } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
+import type { MasterOrItRegister, Photo } from "../type";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
   flexDirection: "column",
 }));
 
-export default function MasterOrderItem() {
+export default function MasterOrderItemDetail() {
   const [company, setCompany] = useState("");
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
@@ -28,7 +28,31 @@ export default function MasterOrderItem() {
 
   const navigate = useNavigate();
 
-  const handleSave = async () => {
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchOrderItemDetail = async () => {
+      try {
+        const response = await getOrItDetail(id); // ← API 호출
+
+        // 상태에 기존 값 채워 넣기
+        setCompany(response.company);
+        setItemCode(response.itemCode);
+        setItemName(response.itemName);
+        setType(response.type);
+        setCoatingMethod(response.coatingMethod);
+        setUnitPrice(response.unitPrice);
+        setColor(response.color);
+        setRemark(response.remark);
+      } catch (error) {
+        console.error("업체 정보 불러오기 실패:", error);
+      }
+    };
+
+    fetchOrderItemDetail();
+  }, [id]);
+
+  const handleUpdate = async () => {
     const payload: MasterOrItRegister = {
       itemCode: Number(itemCode),
       itemName,
@@ -43,12 +67,12 @@ export default function MasterOrderItem() {
     };
 
     try {
-      await registerOrderItem(payload);
-      alert("수주대상품목 등록 완료!");
+      await updateOrItDetail(id, payload);
+      alert("수주대상품목 수정 완료!");
       navigate("/master/orderitem/list");
     } catch (error) {
-      console.error("수주대상품목 등록 실패", error);
-      alert("등록 실패");
+      console.error("수주대상품목 수정 실패", error);
+      alert("수정 실패");
     }
   };
 
@@ -71,9 +95,24 @@ export default function MasterOrderItem() {
             })
         );
 
+        //밑에 있는애 전 버전, photo타입 설정 전
+        // Promise.all(fileReaders).then((images) => {
+        //   setOrderInfo((prev) => ({
+        //     photos: [...prev.photos, ...images],
+        //     imgUrl: [...prev.imgUrl, ...fileArray],
+        //   }));
+        // });
         Promise.all(fileReaders).then((images) => {
+          const newPhotos = images.map((src, i) => ({
+            orderItem: null,
+            imgOriName: fileArray[i].name,
+            imgFileName: fileArray[i].name,
+            imgUrl: src, // base64로 미리보기
+            repYn: "N",
+          }));
+
           setOrderInfo((prev) => ({
-            photos: [...prev.photos, ...images],
+            photos: [...prev.photos, ...newPhotos],
             imgUrl: [...prev.imgUrl, ...fileArray],
           }));
         });
@@ -83,7 +122,7 @@ export default function MasterOrderItem() {
   };
 
   const [orderInfo, setOrderInfo] = useState<{
-    photos: string[]; // 미리보기용
+    photos: Photo[]; // 미리보기용
     imgUrl: File[]; // 서버 전송용
   }>({
     photos: [],
@@ -92,7 +131,7 @@ export default function MasterOrderItem() {
 
   return (
     <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>수주대상등록 등록</h2>
+      <h2>수주대상품목 수정</h2>
 
       <Box sx={{ height: 800, width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
@@ -245,7 +284,8 @@ export default function MasterOrderItem() {
               className="w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
             >
               <img
-                src={photo}
+                // src={photo}
+                src={`/api${photo.imgUrl}`} // 여기서 imgUrl 사용, 필요하면 /api 붙이기
                 alt={`제품 사진 ${idx + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -282,9 +322,9 @@ export default function MasterOrderItem() {
             variant="outlined"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleSave}
+            onClick={handleUpdate}
           >
-            수주대상품목 등록
+            수정
           </Button>
         </Box>
       </Box>

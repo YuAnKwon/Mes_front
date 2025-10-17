@@ -24,6 +24,7 @@ import MasterOrderItem from "./master/page/MasterOrderItem";
 import MasterRoutingList from "./master/page/MasterRoutingList";
 import { MaterialTotalStock } from "./material/page/MaterialTotalStock";
 import OrderProcess from "./orderitem/page/OrderProcess";
+import MasterOrderItemDetail from "./master/page/MasterOrderItemDetail";
 
 function App() {
   return (
@@ -109,6 +110,10 @@ function App() {
             <Route
               path="/master/orderitem/register"
               element={<MasterOrderItem />}
+            />
+            <Route
+              path="/master/orderitem/detail/:id"
+              element={<MasterOrderItemDetail />}
             />
             {/*
             <Route path="/master/routing" element={<MasterRouting />} />
