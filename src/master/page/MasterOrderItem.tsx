@@ -60,6 +60,7 @@ export default function MasterOrderItem() {
     imgUrl: [],
   });
 
+  //이미지 영역
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
