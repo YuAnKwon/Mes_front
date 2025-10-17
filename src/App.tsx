@@ -21,6 +21,7 @@ import MasterMaterialList from "./master/page/MasterMaterialList";
 import MasterMaterial from "./master/page/MasterMaterial";
 import MasterMaterialDetail from "./master/page/MasterMaterialDetail";
 import MasterOrderItem from "./master/page/MasterOrderItem";
+import MasterRoutingList from "./master/page/MasterRoutingList";
 
 function App() {
   return (
@@ -103,6 +104,13 @@ function App() {
             {/*
             <Route path="/master/routing" element={<MasterRouting />} />
             <Route path="/master/company" element={<MasterCompany />} />  */}
+            {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />*/}
+
+            <Route
+              path="/master/routing/list"
+              element={<MasterRoutingList />}
+            />
+            {/*<Route path="/master/company" element={<MasterCompany />} />  */}
           </Routes>
         </div>
       </div>

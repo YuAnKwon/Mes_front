@@ -66,14 +66,13 @@ export default function OrderProcess() {
     try {
       await updateProcessStatus(row.id, {
         startTime: newStartTime ? newStartTime.toISOString() : "",
-        processStatus: nextStatus,
+        completedStatus: nextStatus,
       });
     } catch (error) {
       console.error("상태 변경 실패", error);
     }
   };
 
-  // "다음 공정으로 진행" 버튼 클릭 시 처리
   // "다음 공정으로 진행" 버튼 클릭 시 처리
   const handleProcessNext = async () => {
     // 1. **현재 상태 기준**으로 공정 데이터 복사
@@ -98,7 +97,7 @@ export default function OrderProcess() {
           startTime: currentRows[currentIndex].startTime
             ? new Date(currentRows[currentIndex].startTime).toISOString()
             : "",
-          processStatus: "Y",
+          completedStatus: "Y",
         });
       } catch (error) {
         console.error("현재 공정 완료 처리 실패", error);
@@ -140,7 +139,7 @@ export default function OrderProcess() {
           await updateProcessStatus(nextProcess.id, {
             // 타입 가드 덕분에 안전하게 toISOString() 호출 가능
             startTime: nextProcess.startTime.toISOString(),
-            processStatus: "ING",
+            completedStatus: "ING",
           });
         } catch (error) {
           console.error("다음 공정 진행 처리 실패", error);
@@ -284,7 +283,7 @@ export default function OrderProcess() {
               try {
                 await updateProcessStatus(newRow.id, {
                   startTime: newRow.startTime.toISOString(),
-                  processStatus: "ING",
+                  completedStatus: "ING",
                 });
               } catch (error) {
                 console.error("시간 수정 자동저장 실패", error);
