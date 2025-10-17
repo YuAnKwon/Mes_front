@@ -7,6 +7,7 @@ import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import type { MasterMtList } from "../type";
 import { getMasterMtList, updateMaterialState } from "../api/MaterialApi";
+import SearchBar from "../../common/SearchBar";
 
 
 export default function MasterMaterialList() {
@@ -183,10 +184,37 @@ export default function MasterMaterialList() {
     navigate("/master/material/register");
   };
 
+  const sampleData = [
+    "회사1",
+    "회사2",
+    "품목A",
+    "품목B",
+    "입고번호001",
+    "입고번호002",
+  ];
+  
+  const searchOptions = [
+    { label: "매입처명", value: "companyName" },
+    { label: "품목번호", value: "materialCode" },
+    { label: "품목명", value: "materialName" },
+  ];
+
+  const handleSearch = (criteria: string, query: string) => {
+    console.log("검색 실행:", { criteria, query });
+  };
+
   
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 조회</h2>
+      {/* 공통 검색바 */}
+        <Box sx={{ flex: 1 }}>
+          <SearchBar
+            searchOptions={searchOptions}
+            autoCompleteData={sampleData}
+            onSearch={handleSearch}
+          />
+        </Box>
       {/* 버튼 영역 */}
       <Box
         sx={{
