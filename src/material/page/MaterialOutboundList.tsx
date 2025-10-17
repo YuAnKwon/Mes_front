@@ -8,7 +8,7 @@ import {
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 import { useEffect, useState } from "react";
 import type { MaterialOutList } from "../type";
 import {
@@ -16,6 +16,7 @@ import {
   softDeleteMaterialOut,
   updateMaterialOut,
 } from "../api/MaterialOutboundListApi";
+import { createStyledWorksheet } from "../../common/ExcelUtils";
 
 export function MaterialOutboundList() {
   const [materialsOuts, setMaterialsOuts] = useState<MaterialOutList[]>([]);
@@ -215,12 +216,27 @@ export function MaterialOutboundList() {
     },
   ];
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(materialsOuts);
+    if (!materialsOuts || materialsOuts.length === 0) {
+      alert("다운로드할 데이터가 없습니다.");
+      return; // 더 이상 진행하지 않음
+    }
+    const excelData = materialsOuts.map((item) => ({
+      출고번호: item.outNum,
+      품목명: item.materialName,
+      품목번호: item.materialCode,
+      매입처명: item.companyName,
+      제조사: item.manufacturer,
+      출고수량: item.outAmount,
+      출고일자: item.outDate ? new Date(item.outDate).toLocaleDateString() : "",
+
+      // "거래처명": item.companyName ?? "", // null 방지
+    }));
+
+    const worksheet = createStyledWorksheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "원자재_출고_현황.xlsx");
+    XLSX.writeFile(workbook, "원자재_출고_등록_목록.xlsx");
   };
-
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 출고 등록조회</h2>

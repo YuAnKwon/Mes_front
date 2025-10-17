@@ -10,6 +10,7 @@ import SearchBar from "../../common/SearchBar";
 
 import { getOrderItemInRegiList, registerInboundItem } from "../api/OrderInApi";
 import type { OrderItemList, OrderItemInRegister } from "../type";
+import { createStyledWorksheet } from "../../common/ExcelUtils";
 
 export default function OrderInboundRegister() {
   const sampleData = [
@@ -167,7 +168,18 @@ export default function OrderInboundRegister() {
   ];
 
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
+    if (!rows || rows.length === 0) {
+      alert("다운로드할 데이터가 없습니다.");
+      return; // 더 이상 진행하지 않음
+    }
+    const excelData = rows.map((item) => ({
+      품목명: item.itemName,
+      품목번호: item.itemCode,
+      거래처명: item.company,
+      분류: item.type,
+    }));
+
+    const worksheet = createStyledWorksheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     XLSX.writeFile(workbook, "수주대상품목_목록.xlsx");

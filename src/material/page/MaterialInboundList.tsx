@@ -10,12 +10,13 @@ import {
 import { Box, Button } from "@mui/material";
 import SearchBar from "../../common/SearchBar";
 import Pagination from "../../common/Pagination";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 import { getMaterialInData } from "../api/MaterialInboundregisterApi";
 import {
   softDeleteMaterialIn,
   updateMaterialIn,
 } from "../api/MaterialInboundListApi";
+import { createStyledWorksheet } from "../../common/ExcelUtils";
 
 export function MaterialInboundList() {
   const [materialsIn, setMaterialsIn] = useState<MaterialInList[]>([]);
@@ -265,7 +266,28 @@ export function MaterialInboundList() {
   ];
 
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(materialsIn);
+    if (!materialsIn || materialsIn.length === 0) {
+      alert("다운로드할 데이터가 없습니다.");
+      return; // 더 이상 진행하지 않음
+    }
+    const excelData = materialsIn.map((item) => ({
+      입고번호: item.inNum,
+      품목명: item.materialName,
+      품목번호: item.materialCode,
+      매입처명: item.companyName,
+      "원자재 규격": item.specAndScale,
+      제조사: item.manufacturer,
+      입고수량: item.inAmount,
+      총량: item.totalStock,
+      입고일자: item.inDate ? new Date(item.inDate).toLocaleDateString() : "",
+      제조일자: item.manufactureDate
+        ? new Date(item.inDate).toLocaleDateString()
+        : "",
+
+      // "거래처명": item.companyName ?? "", // null 방지
+    }));
+
+    const worksheet = createStyledWorksheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     XLSX.writeFile(workbook, "원자재_입고_등록현황.xlsx");

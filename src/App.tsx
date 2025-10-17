@@ -16,12 +16,13 @@ import ShipmentInvoice from "./orderitem/page/ShipmentInvoice";
 import { MaterialOutboundRegister } from "./material/page/MaterialOutboundRegister";
 import MasterCompanyDetail from "./master/page/MasterCompanyDetail";
 import { MaterialOutboundList } from "./material/page/MaterialOutboundList";
-import OrderProcess from "./orderitem/page/OrderProcess";
+
 import MasterMaterialList from "./master/page/MasterMaterialList";
 import MasterMaterial from "./master/page/MasterMaterial";
 import MasterMaterialDetail from "./master/page/MasterMaterialDetail";
 import MasterOrderItem from "./master/page/MasterOrderItem";
 import MasterRoutingList from "./master/page/MasterRoutingList";
+import { MaterialTotalStock } from "./material/page/MaterialTotalStock";
 
 function App() {
   return (
@@ -50,7 +51,7 @@ function App() {
               element={<OrderOutboundList />}
             />
             <Route path="/shipmentInvoice/:id" element={<ShipmentInvoice />} />
-            <Route path="/orderitem/process/:id" element={<OrderProcess />} />
+            {/* <Route path="/orderitem/process/:id" element={<OrderProcess />} /> */}
 
             {/* 원자재 */}
             <Route
@@ -68,6 +69,10 @@ function App() {
             <Route
               path="/material/outbound/list"
               element={<MaterialOutboundList />}
+            />
+            <Route
+              path="/material/totalstock"
+              element={<MaterialTotalStock />}
             />
 
             {/* 기준정보관리 */}
@@ -100,7 +105,10 @@ function App() {
               path="/master/orderitem/list"
               element={<MasterOrderItemList />}
             />
-            <Route path="/master/orderitem/register" element={<MasterOrderItem />} />
+            <Route
+              path="/master/orderitem/register"
+              element={<MasterOrderItem />}
+            />
             {/*
             <Route path="/master/routing" element={<MasterRouting />} />
             <Route path="/master/company" element={<MasterCompany />} />  */}

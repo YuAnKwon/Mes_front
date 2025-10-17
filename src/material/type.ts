@@ -23,6 +23,8 @@ export type MaterialInList = {
   manufacturer: string;
   inDate: string;
   manufactureDate: string;
+  inNum: string;
+  totalStock: string;
 };
 
 export type MaterialOut = {
@@ -49,5 +51,13 @@ export type MaterialOutList = {
   manufacturer: string;
   outAmount: number;
   outDate: string;
+  stock: number;
+};
+
+export type MaterialTotalStock = {
+  materialId: number;
+  materialName: string;
+  materialCode: string;
+  companyName: string;
   stock: number;
 };
