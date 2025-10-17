@@ -1,6 +1,6 @@
 import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Chip, Typography } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getProcessStatus, updateProcessStatus } from "../api/OrderInApi";
 import type { ProcessStatus } from "../type";
@@ -9,6 +9,7 @@ import { Select, MenuItem } from "@mui/material";
 export default function OrderProcess() {
   // URL 파라미터에서 id 가져오기
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   // 공정 상태 데이터
   const [rows, setRows] = useState<ProcessStatus[]>([]);
@@ -70,6 +71,22 @@ export default function OrderProcess() {
       });
     } catch (error) {
       console.error("상태 변경 실패", error);
+    }
+
+    // 모든 공정 완료일경우
+    const allCompleted =
+      updatedRow.completedStatus === "Y" &&
+      [...rows.map((r) => (r.id === row.id ? updatedRow : r))].every(
+        (r) => r.completedStatus === "Y"
+      );
+
+    if (allCompleted) {
+      const proceed = window.confirm(
+        "모든 공정이 완료되었습니다. 출고하시겠습니까?"
+      );
+      if (proceed) {
+        navigate(`/orderitem/outbound/register`);
+      }
     }
   };
 
@@ -152,6 +169,15 @@ export default function OrderProcess() {
 
     // 5. 모두 완료 상태인지 재확인 (불필요한 setRows 방지)
     const allCompleted = currentRows.every((r) => r.completedStatus === "Y");
+    if (allCompleted) {
+      const proceed = window.confirm(
+        "모든 공정이 완료되었습니다. 출고하시겠습니까?"
+      );
+      if (proceed) {
+        navigate(`/orderitem/outbound/register`); // 출고 화면으로 이동
+        return;
+      }
+    }
 
     if (hasUpdated || allCompleted) {
       // 6. 상태 갱신

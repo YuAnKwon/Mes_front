@@ -105,11 +105,12 @@ export default function MasterCompanyList() {
     },
     {
       field: "actions",
-      headerName: "", // 헤더 텍스트 없음
+      headerName: "거래 상태 변경", // 헤더 텍스트 없음
       width: 150,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
+      headerAlign: "center",
       align: "center",
       renderCell: (params) => {
         const isActive = params.row.businessYn === "거래 중";

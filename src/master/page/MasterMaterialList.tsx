@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import type { MasterMtList } from "../type";
 import { getMasterMtList, updateMaterialState } from "../api/MaterialApi";
 
-
 export default function MasterMaterialList() {
   const navigate = useNavigate();
   const loadData = async () => {
@@ -19,9 +18,9 @@ export default function MasterMaterialList() {
       // 서버 데이터 → DataGrid rows 형식으로 매핑
       const mappedRows: MasterMtList[] = mcList.map((item: any) => ({
         id: item.id,
-        materialCode: item.code,      // API code → 타입 materialCode
-        materialName: item.name,      // API name → 타입 materialName
-        companyName: item.company,    // API company → 타입 companyName
+        materialCode: item.code, // API code → 타입 materialCode
+        materialName: item.name, // API name → 타입 materialName
+        companyName: item.company, // API company → 타입 companyName
         type: item.type,
         color: item.color,
         useYn: item.useYn,
@@ -113,20 +112,21 @@ export default function MasterMaterialList() {
       align: "center",
     },
     {
-      field: 'actions',
-      headerName: '', // 헤더 텍스트 없음
+      field: "actions",
+      headerName: "거래 상태 변경", // 헤더 텍스트 없음
       width: 150,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      align: 'center',
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => {
-        const isActive = params.row.useYn === '거래 중';
+        const isActive = params.row.useYn === "거래 중";
         const buttonStyle = {
-          color: isActive ? '#ee0000' : '#4169E1',
-          borderColor: isActive ? '#ee0000' : '#4169E1',
+          color: isActive ? "#ee0000" : "#4169E1",
+          borderColor: isActive ? "#ee0000" : "#4169E1",
         };
-        const buttonText = isActive ? '거래 종료' : '거래 재개';
+        const buttonText = isActive ? "거래 종료" : "거래 재개";
 
         return (
           <Button
@@ -163,27 +163,26 @@ export default function MasterMaterialList() {
   ];
 
   const handleState = async (row) => {
-    const updatedState = row.useYn === '거래 중' ? 'Y' : 'N';
-      try {
-        //api 호출로 백엔드에 변경 요청
-        await updateMaterialState(row.id, updatedState)
-        // 2. 변경된 전체 리스트 다시 불러오기
-        const refreshedRows = await getMasterMtList();
-        // 3. 상태 갱신
-        setRows(refreshedRows);
+    const updatedState = row.useYn === "거래 중" ? "Y" : "N";
+    try {
+      //api 호출로 백엔드에 변경 요청
+      await updateMaterialState(row.id, updatedState);
+      // 2. 변경된 전체 리스트 다시 불러오기
+      const refreshedRows = await getMasterMtList();
+      // 3. 상태 갱신
+      setRows(refreshedRows);
 
-        alert('거래 상태가 변경되었습니다');
-      } catch (error) {
-        console.error(error);
-        alert('상태 변경 실패');
-      }
+      alert("거래 상태가 변경되었습니다");
+    } catch (error) {
+      console.error(error);
+      alert("상태 변경 실패");
+    }
   };
 
   const handleRegister = async () => {
     navigate("/master/material/register");
   };
 
-  
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 조회</h2>
@@ -210,7 +209,7 @@ export default function MasterMaterialList() {
           </Button>
         </Box>
       </Box>
-      
+
       {/* 테이블 영역 */}
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid

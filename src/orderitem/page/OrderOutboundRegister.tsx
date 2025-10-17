@@ -33,6 +33,7 @@ export default function OrderOutboundRegister() {
 
   const navigate = useNavigate();
   const apiRef = useGridApiRef();
+  const [rows, setRows] = useState<OrderItemList[]>([]);
 
   useEffect(() => {
     loadData();
@@ -42,7 +43,6 @@ export default function OrderOutboundRegister() {
     try {
       const oiList = await getOrderItemInList();
 
-      // 서버 데이터 → DataGrid rows 형식으로 매핑
       const mappedRows = oiList.map((item) => ({
         id: item.id,
         lotNum: item.lotNum,
@@ -52,6 +52,7 @@ export default function OrderOutboundRegister() {
         type: item.type,
         inAmount: item.inAmount,
         inDate: item.inDate,
+        isProcessCompleted: item.isProcessCompleted ?? "N",
         outAmount: undefined,
         outDate: "",
       }));
@@ -62,7 +63,6 @@ export default function OrderOutboundRegister() {
     }
   };
 
-  const [rows, setRows] = useState<OrderItemList[]>([]);
   const columns: GridColDef[] = [
     {
       field: "lotNum",
@@ -70,6 +70,28 @@ export default function OrderOutboundRegister() {
       width: 200,
       headerAlign: "center",
       align: "center",
+      renderCell: (params) => (
+        <Box
+          sx={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography
+            sx={{
+              textDecoration: "underline",
+              cursor: "pointer",
+              fontSize: "inherit",
+            }}
+            onClick={() => navigate(`/orderitem/process/${params.row.id}`)}
+          >
+            {params.value}
+          </Typography>
+        </Box>
+      ),
     },
     {
       field: "itemName",
@@ -105,6 +127,7 @@ export default function OrderOutboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      type: "number",
     },
     {
       field: "inDate",
@@ -112,9 +135,54 @@ export default function OrderOutboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      renderCell: (params) => (params.value ? params.value.split(" ")[0] : ""),
+    },
+    {
+      field: "isProcessCompleted",
+      headerName: "공정진행상태",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => {
-        if (!params.value) return "";
-        return params.value.split(" ")[0];
+        const value = params.value;
+        // 공정 상태에 따른 색상
+        const colorMap: Record<
+          string,
+          { text: string; bg: string; textColor: string }
+        > = {
+          Y: { text: "공정 완료", bg: "#E6F4EA", textColor: "#2E7D32" }, // 연두/초록
+          N: { text: "진행 중", bg: "#FFF4E5", textColor: "#FF9800" }, // 주황/연한 주황
+          default: { text: "-", bg: "#F5F5F5", textColor: "#9E9E9E" }, // 회색
+        };
+
+        const { text, bg, textColor } = colorMap[value] || colorMap.default;
+
+        return (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography
+              sx={{
+                bgcolor: bg,
+                color: textColor,
+                fontWeight: 600,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1,
+                textAlign: "center",
+                width: "80%",
+              }}
+            >
+              {text}
+            </Typography>
+          </Box>
+        );
       },
     },
     {
@@ -145,7 +213,6 @@ export default function OrderOutboundRegister() {
   };
 
   const handleRegister = async () => {
-    // DataGrid에서 선택된 행 정보 가져오기
     const selectedRowsMap = apiRef.current.getSelectedRows();
     const selectedRows = Array.from(selectedRowsMap.values());
 
@@ -154,25 +221,21 @@ export default function OrderOutboundRegister() {
       return;
     }
 
-    // 선택된 행
     const payload: OrderItemOutRegister[] = selectedRows.map((row) => ({
       id: row.id,
       outAmount: row.outAmount as number,
       outDate: row.outDate as string,
     }));
 
-    // 유효성 검사
     for (const row of payload) {
       if (!row.outAmount || !row.outDate) {
         alert("출고 수량과 출고일자를 모두 입력해주세요.");
         return;
       }
-      console.log(payload);
     }
 
     try {
       await registeroutboundItem(payload);
-      console.log(payload);
       alert("출고 등록이 완료되었습니다.");
       navigate("/orderitem/outbound/list");
     } catch (error) {
@@ -186,6 +249,7 @@ export default function OrderOutboundRegister() {
       <Typography variant="h5" sx={{ mb: 3 }}>
         수주대상 품목 출고 등록
       </Typography>
+
       {/* 버튼 영역 */}
       <Box
         sx={{
@@ -196,7 +260,6 @@ export default function OrderOutboundRegister() {
           gap: 2,
         }}
       >
-        {/* 공통 검색바 */}
         <Box sx={{ flex: 1 }}>
           <SearchBar
             searchOptions={searchOptions}
@@ -205,7 +268,6 @@ export default function OrderOutboundRegister() {
           />
         </Box>
 
-        {/* 버튼 영역 */}
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Button
             variant="outlined"
@@ -225,6 +287,7 @@ export default function OrderOutboundRegister() {
           </Button>
         </Box>
       </Box>
+
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
@@ -233,32 +296,18 @@ export default function OrderOutboundRegister() {
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
           checkboxSelection
+          isRowSelectable={(params) => params.row.isProcessCompleted === "Y"}
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
-            sorting: {
-              sortModel: [
-                {
-                  field: "lotNum",
-                  sort: "desc",
-                },
-              ],
-            },
+            sorting: { sortModel: [{ field: "lotNum", sort: "desc" }] },
           }}
-          slotProps={{
-            basePagination: {
-              material: {
-                ActionsComponent: Pagination,
-              },
-            },
-          }}
+          getRowClassName={(params) =>
+            params.row.isProcessCompleted === "N" ? "row-disabled" : ""
+          }
           sx={{
-            "& .MuiDataGrid-columnHeaders": {
-              fontWeight: "bold",
-            },
-            "& .MuiDataGrid-cell--editable": {
-              position: "relative",
-            },
+            "& .MuiDataGrid-columnHeaders": { fontWeight: "bold" },
+            "& .MuiDataGrid-cell--editable": { position: "relative" },
             "& .MuiDataGrid-cell--editable::after": {
               content: '"✎"',
               position: "absolute",
@@ -267,8 +316,25 @@ export default function OrderOutboundRegister() {
               fontSize: "12px",
               color: "#999",
             },
-            "& .MuiDataGrid-cell--editing::after": {
-              content: '""',
+            "& .MuiDataGrid-cell--editing::after": { content: '""' },
+
+            // 비활성화된 행
+            "& .row-disabled": {
+              opacity: 1,
+              "& .MuiDataGrid-cell--editable::after": {
+                content: '""', // 연필 아이콘 제거
+              },
+            },
+            "& .row-disabled .MuiDataGrid-cell": {
+              pointerEvents: "none", // 기본적으로 셀 클릭 막기
+            },
+
+            "& .row-disabled .MuiDataGrid-cell:first-of-type": {
+              pointerEvents: "auto", // 첫 번째 셀(Lot번호)만 클릭 허용
+            },
+
+            "& .row-disabled .MuiDataGrid-checkboxInput": {
+              display: "none", // 클릭 불가, 안 보이지만 자리 유지
             },
           }}
         />
