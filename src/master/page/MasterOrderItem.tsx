@@ -102,7 +102,7 @@ export default function MasterOrderItem() {
             <FormLabel htmlFor="company" required>
               거래처명
             </FormLabel>
-            <Autocomplete
+            {/* <Autocomplete
               freeSolo
               options={companyList}
               value={company}
@@ -122,6 +122,17 @@ export default function MasterOrderItem() {
                   required
                 />
               )}
+            /> */}
+            <OutlinedInput
+              id="company"
+              name="company"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              type="text"
+              placeholder="거래처명"
+              autoComplete="organization"
+              required
+              size="small"
             />
           </FormGrid>
           <FormGrid size={{ xs: 12, md: 6 }} />

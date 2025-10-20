@@ -113,7 +113,11 @@ export function MaterialOutboundRegister() {
 
   const handleRegister = async () => {
     // :흰색_확인_표시: DataGrid에서 선택된 행 정보 가져오기
-    const selectedRowsMap = apiRef.current.getSelectedRows();
+    const selectedRowsMap = apiRef.current?.getSelectedRows();
+    if (!selectedRowsMap) {
+      alert("선택된 데이터가 없습니다.");
+      return;
+    }
     const selectedRows = Array.from(selectedRowsMap.values());
     if (selectedRows.length === 0) {
       alert("출고등록할 품목을 선택해주세요.");
@@ -121,7 +125,6 @@ export function MaterialOutboundRegister() {
     }
     // 선택된 행
     const payload: MaterialOut[] = selectedRows.map((row) => ({
-      id: row.id,
       inNum: row.inNum,
       materialCode: row.materialCode,
       materialName: row.materialName,
@@ -152,8 +155,22 @@ export function MaterialOutboundRegister() {
     const fetchData = async () => {
       try {
         const data = await getMaterialInData(); //수정
-        setMaterialout(data); //수정
-        setFilteredMaterials(data);
+
+        const mapped = data.map((item) => ({
+          id: item.id,
+          inNum: item.inNum,
+          materialCode: item.materialCode,
+          materialName: item.materialName,
+          companyName: item.companyName,
+          inAmount: item.inAmount, // 입고수량 (남은 재고량 판단용)
+          stock: Number(item.totalStock) || 0, // 총 재고량
+          manufacturer: item.manufacturer,
+          outAmount: 0, // 출고 수량 초기값
+          outDate: "", // 출고일자 초기값
+        }));
+
+        setMaterialout(mapped);
+        setFilteredMaterials(mapped);
 
         // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
         const companyNames = Array.from(
