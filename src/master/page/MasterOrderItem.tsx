@@ -2,14 +2,15 @@ import FormLabel from "@mui/material/FormLabel";
 import Grid from "@mui/material/Grid";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { styled } from "@mui/material/styles";
-import { Box, MenuItem } from "@mui/material";
+import { Autocomplete, Box, MenuItem, TextField } from "@mui/material";
 import Button from "@mui/material/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import type { MasterOrItRegister } from "../type";
 import { registerOrderItem } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
+import { getSupplierList } from "../api/companyApi";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -25,12 +26,27 @@ export default function MasterOrderItem() {
   const [unitPrice, setUnitPrice] = useState("");
   const [color, setColor] = useState("");
   const [remark, setRemark] = useState("");
+  const [companyList, setCompanyList] = useState<string[]>([]);
+
+  // 거래처 리스트 불러오기
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const res = await getSupplierList();
+        const names = res.map((item: any) => item.companyName);
+        setCompanyList(names);
+      } catch (error) {
+        console.error("거래처 목록 불러오기 실패:", error);
+      }
+    };
+    fetchCompanies();
+  }, []);
 
   const navigate = useNavigate();
 
   const handleSave = async () => {
     const payload: MasterOrItRegister = {
-      itemCode: Number(itemCode),
+      itemCode: itemCode,
       itemName,
       company,
       type,
@@ -95,16 +111,26 @@ export default function MasterOrderItem() {
             <FormLabel htmlFor="company" required>
               거래처명
             </FormLabel>
-            <OutlinedInput
-              id="company"
-              name="company"
+            <Autocomplete
+              freeSolo
+              options={companyList}
               value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              type="text"
-              placeholder="거래처명"
-              autoComplete="organization"
-              required
-              size="small"
+              onChange={(e, newValue) => setCompany(newValue || "")}
+              onInputChange={(e, newInputValue) => setCompany(newInputValue)}
+              ListboxProps={{
+                style: {
+                  maxHeight: 200, // 스크롤 생김
+                  overflowY: "auto",
+                },
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="거래처명"
+                  size="small"
+                  required
+                />
+              )}
             />
           </FormGrid>
           <FormGrid size={{ xs: 12, md: 6 }} />
@@ -141,6 +167,7 @@ export default function MasterOrderItem() {
             />
           </FormGrid>
 
+          {/* 분류 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="type" required>
               분류
@@ -150,21 +177,33 @@ export default function MasterOrderItem() {
               name="type"
               value={type}
               onChange={(e) => setType(e.target.value)}
-              displayEmpty
               input={<OutlinedInput />}
               size="small"
               required
               fullWidth
+              displayEmpty
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <span style={{ color: "#aaa" }}>분류 선택</span>;
+                }
+                return (
+                  {
+                    GENERAL: "일반",
+                    CAR: "자동차",
+                    SHIPBUILDING: "조선",
+                    DEFENSE: "방산",
+                  }[selected] || selected
+                );
+              }}
             >
-              <MenuItem value="" disabled>
-                원자재 종류 선택
-              </MenuItem>
               <MenuItem value="GENERAL">일반</MenuItem>
               <MenuItem value="CAR">자동차</MenuItem>
               <MenuItem value="SHIPBUILDING">조선</MenuItem>
               <MenuItem value="DEFENSE">방산</MenuItem>
             </Select>
           </FormGrid>
+
+          {/* 도장 방식 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="coatingMethod" required>
               도장 방식
@@ -174,19 +213,28 @@ export default function MasterOrderItem() {
               name="coatingMethod"
               value={coatingMethod}
               onChange={(e) => setCoatingMethod(e.target.value)}
-              displayEmpty
               input={<OutlinedInput />}
               size="small"
               required
               fullWidth
+              displayEmpty
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <span style={{ color: "#aaa" }}>도장 방식 선택</span>;
+                }
+                return (
+                  {
+                    POWDER: "분체",
+                    LIQUID: "액체",
+                  }[selected] || selected
+                );
+              }}
             >
-              <MenuItem value="" disabled>
-                도장 방식 선택
-              </MenuItem>
               <MenuItem value="POWDER">분체</MenuItem>
               <MenuItem value="LIQUID">액체</MenuItem>
             </Select>
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="unitPrice" required>
               품목단가

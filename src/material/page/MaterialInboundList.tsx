@@ -162,7 +162,7 @@ export function MaterialInboundList() {
     },
     {
       field: "inAmount",
-      headerName: "입고수량(개)",
+      headerName: "입고수량",
       width: 120,
       headerAlign: "center",
       align: "center",

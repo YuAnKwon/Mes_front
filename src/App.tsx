@@ -24,6 +24,7 @@ import MasterOrderItem from "./master/page/MasterOrderItem";
 import MasterRoutingList from "./master/page/MasterRoutingList";
 import { MaterialTotalStock } from "./material/page/MaterialTotalStock";
 import OrderProcess from "./orderitem/page/OrderProcess";
+import WorkOrder from "./orderitem/page/WorkOrder";
 
 function App() {
   return (
@@ -53,6 +54,8 @@ function App() {
             />
             <Route path="/shipmentInvoice/:id" element={<ShipmentInvoice />} />
             <Route path="/orderitem/process/:id" element={<OrderProcess />} />
+            <Route path="/orderitem/workorder/:id" element={<WorkOrder />} />
+
             {/* 원자재 */}
             <Route
               path="/material/inbound/register"

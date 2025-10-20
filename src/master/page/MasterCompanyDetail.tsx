@@ -74,7 +74,6 @@ export default function MasterCompanyDetail() {
   const handleComplete = (data) => {
     //data는 주소 검색 전체 결과 객체
     setZipcode(data.zonecode);
-    setAddress(data.address); // 선택된 주소 저장
     setAddressBase(data.address); // 기본 주소에 저장
     setOpenPostcode(false); // 검색창 닫기
   };
@@ -95,7 +94,7 @@ export default function MasterCompanyDetail() {
       managerEmail,
       remark,
       zipcode,
-      addressBase: address,
+      addressBase,
       addressDetail,
     };
 

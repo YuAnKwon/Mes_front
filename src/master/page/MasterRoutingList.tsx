@@ -155,7 +155,7 @@ export default function MasterRoutingList() {
     {
       field: "remark",
       headerName: "비고",
-      width: 500,
+      width: 450,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => (

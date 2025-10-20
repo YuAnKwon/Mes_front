@@ -2,22 +2,44 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Button, Tab, Tabs, Typography } from "@mui/material";
+import {
+  Button,
+  Tab,
+  Tabs,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+} from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import type { MasterCpList } from "../type";
-import { getMasterCpList, updateCompanyState } from "../api/companyApi";
+import {
+  getClientList,
+  getMasterCpList,
+  getSupplierList,
+  updateCompanyState,
+} from "../api/companyApi";
 import SearchBar from "../../common/SearchBar";
+import MasterCompany from "./MasterCompany";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function MasterCompanyList() {
   const navigate = useNavigate();
+  const [currentTab, setCurrentTab] = useState<number>(0);
+  const [rows, setRows] = useState<MasterCpList[]>([]);
+  const [openRegister, setOpenRegister] = useState(false); // ✅ 등록 모달 상태 추가
 
   const loadData = async () => {
     try {
-      const mcList = await getMasterCpList();
+      let data: MasterCpList[] = [];
 
-      // 서버 데이터 → DataGrid rows 형식으로 매핑
-      const mappedRows = mcList.map((item) => ({
+      if (currentTab === 0) data = await getMasterCpList();
+      else if (currentTab === 1) data = await getClientList();
+      else if (currentTab === 2) data = await getSupplierList();
+
+      const mappedRows = data.map((item) => ({
         id: item.id,
         companyName: item.companyName,
         companyType: item.companyType,
@@ -35,22 +57,37 @@ export default function MasterCompanyList() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentTab]);
 
-  const [rows, setRows] = useState<MasterCpList[]>([]);
   const apiRef = useGridApiRef();
+
+  const handleState = async (row) => {
+    const updatedState = row.businessYn === "거래 중" ? "Y" : "N";
+    try {
+      await updateCompanyState(row.id, updatedState);
+      await loadData(); // ✅ 변경 후 리스트 다시 불러오기
+      alert("거래 상태가 변경되었습니다");
+    } catch (error) {
+      console.error(error);
+      alert("상태 변경 실패");
+    }
+  };
+
+  const handleOpenRegister = () => setOpenRegister(true);
+  const handleCloseRegister = () => setOpenRegister(false);
+
   const columns: GridColDef[] = [
     {
       field: "id",
       headerName: "id",
-      width: 150,
+      width: 100,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "companyType",
       headerName: "업체 유형",
-      width: 150,
+      width: 120,
       headerAlign: "center",
       align: "center",
     },
@@ -71,11 +108,7 @@ export default function MasterCompanyList() {
           }}
         >
           <Typography
-            sx={{
-              textDecoration: "underline",
-              cursor: "pointer",
-              fontSize: "inherit",
-            }}
+            sx={{ textDecoration: "underline", cursor: "pointer" }}
             onClick={() => navigate(`/master/company/detail/${params.row.id}`)}
           >
             {params.value}
@@ -86,31 +119,29 @@ export default function MasterCompanyList() {
     {
       field: "ceoName",
       headerName: "대표명",
-      width: 150,
+      width: 130,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "address",
       headerName: "기업 주소",
-      width: 150,
+      width: 300,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "businessYn",
       headerName: "거래 상태",
-      width: 150,
+      width: 120,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "actions",
-      headerName: "거래 상태 변경", // 헤더 텍스트 없음
+      headerName: "거래 상태 변경",
       width: 150,
       sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
@@ -120,7 +151,6 @@ export default function MasterCompanyList() {
           borderColor: isActive ? "#ee0000" : "#4169E1",
         };
         const buttonText = isActive ? "거래 종료" : "거래 재개";
-
         return (
           <Button
             variant="outlined"
@@ -136,64 +166,36 @@ export default function MasterCompanyList() {
     {
       field: "remark",
       headerName: "비고",
-      width: 250,
+      width: 300, // 컬럼 고정 폭
       headerAlign: "center",
       align: "left",
       renderCell: (params) => (
-        <Typography
+        <Box
           sx={{
-            whiteSpace: "normal",
-            wordBreak: "break-word",
-            maxHeight: 60,
-            overflowY: "auto",
-            p: 1,
+            width: "100%",
+            height: "100%",
+            overflowX: "auto", // 가로 스크롤
+            overflowY: "hidden",
           }}
         >
-          {params.value}
-        </Typography>
+          <Box
+            sx={{
+              display: "inline-block", // 실제 내용 길이만큼 폭 확장
+              whiteSpace: "nowrap", // 줄바꿈 방지
+              px: 0.5,
+            }}
+          >
+            {params.value}
+          </Box>
+        </Box>
       ),
     },
   ];
 
-  const handleState = async (row) => {
-    const updatedState = row.businessYn === "거래 중" ? "Y" : "N";
-    try {
-      //api 호출로 백엔드에 변경 요청
-      await updateCompanyState(row.id, updatedState);
-      // 2. 변경된 전체 리스트 다시 불러오기
-      const refreshedRows = await getMasterCpList();
-      // 3. 상태 갱신
-      setRows(refreshedRows);
-
-      alert("거래 상태가 변경되었습니다");
-    } catch (error) {
-      console.error(error);
-      alert("상태 변경 실패");
-    }
-  };
-
-  const handleRegister = async () => {
-    navigate("/master/company/register");
-  };
-
-  // 탭기능
-  const [currentTab, setCurrentTab] = useState<number>(0);
-
   const tabList = ["전체", "거래처", "매입처"];
+  const handleTabChange = (_e, newValue: number) => setCurrentTab(newValue);
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setCurrentTab(newValue);
-  };
-
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
-
+  const sampleData = ["회사1", "회사2", "품목A", "품목B"];
   const searchOptions = [
     { label: "매입처명", value: "companyName" },
     { label: "품목번호", value: "materialCode" },
@@ -215,15 +217,8 @@ export default function MasterCompanyList() {
         업체 조회
       </Typography>
 
-      {/* 버튼 영역 */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        {/* 공통 검색바 */}
+      {/* 검색 + 버튼 */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Box sx={{ flex: 1 }}>
           <SearchBar
             searchOptions={searchOptions}
@@ -231,29 +226,25 @@ export default function MasterCompanyList() {
             onSearch={handleSearch}
           />
         </Box>
-
-        {/* 버튼 영역 */}
-        <Box sx={{ ml: "auto" }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleRegister}
-          >
-            업체 등록
-          </Button>
-        </Box>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={{ height: 40, fontWeight: 500, px: 2.5, ml: 2 }}
+          onClick={handleOpenRegister}
+        >
+          업체 등록
+        </Button>
       </Box>
-      {/* 탭 메뉴 */}
 
+      {/* 탭 */}
       <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 2 }}>
-        {tabList.map((label, index) => (
-          <Tab key={index} label={label} />
+        {tabList.map((label, i) => (
+          <Tab key={i} label={label} />
         ))}
       </Tabs>
 
-      {/* 테이블 영역 */}
-      <Box sx={{ height: 1200, width: "100%" }}>
+      {/* 테이블 */}
+      <Box sx={{ height: 800 }}>
         <DataGrid
           apiRef={apiRef}
           rows={filteredRows}
@@ -273,6 +264,24 @@ export default function MasterCompanyList() {
           }}
         />
       </Box>
+
+      {/* ✅ 등록 모달 */}
+      <Dialog
+        open={openRegister}
+        onClose={handleCloseRegister}
+        maxWidth="lg"
+        // fullWidth
+      >
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          업체 등록
+          <IconButton onClick={handleCloseRegister}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ maxHeight: "80vh", overflowY: "auto" }}>
+          <MasterCompany />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

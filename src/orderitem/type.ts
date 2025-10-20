@@ -1,3 +1,5 @@
+import type { MasterOrItList, MasterRouting } from "../master/type";
+
 export type OrderItemList = {
   id: number;
   lotNum?: number;
@@ -26,7 +28,13 @@ export type OrderItemOutRegister = {
   outDate: string;
 };
 
-// 공정 진행현황
+//작업지시서
+export type WorkOrder = {
+  item: MasterOrItList; // 수주품목 정보
+  processes: MasterRouting[]; // 공정(라우팅) 리스트
+};
+
+// 출하증
 export type ShipInvoice = {
   id: number; // 수주 입출고 id
   companyName: string; // 거래처명
@@ -39,6 +47,7 @@ export type ShipInvoice = {
   outAmount: number; // 출고수량
 };
 
+// 공정 진행현황
 export type ProcessStatus = {
   id: number; // 수추입출고 라우팅 id
   routingOrder: number;

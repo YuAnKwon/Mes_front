@@ -5,17 +5,19 @@ import type {
   OrderItemOutRegister,
   ShipInvoice,
   ProcessStatus,
+  WorkOrder,
 } from "../type";
 
 export const BASE_URL = import.meta.env.VITE_API_URL;
 
-// 입고 등록
+// 입고 등록 조회페이지
 export const getOrderItemInRegiList = async (): Promise<OrderItemList[]> => {
   const response = await axios.get(`${BASE_URL}/orderitem/in/regi/list`);
   console.log(response.data);
   return response.data;
 };
 
+// 입고 등록
 export const registerInboundItem = async (data: OrderItemInRegister[]) => {
   const response = await axios.post(`${BASE_URL}/orderitem/in/register`, data);
   return response.data;
@@ -79,6 +81,13 @@ export const updateProcessStatus = async (
   id: number,
   data: { startTime: string; completedStatus: string }
 ) => (await axios.put(`${BASE_URL}/orderitem/process/${id}`, data)).data;
+
+// 출하증
+export const getWorkOrder = async (id: number): Promise<WorkOrder[]> => {
+  const response = await axios.get(`${BASE_URL}/orderitem/workorder/${id}`);
+  console.log(response.data);
+  return response.data;
+};
 
 // 출하증
 export const getShip = async (id: number): Promise<ShipInvoice[]> => {

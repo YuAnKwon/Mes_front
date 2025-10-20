@@ -83,11 +83,7 @@ export default function MasterCompany() {
   };
 
   return (
-    <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <Typography variant="h5" sx={{ mb: 1 }}>
-        업체 등록
-      </Typography>
-
+    <Box sx={{ p: 2, maxWidth: 850, mx: "auto" }}>
       <Box sx={{ height: 600, width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>

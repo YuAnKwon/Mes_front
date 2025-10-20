@@ -157,7 +157,7 @@ export default function OrderOutboundList() {
     },
     {
       field: "outAmount",
-      headerName: "출고수량 (개)",
+      headerName: "출고수량",
       width: 150,
       headerAlign: "center",
       align: "center",

@@ -2,30 +2,30 @@
 //수주품목대상 등록 조회
 export type MasterOrItList = {
   id: number;
-  itemCode: number;//품목번호
-  itemName: string;//품목명
-  company: string;//거래처명
-  type: string;//분류
-  unitPrice: number;//품목단가
-  color: string;//색상
-  coatingMethod: string;//도장방식
-  remark: string;//비고
-  useYn: string;//거래상태
-}
+  itemCode: string; //품목번호
+  itemName: string; //품목명
+  company: string; //거래처명
+  type: string; //분류
+  unitPrice: number; //품목단가
+  color: string; //색상
+  coatingMethod: string; //도장방식
+  remark: string; //비고
+  useYn: string; //거래상태
+};
 
 //수주품목대상 등록
 export type MasterOrItRegister = {
   id?: number;
-  itemCode: number;//품목번호
-  itemName: string;//품목명
-  company: string;//거래처명
-  type: string;//분류
-  unitPrice: number;//품목단가
-  color: string;//색상
-  coatingMethod: string;//도장방식
-  remark: string;//비고
+  itemCode: string; //품목번호
+  itemName: string; //품목명
+  company: string; //거래처명
+  type: string; //분류
+  unitPrice: number; //품목단가
+  color: string; //색상
+  coatingMethod: string; //도장방식
+  remark: string; //비고
   imgUrl: File[];
-  routing: string[];
+  routing: MasterRouting[];
 };
 
 /* 원자재 */

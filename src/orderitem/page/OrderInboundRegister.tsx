@@ -116,7 +116,7 @@ export default function OrderInboundRegister() {
     },
     {
       field: "inAmount",
-      headerName: "입고수량 (개)",
+      headerName: "입고수량",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -132,36 +132,30 @@ export default function OrderInboundRegister() {
       editable: true,
       type: "date",
     },
-
     {
       field: "remark",
       headerName: "비고",
-      width: 250,
+      width: 300, // 컬럼 고정 폭
       headerAlign: "center",
-      align: "center",
-      sortable: false,
+      align: "left",
       renderCell: (params) => (
         <Box
           sx={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "flex-start",
-            height: "100%", // 셀 전체 높이 기준
-            whiteSpace: "normal",
-            wordBreak: "break-word",
-            overflowY: "auto",
-            p: 1,
+            width: "100%",
+            height: "100%",
+            overflowX: "auto", // 가로 스크롤
+            overflowY: "hidden",
           }}
         >
-          <Typography
-            variant="body2"
+          <Box
             sx={{
-              display: "block",
-              lineHeight: 1.4,
+              display: "inline-block", // 실제 내용 길이만큼 폭 확장
+              whiteSpace: "nowrap", // 줄바꿈 방지
+              px: 0.5,
             }}
           >
             {params.value}
-          </Typography>
+          </Box>
         </Box>
       ),
     },

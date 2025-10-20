@@ -179,7 +179,7 @@ export default function OrderInboundList() {
     },
     {
       field: "inAmount",
-      headerName: "입고수량 (개)",
+      headerName: "입고수량",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -215,7 +215,7 @@ export default function OrderInboundList() {
           variant="outlined"
           size="small"
           onClick={() => {
-            navigate(`/workorder/${params.row.id}`);
+            navigate(`/orderitem/workorder/${params.row.id}`);
           }}
         >
           작업지시서

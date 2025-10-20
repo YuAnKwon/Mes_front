@@ -124,7 +124,7 @@ export default function OrderOutboundRegister() {
     },
     {
       field: "inAmount",
-      headerName: "입고수량 (개)",
+      headerName: "입고수량",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -339,9 +339,6 @@ export default function OrderOutboundRegister() {
               "& .MuiDataGrid-cell--editable::after": {
                 content: '""', // 연필 아이콘 제거
               },
-            },
-            "& .row-disabled .MuiDataGrid-cell": {
-              pointerEvents: "none", // 기본적으로 셀 클릭 막기
             },
 
             "& .row-disabled .MuiDataGrid-cell:first-of-type": {

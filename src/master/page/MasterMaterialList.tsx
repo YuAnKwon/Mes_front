@@ -144,21 +144,28 @@ export default function MasterMaterialList() {
     {
       field: "remark",
       headerName: "비고",
-      width: 250,
+      width: 300, // 컬럼 고정 폭
       headerAlign: "center",
       align: "left",
       renderCell: (params) => (
-        <Typography
+        <Box
           sx={{
-            whiteSpace: "normal",
-            wordBreak: "break-word",
-            maxHeight: 60,
-            overflowY: "auto",
-            p: 1,
+            width: "100%",
+            height: "100%",
+            overflowX: "auto", // 가로 스크롤
+            overflowY: "hidden",
           }}
         >
-          {params.value}
-        </Typography>
+          <Box
+            sx={{
+              display: "inline-block", // 실제 내용 길이만큼 폭 확장
+              whiteSpace: "nowrap", // 줄바꿈 방지
+              px: 0.5,
+            }}
+          >
+            {params.value}
+          </Box>
+        </Box>
       ),
     },
   ];
