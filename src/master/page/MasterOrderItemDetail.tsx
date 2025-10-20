@@ -51,7 +51,9 @@ export default function MasterOrderItemDetail() {
 
     // 파일 배열을 "imgUrl" key로 추가
     if (imgFiles && imgFiles.length > 0) {
-      imgFiles.forEach((file) => formData.append("imgUrl", file));
+      imgFiles.forEach((img) => {
+        if (img.file) formData.append("imgUrl", img.file); // ✅ file만 append
+      });
     }
 
     try {
