@@ -86,24 +86,48 @@ export default function MasterOrderItemDetail() {
     });
   };
 
+  // const handleUpdate = async () => {
+  //   const formData = new FormData();
+
+  //   imgFiles.forEach((img) => {
+  //     formData.append("imgUrl", img.imgUrl); // 실제 파일 업로드
+  //     formData.append("repYn", img.repYn); // 대표 여부
+  //   });
+
+  //   // 나머지 orderItem 데이터
+  //   const { images, ...rest } = orderItem;
+  //   Object.entries(rest).forEach(([key, value]) => {
+  //     if (value !== undefined && value !== null)
+  //       formData.append(key, value.toString());
+  //   });
+
+  //   try {
+  //     await updateOrItDetail(orderItem.id, formData);
+  //     alert("수정 완료!");
+  //   } catch (error) {
+  //     console.error("수정 실패:", error);
+  //     alert("수정 실패");
+  //   }
+  // };
+
   const handleUpdate = async () => {
     const formData = new FormData();
 
-    imgFiles.forEach((img) => {
-      formData.append("imgUrl", img.imgUrl); // 실제 파일 업로드
-      formData.append("repYn", img.repYn); // 대표 여부
-    });
+    // JSON 객체를 "data" key로 추가
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(orderItem)], { type: "application/json" })
+    );
 
-    // 나머지 orderItem 데이터
-    const { images, ...rest } = orderItem;
-    Object.entries(rest).forEach(([key, value]) => {
-      if (value !== undefined && value !== null)
-        formData.append(key, value.toString());
-    });
+    // 파일 배열을 "imgUrl" key로 추가
+    if (imgFiles && imgFiles.length > 0) {
+      imgFiles.forEach((file) => formData.append("imgUrl", file));
+    }
 
     try {
-      await updateOrItDetail(orderItem.id, formData);
+      await updateOrItDetail(orderItem.id, formData); // api 함수 호출
       alert("수정 완료!");
+      navigate("/master/orderitem/list");
     } catch (error) {
       console.error("수정 실패:", error);
       alert("수정 실패");
