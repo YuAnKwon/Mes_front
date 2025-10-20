@@ -21,6 +21,7 @@ export type imgType = {
   imgOriName?: string;
   imgUrl: string;
   repYn: string;
+  file?: File; // ✅ 추가
 };
 
 //수주품목대상 등록

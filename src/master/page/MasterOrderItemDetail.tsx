@@ -57,10 +57,24 @@ export default function MasterOrderItemDetail() {
 
   // 이미지 미리보기
   useEffect(() => {
-    const newUrls = imgFiles.map((file) => URL.createObjectURL(file));
-    setPreviewUrls((prev) => [...(prev || []), ...newUrls]);
+    if (!imgFiles || imgFiles.length === 0) return;
 
-    return () => newUrls.forEach((url) => URL.revokeObjectURL(url));
+    // 새로 추가된 이미지 파일만 Blob URL 생성
+    const newBlobUrls = imgFiles
+      .filter((img) => img.file) // 새로 추가된 파일만
+      .map((img) => URL.createObjectURL(img.file!));
+
+    // 기존 이미지 URL + 새 Blob URL 합치기
+    setPreviewUrls((prev) => {
+      // 중복 방지: 이미 포함된 URL은 제외
+      const all = [...prev, ...newBlobUrls];
+      return Array.from(new Set(all));
+    });
+
+    // cleanup: 새로 생성된 Blob URL만 해제
+    return () => {
+      newBlobUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
   }, [imgFiles]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,30 +99,6 @@ export default function MasterOrderItemDetail() {
       }));
     });
   };
-
-  // const handleUpdate = async () => {
-  //   const formData = new FormData();
-
-  //   imgFiles.forEach((img) => {
-  //     formData.append("imgUrl", img.imgUrl); // 실제 파일 업로드
-  //     formData.append("repYn", img.repYn); // 대표 여부
-  //   });
-
-  //   // 나머지 orderItem 데이터
-  //   const { images, ...rest } = orderItem;
-  //   Object.entries(rest).forEach(([key, value]) => {
-  //     if (value !== undefined && value !== null)
-  //       formData.append(key, value.toString());
-  //   });
-
-  //   try {
-  //     await updateOrItDetail(orderItem.id, formData);
-  //     alert("수정 완료!");
-  //   } catch (error) {
-  //     console.error("수정 실패:", error);
-  //     alert("수정 실패");
-  //   }
-  // };
 
   const handleUpdate = async () => {
     const formData = new FormData();
