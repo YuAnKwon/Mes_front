@@ -9,12 +9,11 @@ import {
   Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Autocomplete, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import type { MasterOrItRegister } from "../type";
 import { registerOrderItem } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import { getClientList, getSupplierList } from "../api/companyApi";
+import { getClientList } from "../api/companyApi";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",

@@ -66,17 +66,19 @@ export const updateOrItDetail = async (
   //키/값 쌍을 담아 multipart 요청 본문으로 보낼 준비를 함.
   const formData = new FormData();
 
-  // updatedMaterial의 key-value를 FormData에 추가
-  Object.entries(updatedMaterial).forEach(([key, value]) => {
-    if (value instanceof FileList) {
-      // 파일이 여러 개라면 반복해서 추가
-      Array.from(value).forEach((file) => formData.append(key, file));
-    } else {
-      formData.append(key, value as any);
-    }
-  });
+  // 1. JSON 객체를 "data" key로 추가
+  const { imgUrl, ...rest } = updatedMaterial;
+  formData.append(
+    "data",
+    new Blob([JSON.stringify(rest)], { type: "application/json" })
+  );
 
-  //서버의 등록 엔드포인트(?)로 multipart 형식으로 get 요청 전송.
+  // 2. 파일 배열을 "imgUrl" key로 추가
+  if (imgUrl && imgUrl.length > 0) {
+    imgUrl.forEach((file) => formData.append("imgUrl", file));
+  }
+
+  // 3. axios PUT 요청
   return axios.put(`${BASE_URL}/master/orderitem/detail/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });

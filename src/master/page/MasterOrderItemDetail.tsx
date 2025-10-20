@@ -34,6 +34,7 @@ export default function MasterOrderItemDetail() {
       try {
         const response = await getOrItDetail(Number(id));
         setOrderItem(response);
+        console.log("response :", response);
 
         if (response.images) {
           const urls = response.images.map((p: any) => p.imgUrl);
@@ -152,7 +153,7 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <Select
               id="type"
-              value={orderItem?.type}
+              value={orderItem.type || ""} // undefined 방지
               onChange={(e) =>
                 setOrderItem((prev) =>
                   prev
@@ -180,7 +181,7 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <Select
               id="coatingMethod"
-              value={orderItem?.coatingMethod}
+              value={orderItem?.coatingMethod || ""} // undefined 방지
               onChange={(e) =>
                 setOrderItem((prev) =>
                   prev
