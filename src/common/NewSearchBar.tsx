@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   Box,
+  createFilterOptions,
   IconButton,
   InputAdornment,
   MenuItem,
@@ -23,7 +24,7 @@ export default function NewSearchBar({
 }: SearchBarProps) {
   const [criteria, setCriteria] = useState(searchOptions[0].value);
   const [query, setQuery] = useState("");
-
+  const filter = createFilterOptions<string>();
   const handleSearch = () => {
     onSearch(criteria, query);
   };
@@ -72,6 +73,10 @@ export default function NewSearchBar({
       <Autocomplete
         freeSolo
         options={currentAutoCompleteList} // ✅ 기준에 따라 자동완성 리스트 변경
+        filterOptions={(options, params) => {
+          const filtered = filter(options, params); // ✅ 기본 필터링 유지
+          return filtered.slice(0, 5); // ✅ 그중 상위 5개만 표시
+        }}
         sx={{
           flex: 1,
           height: "100%",

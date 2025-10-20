@@ -1,5 +1,4 @@
 import { Box, Button } from "@mui/material";
-import SearchBar from "../../common/SearchBar";
 import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
 import * as XLSX from "xlsx-js-style";
@@ -9,23 +8,20 @@ import { useNavigate } from "react-router-dom";
 import { getMaterialInData } from "../api/MaterialInboundregisterApi";
 import { postMaterialOutData } from "../api/MaterialOutboundRegisterApi";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
+import NewSearchBar from "../../common/NewSearchBar";
 
 export function MaterialOutboundRegister() {
   const [materialout, setMaterialout] = useState<MaterialOut[]>([]);
   const apiRef = useGridApiRef();
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-  ];
+  const [filteredMaterials, setFilteredMaterials] = useState<MaterialOut[]>([]);
+  const [autoCompleteMap, setAutoCompleteMap] = useState<
+    Record<string, string[]>
+  >({
+    companyName: [], //수정
+    materialCode: [], //수정
+    materialName: [], //수정
+  });
+
   const columns: GridColDef[] = [
     {
       field: "inNum",
@@ -99,9 +95,20 @@ export function MaterialOutboundRegister() {
     },
   ];
 
-  //검색
   const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
+    if (!query.trim()) {
+      setFilteredMaterials(materialout); // 검색어 없으면 전체 리스트 수정
+      return;
+    }
+
+    const filtered = materialout.filter((item) =>
+      item[criteria as keyof MaterialOut] //수정
+        ?.toString()
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
+
+    setFilteredMaterials(filtered);
   };
 
   const handleRegister = async () => {
@@ -141,18 +148,35 @@ export function MaterialOutboundRegister() {
     }
   };
 
-  const fetchMaterialOutData = async () => {
-    try {
-      const response = await getMaterialInData();
-      setMaterialout(response);
-    } catch (error) {
-      console.error("데이터 로딩 실패", error);
-      alert("출고 데이터를 불러오지 못했습니다.");
-    }
-  };
-
   useEffect(() => {
-    fetchMaterialOutData();
+    const fetchData = async () => {
+      try {
+        const data = await getMaterialInData(); //수정
+        setMaterialout(data); //수정
+        setFilteredMaterials(data);
+
+        // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
+        const companyNames = Array.from(
+          new Set(data.map((m) => m.companyName))
+        ); //수정
+        const materialCodes = Array.from(
+          new Set(data.map((m) => m.materialCode))
+        ); //수정
+        const materialNames = Array.from(
+          new Set(data.map((m) => m.materialName))
+        ); //수정
+
+        setAutoCompleteMap({
+          companyName: companyNames, //수정
+          materialCode: materialCodes, //수정
+          materialName: materialNames, //수정
+        });
+      } catch (error) {
+        console.error("원자재 데이터 로딩 실패", error); //수정
+      }
+    };
+
+    fetchData();
   }, []);
 
   const navigate = useNavigate();
@@ -192,9 +216,13 @@ export function MaterialOutboundRegister() {
       >
         {/* 공통 검색바 */}
         <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
+          <NewSearchBar
+            searchOptions={[
+              { label: "거래처명", value: "companyName" }, //수정
+              { label: "품목코드", value: "materialCode" }, //수정
+              { label: "품목명", value: "materialName" }, //수정
+            ]}
+            autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
           />
         </Box>
@@ -222,7 +250,7 @@ export function MaterialOutboundRegister() {
 
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
-          rows={materialout}
+          rows={filteredMaterials}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
