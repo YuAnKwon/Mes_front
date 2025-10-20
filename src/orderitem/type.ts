@@ -2,16 +2,16 @@ import type { MasterOrItList, MasterRouting } from "../master/type";
 
 export type OrderItemList = {
   id: number;
-  lotNum?: number;
-  outNum?: number;
+  lotNum?: string;
+  outNum?: string;
   itemName: string;
   itemCode: string;
   company: string;
   type: string;
   inAmount?: number;
-  inDate?: string;
+  inDate?: string | Date | null;
   outAmount?: number;
-  outDate?: string;
+  outDate?: string | Date | null;
   remark?: string;
   isProcessCompleted?: string;
 };

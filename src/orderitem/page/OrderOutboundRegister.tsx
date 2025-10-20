@@ -6,63 +6,102 @@ import { Button, Typography } from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
-import SearchBar from "../../common/SearchBar";
-
 import { getOrderItemInList, registeroutboundItem } from "../api/OrderInApi";
 import type { OrderItemList, OrderItemOutRegister } from "../type";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
+import NewSearchBar from "../../common/NewSearchBar";
 
 export default function OrderOutboundRegister() {
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
-
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-  ];
-
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
-
   const navigate = useNavigate();
   const apiRef = useGridApiRef();
   const [rows, setRows] = useState<OrderItemList[]>([]);
+  const [filteredMaterials, setFilteredMaterials] = useState<OrderItemList[]>(
+    []
+  );
+
+  const [autoCompleteMap, setAutoCompleteMap] = useState<
+    Record<string, string[]>
+  >({
+    company: [], //수정
+    itemCode: [], //수정
+    itemName: [], //수정
+    lotNum: [],
+    inDate: [],
+  });
+
+  const handleSearch = (criteria: string, query: string) => {
+    if (!query.trim()) {
+      setFilteredMaterials(rows); // 검색어 없으면 전체 리스트 수정
+      return;
+    }
+
+    const filtered = rows.filter((item) =>
+      item[criteria as keyof OrderItemList] //수정
+        ?.toString()
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
+
+    setFilteredMaterials(filtered);
+  };
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const oiList = await getOrderItemInList();
+        setRows(oiList);
+        // 서버 데이터 → DataGrid rows 형식으로 매핑
+        const mappedRows = oiList.map((item) => ({
+          id: item.id,
+          lotNum: item.lotNum,
+          itemName: item.itemName,
+          itemCode: item.itemCode,
+          company: item.company,
+          type: item.type,
+          inAmount: item.inAmount,
+          inDate: item.inDate,
+          isProcessCompleted: item.isProcessCompleted ?? "N",
+          outAmount: undefined,
+          outDate: "",
+        }));
+        setFilteredMaterials(mappedRows); //초기값
+
+        // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
+        const companys = Array.from(new Set(oiList.map((m) => m.company))); //수정
+        const itemCodes = Array.from(new Set(oiList.map((m) => m.itemCode))); //수정
+        const itemNames = Array.from(new Set(oiList.map((m) => m.itemName))); //수정
+        const lotNums = Array.from(
+          new Set(oiList.map((m) => m.lotNum))
+        ) as string[];
+        const inDates = Array.from(
+          new Set(
+            oiList
+              .map((m) => m.inDate)
+              .filter(Boolean)
+              .map((dateString) => {
+                const date = new Date(dateString!);
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
+                return `${yyyy}-${mm}-${dd}`;
+              })
+          )
+        );
+
+        setAutoCompleteMap({
+          company: companys, //수정
+          itemCode: itemCodes, //수정
+          itemName: itemNames, //수정
+          lotNum: lotNums,
+          inDate: inDates,
+        });
+      } catch (error) {
+        console.error("수주 데이터 로딩 실패", error); //수정
+      }
+    };
+
     loadData();
   }, []);
-
-  const loadData = async () => {
-    try {
-      const oiList = await getOrderItemInList();
-
-      const mappedRows = oiList.map((item) => ({
-        id: item.id,
-        lotNum: item.lotNum,
-        itemName: item.itemName,
-        itemCode: item.itemCode,
-        company: item.company,
-        type: item.type,
-        inAmount: item.inAmount,
-        inDate: item.inDate,
-        isProcessCompleted: item.isProcessCompleted ?? "N",
-        outAmount: undefined,
-        outDate: "",
-      }));
-
-      setRows(mappedRows);
-    } catch (error) {
-      console.error("입고 데이터 로딩 실패", error);
-    }
-  };
 
   const columns: GridColDef[] = [
     {
@@ -228,7 +267,12 @@ export default function OrderOutboundRegister() {
   };
 
   const handleRegister = async () => {
-    const selectedRowsMap = apiRef.current.getSelectedRows();
+    const selectedRowsMap = apiRef.current?.getSelectedRows();
+    if (!selectedRowsMap) {
+      alert("선택된 데이터가 없습니다.");
+      return;
+    }
+
     const selectedRows = Array.from(selectedRowsMap.values());
 
     if (selectedRows.length === 0) {
@@ -299,9 +343,15 @@ export default function OrderOutboundRegister() {
         }}
       >
         <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
+          <NewSearchBar
+            searchOptions={[
+              { label: "거래처명", value: "companyName" }, //수정
+              { label: "품목코드", value: "materialCode" }, //수정
+              { label: "품목명", value: "materialName" }, //수정
+              { label: "LOT 번호", value: "lotNum" },
+              { label: "입고일자", value: "inDate" },
+            ]}
+            autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
           />
         </Box>
@@ -329,7 +379,7 @@ export default function OrderOutboundRegister() {
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
-          rows={rows}
+          rows={filteredMaterials}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
@@ -339,6 +389,13 @@ export default function OrderOutboundRegister() {
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
             sorting: { sortModel: [{ field: "lotNum", sort: "desc" }] },
+          }}
+          slotProps={{
+            basePagination: {
+              material: {
+                ActionsComponent: Pagination,
+              },
+            },
           }}
           getRowClassName={(params) =>
             params.row.isProcessCompleted === "N" ? "row-disabled" : ""

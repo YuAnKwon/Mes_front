@@ -6,7 +6,6 @@ import {
 } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
 import { Box, Button, Typography } from "@mui/material";
-import SearchBar from "../../common/SearchBar";
 import * as XLSX from "xlsx-js-style";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -17,63 +16,114 @@ import {
 } from "../api/OrderInApi";
 import type { OrderItemList } from "../type";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
+import NewSearchBar from "../../common/NewSearchBar";
 
 export default function OrderInboundList() {
   const navigate = useNavigate();
   const apiRef = useGridApiRef();
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
-
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-  ];
-
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
-
-  const loadData = async () => {
-    try {
-      const oiList = await getOrderItemInList();
-
-      // 서버 데이터 → DataGrid rows 형식으로 매핑
-      const mappedRows = oiList.map((item) => ({
-        id: item.id,
-        lotNum: item.lotNum,
-        itemName: item.itemName,
-        itemCode: item.itemCode,
-        company: item.company,
-        type: item.type,
-        inAmount: item.inAmount,
-        inDate: item.inDate
-          ? (() => {
-              const [datePart, timePart] = item.inDate.split(" ");
-              const [year, month, day] = datePart.split("-").map(Number);
-              const [hour, minute, second] = timePart.split(":").map(Number);
-              return new Date(year, month - 1, day, hour, minute, second);
-            })()
-          : null,
-
-        remark: item.remark,
-      }));
-
-      setRows(mappedRows);
-    } catch (error) {
-      console.error("입고 데이터 로딩 실패", error);
-    }
-  };
+  const [filteredMaterials, setFilteredMaterials] = useState<OrderItemList[]>(
+    []
+  );
+  const [autoCompleteMap, setAutoCompleteMap] = useState<
+    Record<string, string[]>
+  >({
+    company: [], //수정
+    itemCode: [], //수정
+    itemName: [], //수정
+    lotNum: [],
+    inDate: [],
+  });
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const oiList = await getOrderItemInList();
+        setRows(oiList);
+        // 서버 데이터 → DataGrid rows 형식으로 매핑
+        const mappedRows = oiList.map((item) => ({
+          id: item.id,
+          lotNum: item.lotNum as string,
+          itemName: item.itemName,
+          itemCode: item.itemCode,
+          company: item.company,
+          type: item.type,
+          inAmount: item.inAmount as number,
+          inDate: item.inDate ? new Date(item.inDate) : null,
+          remark: item.remark as string,
+        }));
+        setFilteredMaterials(mappedRows); //초기값
+
+        // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
+        const companys = Array.from(new Set(oiList.map((m) => m.company))); //수정
+        const itemCodes = Array.from(new Set(oiList.map((m) => m.itemCode))); //수정
+        const itemNames = Array.from(new Set(oiList.map((m) => m.itemName))); //수정
+        const lotNums = Array.from(
+          new Set(oiList.map((m) => m.lotNum))
+        ) as string[];
+        const inDates = Array.from(
+          new Set(
+            oiList
+              .map((m) => m.inDate)
+              .filter(Boolean)
+              .map((dateString) => {
+                const date = new Date(dateString!);
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
+                return `${yyyy}-${mm}-${dd}`;
+              })
+          )
+        );
+        setAutoCompleteMap({
+          company: companys, //수정
+          itemCode: itemCodes, //수정
+          itemName: itemNames, //수정
+          lotNum: lotNums,
+          inDate: inDates,
+        });
+      } catch (error) {
+        console.error("입고 데이터 로딩 실패", error); //수정
+      }
+    };
+
     loadData();
   }, []);
+
+  const handleSearch = (criteria: string, query: string) => {
+    const trimmedQuery = query.trim().toLowerCase();
+    if (!trimmedQuery) {
+      setFilteredMaterials(rows);
+      return;
+    }
+
+    const filtered = rows.filter((item) => {
+      const value = item[criteria as keyof OrderItemList];
+      if (!value) return false;
+
+      // ✅ 입고일자 검색일 경우
+      if (criteria === "inDate") {
+        const dateObj = new Date(value as string | Date);
+
+        // 변환된 날짜를 다양한 형식으로 저장
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const d = String(dateObj.getDate()).padStart(2, "0");
+
+        const dateStr = `${y}-${m}-${d}`;
+        const dateStrSlash = `${y}/${m}/${d}`;
+        const shortStr = `${m}-${d}`;
+
+        // ✅ 검색어가 이 중 하나라도 포함되면 true
+        return (
+          dateStr.includes(trimmedQuery) ||
+          dateStrSlash.includes(trimmedQuery) ||
+          shortStr.includes(trimmedQuery)
+        );
+      }
+      return value.toString().toLowerCase().includes(trimmedQuery);
+    });
+    setFilteredMaterials(filtered);
+  };
 
   const [rows, setRows] = useState<OrderItemList[]>([]);
   const [editedRows, setEditedRows] = useState<{ [key: number]: boolean }>({});
@@ -308,9 +358,15 @@ export default function OrderInboundList() {
       >
         {/* 공통 검색바 */}
         <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
+          <NewSearchBar
+            searchOptions={[
+              { label: "거래처명", value: "companyName" }, //수정
+              { label: "품목코드", value: "itemCode" }, //수정
+              { label: "품목명", value: "itemName" }, //수정
+              { label: "Lot 번호", value: "lotNum" },
+              { label: "입고일자", value: "inDate" },
+            ]}
+            autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
           />
         </Box>
@@ -330,7 +386,7 @@ export default function OrderInboundList() {
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
-          rows={rows}
+          rows={filteredMaterials}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick

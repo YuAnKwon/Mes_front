@@ -31,7 +31,7 @@ export function SideNav() {
     >
       <SidebarItems>
         <SidebarItemGroup>
-          <SidebarItem href="#" icon={HiChartPie}>
+          <SidebarItem href="/" icon={HiChartPie}>
             대시보드
           </SidebarItem>
           <SidebarCollapse

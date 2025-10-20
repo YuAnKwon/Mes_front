@@ -1,31 +1,45 @@
 import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
 import { Box, Button } from "@mui/material";
-import SearchBar from "../../common/SearchBar";
 import type { MaterialTotalStock } from "../type";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx-js-style";
 import { getMaterialTotalStock } from "../api/MaterialTotalStockApi";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
+import NewSearchBar from "../../common/NewSearchBar";
 
 export function MaterialTotalStock() {
   const [materialTotalStock, setMaterialTotalStock] = useState<
     MaterialTotalStock[]
   >([]);
   const apiRef = useGridApiRef();
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-  ];
+  const [filteredMaterials, setFilteredMaterials] = useState<
+    MaterialTotalStock[]
+  >([]);
+  const [autoCompleteMap, setAutoCompleteMap] = useState<
+    Record<string, string[]>
+  >({
+    companyName: [], //수정
+    materialCode: [], //수정
+    materialName: [], //수정
+  });
+
+  const handleSearch = (criteria: string, query: string) => {
+    if (!query.trim()) {
+      setFilteredMaterials(materialTotalStock); // 검색어 없으면 전체 리스트 수정
+      return;
+    }
+
+    const filtered = materialTotalStock.filter((item) =>
+      item[criteria as keyof MaterialTotalStock] //수정
+        ?.toString()
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
+
+    setFilteredMaterials(filtered);
+  };
+
   const columns: GridColDef[] = [
     {
       field: "materialId",
@@ -64,18 +78,36 @@ export function MaterialTotalStock() {
     },
   ];
 
-  const fetchMaterialOutData = async () => {
-    try {
-      const response = await getMaterialTotalStock();
-      setMaterialTotalStock(response);
-    } catch (error) {
-      console.error("데이터 로딩 실패", error);
-      alert("재고현황 데이터를 불러오지 못했습니다.");
-    }
-  };
-
   useEffect(() => {
-    fetchMaterialOutData();
+    const fetchData = async () => {
+      try {
+        const data = await getMaterialTotalStock(); //수정
+        setMaterialTotalStock(data); //수정
+
+        // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
+        const companyNames = Array.from(
+          new Set(data.map((m) => m.companyName))
+        ); //수정
+        const materialCodes = Array.from(
+          new Set(data.map((m) => m.materialCode))
+        ); //수정
+        const materialNames = Array.from(
+          new Set(data.map((m) => m.materialName))
+        ); //수정
+
+        setFilteredMaterials(data); //초기값
+
+        setAutoCompleteMap({
+          companyName: companyNames, //수정
+          materialCode: materialCodes, //수정
+          materialName: materialNames, //수정
+        });
+      } catch (error) {
+        console.error("원자재 데이터 로딩 실패", error); //수정
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleExcelDownload = () => {
@@ -99,9 +131,6 @@ export function MaterialTotalStock() {
     XLSX.writeFile(workbook, "원자재_재고현황.xlsx");
   };
 
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 재고현황</h2>
@@ -116,9 +145,13 @@ export function MaterialTotalStock() {
       >
         {/* 공통 검색바 */}
         <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
+          <NewSearchBar
+            searchOptions={[
+              { label: "거래처명", value: "companyName" }, //수정
+              { label: "품목코드", value: "materialCode" }, //수정
+              { label: "품목명", value: "materialName" }, //수정
+            ]}
+            autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
           />
         </Box>
@@ -138,7 +171,7 @@ export function MaterialTotalStock() {
 
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
-          rows={materialTotalStock}
+          rows={filteredMaterials}
           columns={columns}
           getRowId={(row) => row.materialId}
           disableRowSelectionOnClick

@@ -14,14 +14,25 @@ import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import type { MasterMtList } from "../type";
 import { getMasterMtList, updateMaterialState } from "../api/MaterialApi";
-import SearchBar from "../../common/SearchBar";
 import { CloseIcon } from "flowbite-react";
 import MasterMaterial from "./MasterMaterial";
+import NewSearchBar from "../../common/NewSearchBar";
+import { createStyledWorksheet } from "../../common/ExcelUtils";
+import * as XLSX from "xlsx-js-style";
 
 export default function MasterMaterialList() {
   const navigate = useNavigate();
   const [openRegister, setOpenRegister] = useState(false);
-
+  const [filteredMaterials, setFilteredMaterials] = useState<MasterMtList[]>(
+    []
+  );
+  const [autoCompleteMap, setAutoCompleteMap] = useState<
+    Record<string, string[]>
+  >({
+    companyName: [], //수정
+    materialCode: [], //수정
+    materialName: [], //수정
+  });
   const handleOpenRegister = () => setOpenRegister(true);
   const handleCloseRegister = () => setOpenRegister(false);
 
@@ -29,29 +40,59 @@ export default function MasterMaterialList() {
     handleCloseRegister(); // 모달 닫기
     await loadData(); // 리스트 갱신
   };
+
+  const handleSearch = (criteria: string, query: string) => {
+    if (!query.trim()) {
+      setFilteredMaterials(rows); // 검색어 없으면 전체 리스트 수정
+      return;
+    }
+
+    const filtered = rows.filter((item) =>
+      item[criteria as keyof MasterMtList] //수정
+        ?.toString()
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
+
+    setFilteredMaterials(filtered);
+  };
+
   const loadData = async () => {
     try {
-      const mcList = await getMasterMtList();
-      console.log("API 응답:", mcList); // 구조 확인
+      const mcList = await getMasterMtList(); //수정
 
-      // 서버 데이터 → DataGrid rows 형식으로 매핑
       const mappedRows: MasterMtList[] = mcList.map((item: any) => ({
         id: item.id,
-        materialCode: item.code, // API code → 타입 materialCode
-        materialName: item.name, // API name → 타입 materialName
-        companyName: item.company, // API company → 타입 companyName
+        materialCode: item.materialCode, // API code → 타입 materialCode
+        materialName: item.materialName, // API name → 타입 materialName
+        companyName: item.companyName, // API company → 타입 companyName
         type: item.type,
         color: item.color,
         useYn: item.useYn,
         remark: item.remark,
       }));
+      setRows(mappedRows); //수정
 
-      setRows(mappedRows);
+      // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
+      const companies = Array.from(new Set(mcList.map((m) => m.companyName))); //수정
+      const materialCodes = Array.from(
+        new Set(mcList.map((m) => m.materialCode))
+      ); //수정
+      const materialNames = Array.from(
+        new Set(mcList.map((m) => m.materialName))
+      ); //수정
+
+      setFilteredMaterials(mappedRows); //초기값
+
+      setAutoCompleteMap({
+        companyName: companies, //수정
+        materialCode: materialCodes, //수정
+        materialName: materialNames, //수정
+      });
     } catch (error) {
-      console.error("업체 데이터 조회 실패", error);
+      console.error("업체 데이터 조회 실패", error); //수정
     }
   };
-
   useEffect(() => {
     loadData();
   }, []);
@@ -232,23 +273,29 @@ export default function MasterMaterialList() {
     }
   };
 
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
+  const handleExcelDownload = () => {
+    if (!rows || rows.length === 0) {
+      alert("다운로드할 데이터가 없습니다.");
+      return; // 더 이상 진행하지 않음
+    }
+    const excelData = rows.map((item) => ({
+      // Id: item.id, 필요하면 주석풀기
+      품목번호: item.materialCode,
+      품목명: item.materialName,
 
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-  ];
+      매입처명: item.companyName,
+      분류: item.type,
 
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
+      색상: item.color,
+
+      거래상태: item.useYn,
+      비고: item.remark,
+    }));
+
+    const worksheet = createStyledWorksheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, "원자재_목록(기준정보관리).xlsx");
   };
 
   return (
@@ -267,28 +314,42 @@ export default function MasterMaterialList() {
       >
         {/* 공통 검색바 */}
         <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
+          <NewSearchBar
+            searchOptions={[
+              { label: "거래처명", value: "companyName" }, //수정
+              { label: "품목코드", value: "materialCode" }, //수정
+              { label: "품목명", value: "materialName" }, //수정
+            ]}
+            autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
           />
         </Box>
         {/* 버튼 영역 */}
-        <Button
-          variant="outlined"
-          color="primary"
-          sx={{ height: 40, fontWeight: 500, px: 2.5, ml: 2 }}
-          onClick={handleOpenRegister}
-        >
-          원자재 등록
-        </Button>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <Button
+            variant="outlined"
+            color="success"
+            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
+            onClick={handleExcelDownload}
+          >
+            엑셀 다운로드
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
+            onClick={handleOpenRegister}
+          >
+            수주대상품목 등록
+          </Button>
+        </Box>
       </Box>
 
       {/* 테이블 영역 */}
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
-          rows={rows}
+          rows={filteredMaterials}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick

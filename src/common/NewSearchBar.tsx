@@ -83,7 +83,7 @@ export default function NewSearchBar({
 
           "& .MuiInputBase-root": {
             height: "100%",
-            paddingRight: "40px !important",
+            paddingRight: "0 !important",
           },
         }}
         onInputChange={(_, value) => setQuery(value)}
@@ -102,6 +102,15 @@ export default function NewSearchBar({
                 py: 0,
                 height: "100%",
                 width: 300,
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: "none",
+                },
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#ccc" },
+                "&:hover fieldset": { borderColor: "#999" },
+                "&.Mui-focused fieldset": { borderColor: "#1976d2" },
               },
             }}
             InputProps={{

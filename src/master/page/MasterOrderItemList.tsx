@@ -8,56 +8,75 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import { getMasterOrItList, updateOrItState } from "../api/OrderItemApi";
 import type { MasterOrItList } from "../type";
-import SearchBar from "../../common/SearchBar";
+import NewSearchBar from "../../common/NewSearchBar";
+import { createStyledWorksheet } from "../../common/ExcelUtils";
 
 export default function MasterOrderItemList() {
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
-
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-  ];
+  const navigate = useNavigate();
+  const [filteredMaterials, setFilteredMaterials] = useState<MasterOrItList[]>(
+    []
+  );
+  const [autoCompleteMap, setAutoCompleteMap] = useState<
+    Record<string, string[]>
+  >({
+    company: [], //수정
+    itemCode: [], //수정
+    itemName: [], //수정
+  });
 
   const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
-
-  const navigate = useNavigate();
-
-  const loadData = async () => {
-    try {
-      const oiList = await getMasterOrItList();
-
-      // 서버 데이터 → DataGrid rows 형식으로 매핑
-      const mappedRows = oiList.map((item) => ({
-        id: item.id,
-        itemCode: item.itemCode,
-        itemName: item.itemName,
-        company: item.company,
-        type: item.type,
-        unitPrice: item.unitPrice,
-        color: item.color,
-        coatingMethod: item.coatingMethod,
-        remark: item.remark,
-        useYn: item.useYn,
-      }));
-
-      setRows(mappedRows);
-    } catch (error) {
-      console.error("수주품목대상 데이터 조회 실패", error);
+    if (!query.trim()) {
+      setFilteredMaterials(rows); // 검색어 없으면 전체 리스트 수정
+      return;
     }
+
+    const filtered = rows.filter((item) =>
+      item[criteria as keyof MasterOrItList] //수정
+        ?.toString()
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
+
+    setFilteredMaterials(filtered);
   };
 
   useEffect(() => {
-    loadData();
+    const fetchData = async () => {
+      try {
+        const oiList = await getMasterOrItList(); //수정
+        setRows(oiList); //수정
+
+        const mappedRows = oiList.map((item) => ({
+          id: item.id,
+          itemCode: item.itemCode,
+          itemName: item.itemName,
+          company: item.company,
+          type: item.type,
+          unitPrice: item.unitPrice,
+          color: item.color,
+          coatingMethod: item.coatingMethod,
+          remark: item.remark,
+          useYn: item.useYn,
+        }));
+
+        setFilteredMaterials(mappedRows); //초기값
+
+        // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
+        const companys = Array.from(new Set(oiList.map((m) => m.company))); //수정
+        const itemCodes = Array.from(new Set(oiList.map((m) => m.itemCode))); //수정
+        const itemNames = Array.from(new Set(oiList.map((m) => m.itemName))); //수정
+
+        setAutoCompleteMap({
+          company: companys, //수정
+          itemCode: itemCodes, //수정
+          itemName: itemNames, //수정
+        });
+      } catch (error) {
+        console.error("수주품목대상 데이터 조회 실패", error); //수정
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleState = async (row) => {
@@ -248,10 +267,25 @@ export default function MasterOrderItemList() {
   ];
 
   const handleExcelDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
+    if (!rows || rows.length === 0) {
+      alert("다운로드할 데이터가 없습니다.");
+      return; // 더 이상 진행하지 않음
+    }
+    const excelData = rows.map((item) => ({
+      품목명: item.itemName,
+      품목번호: item.itemCode,
+      거래처명: item.company,
+      분류: item.type,
+      품목단가: item.unitPrice,
+      색상: item.color,
+      도정방식: item.coatingMethod,
+      거래상태: item.useYn,
+    }));
+
+    const worksheet = createStyledWorksheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "수주대상품목_목록.xlsx");
+    XLSX.writeFile(workbook, "수주대상품목_목록(기준정보관리).xlsx");
   };
 
   const handleRegister = async () => {
@@ -273,9 +307,13 @@ export default function MasterOrderItemList() {
       >
         {/* 공통 검색바 */}
         <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
+          <NewSearchBar
+            searchOptions={[
+              { label: "거래처명", value: "company" }, //수정
+              { label: "품목번호", value: "itemCode" }, //수정
+              { label: "품목명", value: "itemName" }, //수정
+            ]}
+            autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
           />
         </Box>
@@ -303,7 +341,7 @@ export default function MasterOrderItemList() {
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
-          rows={rows}
+          rows={filteredMaterials}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
