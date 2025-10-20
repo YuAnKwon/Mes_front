@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import type { MasterOrItRegister } from "../type";
 import { registerOrderItem } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import { getSupplierList } from "../api/companyApi";
+import { getClientList, getSupplierList } from "../api/companyApi";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -32,7 +32,7 @@ export default function MasterOrderItem() {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await getSupplierList();
+        const res = await getClientList();
         const names = res.map((item: any) => item.companyName);
         setCompanyList(names);
       } catch (error) {

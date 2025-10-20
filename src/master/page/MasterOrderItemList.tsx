@@ -157,9 +157,38 @@ export default function MasterOrderItemList() {
     {
       field: "useYn",
       headerName: "거래상태",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
+      renderCell: (params) => {
+        const value = params.value;
+        let color = "#000"; // 기본 검정
+        if (value === "거래 종료") color = "#ee0000"; // 거래 완료 빨간색
+        else if (value === "거래 중") color = "#000"; // 거래 중 초록
+
+        return (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography
+              sx={{
+                color,
+                // fontWeight: 600,
+                textAlign: "center",
+                fontSize: "inherit",
+              }}
+            >
+              {value}
+            </Typography>
+          </Box>
+        );
+      },
     },
     {
       field: "actions",

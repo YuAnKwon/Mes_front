@@ -149,7 +149,7 @@ export function MaterialInboundList() {
     {
       field: "inNum",
       headerName: "입고번호",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
     },

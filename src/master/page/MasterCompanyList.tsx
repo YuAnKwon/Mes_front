@@ -59,6 +59,10 @@ export default function MasterCompanyList() {
     loadData();
   }, [currentTab]);
 
+  const handleRegisterComplete = async () => {
+    handleCloseRegister(); // 모달 닫기
+    await loadData(); // 리스트 갱신
+  };
   const apiRef = useGridApiRef();
 
   const handleState = async (row) => {
@@ -136,6 +140,39 @@ export default function MasterCompanyList() {
       width: 120,
       headerAlign: "center",
       align: "center",
+      renderCell: (params) => {
+        const value = params.value;
+
+        // 글자만 표시 + 세련된 색상
+        const colorMap: Record<string, { text: string; textColor: string }> = {
+          "거래 중": { text: "거래 중", textColor: "#000" }, // 진한 초록
+          "거래 종료": { text: "거래 종료", textColor: "#" }, // 진한 주황/적갈색
+          default: { text: "-", textColor: "#616161" }, // 중간 회색
+        };
+
+        const { text, textColor } = colorMap[value] || colorMap.default;
+
+        return (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center", // 세로 가운데
+              justifyContent: "center", // 가로 가운데
+            }}
+          >
+            <Typography
+              sx={{
+                color: textColor,
+                fontSize: "0.95rem",
+              }}
+            >
+              {text}
+            </Typography>
+          </Box>
+        );
+      },
     },
     {
       field: "actions",
@@ -265,7 +302,7 @@ export default function MasterCompanyList() {
         />
       </Box>
 
-      {/* ✅ 등록 모달 */}
+      {/*  등록 모달 */}
       <Dialog
         open={openRegister}
         onClose={handleCloseRegister}
@@ -279,7 +316,7 @@ export default function MasterCompanyList() {
           </IconButton>
         </DialogTitle>
         <DialogContent dividers sx={{ maxHeight: "80vh", overflowY: "auto" }}>
-          <MasterCompany />
+          <MasterCompany onRegisterComplete={handleRegisterComplete} />
         </DialogContent>
       </Dialog>
     </Box>

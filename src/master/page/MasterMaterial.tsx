@@ -9,14 +9,18 @@ import { Select } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { registerMaterial } from "../api/MaterialApi";
 import type { MasterMtRegister } from "../type";
-import { getClientList } from "../api/companyApi";
+import { getClientList, getSupplierList } from "../api/companyApi";
+
+interface Props {
+  onRegisterComplete: () => void;
+}
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
   flexDirection: "column",
 }));
 
-export default function MasterMaterial() {
+export default function MasterMaterial({ onRegisterComplete }: Props) {
   const [materialCode, setMaterialCode] = useState("");
   const [materialName, setMaterialName] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -28,13 +32,11 @@ export default function MasterMaterial() {
   const [remark, setRemark] = useState("");
   const [companyList, setCompanyList] = useState<string[]>([]); // 자동완성용 리스트
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     // 매입처 리스트 가져오기
     const fetchCompanies = async () => {
       try {
-        const response = await getClientList();
+        const response = await getSupplierList();
         const names = response.map((item: any) => item.companyName);
         setCompanyList(names);
       } catch (error) {
@@ -60,7 +62,7 @@ export default function MasterMaterial() {
     try {
       await registerMaterial(payload);
       alert("원자재 등록 완료!");
-      navigate("/master/material/list");
+      onRegisterComplete();
     } catch (error) {
       console.error("원자재 등록 실패", error);
       alert("등록 실패");
@@ -68,10 +70,8 @@ export default function MasterMaterial() {
   };
 
   return (
-    <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>원자재 등록</h2>
-
-      <Box sx={{ height: 600, width: "100%" }}>
+    <Box sx={{ p: 2, maxWidth: 900, mx: "auto" }}>
+      <Box sx={{ width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="companyName" required>
@@ -144,25 +144,24 @@ export default function MasterMaterial() {
               name="type"
               value={type}
               onChange={(e) => setType(e.target.value)}
+              displayEmpty
               input={<OutlinedInput />}
               size="small"
               required
               fullWidth
-              displayEmpty
               renderValue={(selected) => {
                 if (!selected) {
                   return (
                     <span style={{ color: "#aaa" }}>원자재 종류 선택</span>
                   );
                 }
-                return (
-                  {
-                    PAINT: "페인트",
-                    THINNER: "신나",
-                    CLEANER: "세척제",
-                    HARDENER: "경화제",
-                  }[selected] || selected
-                );
+                const labels: Record<string, string> = {
+                  PAINT: "페인트",
+                  THINNER: "신나",
+                  CLEANER: "세척제",
+                  HARDENER: "경화제",
+                };
+                return labels[selected] || selected;
               }}
             >
               <MenuItem value="PAINT">페인트</MenuItem>
@@ -257,6 +256,7 @@ export default function MasterMaterial() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          mt: 8,
           mb: 2,
         }}
       >
@@ -265,7 +265,7 @@ export default function MasterMaterial() {
           <Button
             variant="outlined"
             color="primary"
-            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
+            sx={{ height: 40, fontWeight: 500 }}
             onClick={handleSave}
           >
             원자재 등록
