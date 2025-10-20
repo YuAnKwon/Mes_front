@@ -58,34 +58,13 @@ export const getOrItDetail = async (id: number) => {
   return response.data;
 };
 
-//PUT으로 수정 요청을 보냄(현재는 multipart가 아닌 일반 객체 전송 형태여서 파일 포함 시 작동하지 않음).
-// export const updateOrItDetail = async (
-//   id: number,
-//   updatedMaterial: MasterOrItRegister
-// ) => {
-//   //키/값 쌍을 담아 multipart 요청 본문으로 보낼 준비를 함.
-//   const formData = new FormData();
-
-//   // 1. JSON 객체를 "data" key로 추가
-//   const { imgUrl, ...rest } = updatedMaterial;
-//   formData.append(
-//     "data",
-//     new Blob([JSON.stringify(rest)], { type: "application/json" })
-//   );
-
-//   // 2. 파일 배열을 "imgUrl" key로 추가
-//   if (imgUrl && imgUrl.length > 0) {
-//     imgUrl.forEach((file) => formData.append("imgUrl", file));
-//   }
-
-//   // 3. axios PUT 요청
-//   return axios.put(`${BASE_URL}/master/orderitem/detail/${id}`, formData, {
-//     headers: { "Content-Type": "multipart/form-data" },
-//   });
-// };
-
+//api 바꿔보기
 export const updateOrItDetail = (id: number, formData: FormData) => {
   return axios.put(`/api/master/orderitem/detail/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+};
+
+export const deleteImage = async (imageId: number) => {
+  return axios.delete(`${BASE_URL}/master/orderitem/detail/image/${imageId}`);
 };

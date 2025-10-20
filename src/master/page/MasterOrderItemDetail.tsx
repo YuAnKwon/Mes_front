@@ -7,7 +7,11 @@ import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { getOrItDetail, updateOrItDetail } from "../api/OrderItemApi";
+import {
+  deleteImage,
+  getOrItDetail,
+  updateOrItDetail,
+} from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
 import type { imgType, MasterOrItList } from "../type";
 
@@ -36,70 +40,6 @@ export default function MasterOrderItemDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // 상세 정보 가져오기
-  useEffect(() => {
-    const fetchOrderItemDetail = async () => {
-      try {
-        const response = await getOrItDetail(Number(id));
-        setOrderItem(response);
-        console.log("response :", response);
-
-        if (response.images) {
-          const urls = response.images.map((p: any) => p.imgUrl);
-          setPreviewUrls(urls);
-        }
-      } catch (error) {
-        console.error("품목 불러오기 실패:", error);
-      }
-    };
-    fetchOrderItemDetail();
-  }, [id]);
-
-  // 이미지 미리보기
-  useEffect(() => {
-    if (!imgFiles || imgFiles.length === 0) return;
-
-    // 새로 추가된 이미지 파일만 Blob URL 생성
-    const newBlobUrls = imgFiles
-      .filter((img) => img.file) // 새로 추가된 파일만
-      .map((img) => URL.createObjectURL(img.file!));
-
-    // 기존 이미지 URL + 새 Blob URL 합치기
-    setPreviewUrls((prev) => {
-      // 중복 방지: 이미 포함된 URL은 제외
-      const all = [...prev, ...newBlobUrls];
-      return Array.from(new Set(all));
-    });
-
-    // cleanup: 새로 생성된 Blob URL만 해제
-    return () => {
-      newBlobUrls.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [imgFiles]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-
-    const filesArray = Array.from(e.target.files);
-
-    // 새로 업로드된 이미지 배열 생성
-    const newImgs: imgType[] = filesArray.map((file, index) => ({
-      id: Date.now() + index, // 임시 id
-      imgUrl: URL.createObjectURL(file),
-      repYn: "N", // 일단 모두 N으로
-      file, // 실제 업로드할 File 객체 포함
-    }));
-
-    setImgFiles((prev) => {
-      const combined = [...prev, ...newImgs];
-      // 맨 앞 이미지 대표로 설정
-      return combined.map((img, idx) => ({
-        ...img,
-        repYn: idx === 0 ? "Y" : "N",
-      }));
-    });
-  };
-
   const handleUpdate = async () => {
     const formData = new FormData();
 
@@ -122,6 +62,109 @@ export default function MasterOrderItemDetail() {
       console.error("수정 실패:", error);
       alert("수정 실패");
     }
+  };
+
+  // 상세 정보 가져오기
+  useEffect(() => {
+    const fetchOrderItemDetail = async () => {
+      try {
+        const response = await getOrItDetail(Number(id));
+        setOrderItem(response);
+        console.log("response :", response);
+
+        if (response.images) {
+          // 기존 이미지도 imgFiles에 추가
+          const existingImgs: imgType[] = response.images.map((img: any) => ({
+            id: img.id,
+            imgUrl: img.imgUrl,
+            repYn: img.repYn,
+            // file은 기존 이미지라 undefined
+          }));
+          setImgFiles(existingImgs);
+
+          // 미리보기용 URL
+          const urls = existingImgs.map((img) => img.imgUrl);
+          setPreviewUrls(urls);
+        }
+      } catch (error) {
+        console.error("품목 불러오기 실패:", error);
+      }
+    };
+    fetchOrderItemDetail();
+  }, [id]);
+
+  // ----------------------------
+  // 이미지 미리보기 useEffect
+  useEffect(() => {
+    console.log("=== imgFiles 변경됨 ===");
+    console.log("imgFiles:", imgFiles);
+
+    const urls = imgFiles.map((img) =>
+      img.file ? URL.createObjectURL(img.file) : img.imgUrl
+    );
+    console.log("previewUrls 생성:", urls);
+    setPreviewUrls(urls);
+
+    return () => {
+      imgFiles.forEach((img) => {
+        if (img.file) {
+          console.log("revokeObjectURL:", img.imgUrl);
+          URL.revokeObjectURL(img.imgUrl);
+        }
+      });
+    };
+  }, [imgFiles]);
+
+  // ----------------------------
+  // 파일 선택 시
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    const filesArray = Array.from(e.target.files);
+    console.log("선택된 파일들:", filesArray);
+
+    const newImgs: imgType[] = filesArray.map((file, index) => ({
+      id: undefined,
+      imgUrl: URL.createObjectURL(file),
+      repYn: "N",
+      file,
+    }));
+    console.log("새 imgType 배열:", newImgs);
+
+    setImgFiles((prev) => {
+      const combined = [...prev, ...newImgs];
+      console.log("결합된 imgFiles:", combined);
+      return combined.map((img, idx) => ({
+        ...img,
+        repYn: idx === 0 ? "Y" : "N",
+      }));
+    });
+  };
+
+  // ----------------------------
+  // 이미지 삭제
+  const handleRemoveImage = async (index: number) => {
+    console.log("삭제 요청 index:", index);
+    const targetImg = imgFiles[index];
+    console.log("삭제할 이미지:", targetImg);
+    if (!targetImg) return;
+
+    if (targetImg.id && !targetImg.file) {
+      // 기존 이미지(DB) 삭제
+      try {
+        console.log("DB 이미지 삭제 API 호출:", targetImg.id);
+        await deleteImage(targetImg.id); // API 호출
+        alert("이미지 삭제 완료");
+      } catch (error) {
+        console.error("이미지 삭제 실패:", error);
+        alert("이미지 삭제 실패");
+        return;
+      }
+    }
+
+    console.log("배열에서 제거 전 imgFiles:", imgFiles);
+    setImgFiles((prev) => prev.filter((_, i) => i !== index));
+    console.log("배열에서 제거 후 imgFiles:", imgFiles);
   };
 
   return (
@@ -272,13 +315,24 @@ export default function MasterOrderItemDetail() {
           {previewUrls.map((url, idx) => (
             <div
               key={idx}
-              className="w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
+              className="relative w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
             >
               <img
                 src={url}
                 alt={`제품 사진 ${idx + 1}`}
                 className="w-full h-full object-cover"
               />
+
+              {/* 삭제 버튼 (오른쪽 상단 X) */}
+              <button
+                onClick={() => handleRemoveImage(idx)}
+                className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center
+               rounded-full bg-black/60 text-white text-xs font-bold
+               hover:bg-red-600 transition duration-200"
+                title="이미지 삭제"
+              >
+                x
+              </button>
             </div>
           ))}
 
