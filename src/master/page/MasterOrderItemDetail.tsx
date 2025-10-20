@@ -9,7 +9,7 @@ import { Select } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { getOrItDetail, updateOrItDetail } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import type { MasterOrItList } from "../type";
+import type { imgType, MasterOrItList } from "../type";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -30,7 +30,7 @@ export default function MasterOrderItemDetail() {
     imgUrl: [],
   });
 
-  const [imgFiles, setImgFiles] = useState<File[]>([]); // 새로 올린 파일
+  const [imgFiles, setImgFiles] = useState<imgType[]>([]); // 새로 올린 파일
   const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 전체 미리보기
 
   const navigate = useNavigate();
@@ -65,17 +65,36 @@ export default function MasterOrderItemDetail() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
+
     const filesArray = Array.from(e.target.files);
-    setImgFiles((prev) => [...prev, ...filesArray]);
+
+    // 새로 업로드된 이미지 배열 생성
+    const newImgs: imgType[] = filesArray.map((file, index) => ({
+      id: Date.now() + index, // 임시 id
+      imgUrl: URL.createObjectURL(file),
+      repYn: "N", // 일단 모두 N으로
+      file, // 실제 업로드할 File 객체 포함
+    }));
+
+    setImgFiles((prev) => {
+      const combined = [...prev, ...newImgs];
+      // 맨 앞 이미지 대표로 설정
+      return combined.map((img, idx) => ({
+        ...img,
+        repYn: idx === 0 ? "Y" : "N",
+      }));
+    });
   };
 
   const handleUpdate = async () => {
-    if (!orderItem) return;
-
     const formData = new FormData();
 
-    imgFiles.forEach((file) => formData.append("imgUrl", file));
+    imgFiles.forEach((img) => {
+      formData.append("imgUrl", img.imgUrl); // 실제 파일 업로드
+      formData.append("repYn", img.repYn); // 대표 여부
+    });
 
+    // 나머지 orderItem 데이터
     const { images, ...rest } = orderItem;
     Object.entries(rest).forEach(([key, value]) => {
       if (value !== undefined && value !== null)
@@ -85,7 +104,6 @@ export default function MasterOrderItemDetail() {
     try {
       await updateOrItDetail(orderItem.id, formData);
       alert("수정 완료!");
-      navigate("/master/orderitem/list");
     } catch (error) {
       console.error("수정 실패:", error);
       alert("수정 실패");

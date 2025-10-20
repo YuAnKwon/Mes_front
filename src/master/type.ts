@@ -16,7 +16,7 @@ export type MasterOrItList = {
 };
 
 export type imgType = {
-  id: number;
+  id?: number;
   imgFileName?: string;
   imgOriName?: string;
   imgUrl: string;
