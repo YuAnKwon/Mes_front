@@ -1,6 +1,4 @@
 import { Box, Button } from "@mui/material";
-import SearchBar from "../../common/SearchBar";
-
 import {
   DataGrid,
   useGridApiRef,
@@ -17,27 +15,23 @@ import {
   updateMaterialOut,
 } from "../api/MaterialOutboundListApi";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
+import NewSearchBar from "../../common/NewSearchBar";
 
 export function MaterialOutboundList() {
   const [materialsOuts, setMaterialsOuts] = useState<MaterialOutList[]>([]);
   const [editedRows, setEditedRows] = useState<{ [key: number]: boolean }>({});
+  const [filteredMaterials, setFilteredMaterials] = useState<MaterialOutList[]>(
+    []
+  );
   const apiRef = useGridApiRef();
-  const sampleData = [
-    "회사1",
-    "회사2",
-    "품목A",
-    "품목B",
-    "입고번호001",
-    "입고번호002",
-  ];
 
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-    { label: "출고번호", value: "outNum" },
-    { label: "출고일자", value: "outDate" },
-  ];
+  const [autoCompleteMap, setAutoCompleteMap] = useState<
+    Record<string, string[]>
+  >({
+    companyName: [], //수정
+    materialCode: [], //수정
+    materialName: [], //수정
+  });
 
   const handleSaveRow = async (row: MaterialOutList) => {
     try {
@@ -77,36 +71,50 @@ export function MaterialOutboundList() {
     }
   };
 
-  const fetchMaterialInData = async () => {
-    try {
-      const response = await getMaterialOutDatas();
-      const data = Array.isArray(response) ? response : response.data || [];
-
-      const mappedRows = data.map((item) => ({
-        id: item.id,
-        outNum: item.outNum,
-        outAmount: item.outAmount,
-        companyName: item.companyName,
-        outDate: item.outDate ? new Date(item.outDate) : null, // ✅ Date 객체로 변환
-        materialName: item.materialName,
-        materialCode: item.materialCode,
-        manufacturer: item.manufacturer,
-      }));
-
-      setMaterialsOuts(mappedRows);
-    } catch (error) {
-      console.error("데이터 로딩 실패", error);
-      alert("원자재 출고 데이터를 불러오지 못했습니다.");
-    }
-  };
-
   useEffect(() => {
-    fetchMaterialInData();
-  }, []);
+    const fetchData = async () => {
+      try {
+        const data = await getMaterialOutDatas(); //수정
 
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
+        // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
+        const companyNames = Array.from(
+          new Set(data.map((m) => m.companyName))
+        ); //수정
+        const materialCodes = Array.from(
+          new Set(data.map((m) => m.materialCode))
+        ); //수정
+        const materialNames = Array.from(
+          new Set(data.map((m) => m.materialName))
+        ); //수정
+        const outNums = Array.from(new Set(data.map((m) => m.outNum)));
+        const outDates = Array.from(new Set(data.map((m) => m.outDate)));
+
+        const mappedRows = data.map((item) => ({
+          id: item.id,
+          outNum: item.outNum,
+          outAmount: item.outAmount,
+          companyName: item.companyName,
+          outDate: item.outDate ? new Date(item.outDate) : null, // ✅ Date 객체로 변환
+          materialName: item.materialName,
+          materialCode: item.materialCode,
+          manufacturer: item.manufacturer,
+        }));
+        setMaterialsOuts(mappedRows);
+        setFilteredMaterials(mappedRows); //수정
+        setAutoCompleteMap({
+          companyName: companyNames, //수정
+          materialCode: materialCodes, //수정
+          materialName: materialNames, //수정
+          outNum: outNums,
+          outDate: outDates,
+        });
+      } catch (error) {
+        console.error("원자재 데이터 로딩 실패", error); //수정
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const columns: GridColDef[] = [
     {
@@ -237,6 +245,22 @@ export function MaterialOutboundList() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     XLSX.writeFile(workbook, "원자재_출고_등록_목록.xlsx");
   };
+
+  const handleSearch = (criteria: string, query: string) => {
+    if (!query.trim()) {
+      setFilteredMaterials(materialsOuts); // 검색어 없으면 전체 리스트 수정
+      return;
+    }
+
+    const filtered = materialsOuts.filter((item) =>
+      item[criteria as keyof MaterialOutList] //수정
+        ?.toString()
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
+
+    setFilteredMaterials(filtered);
+  };
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 출고 등록조회</h2>
@@ -251,9 +275,15 @@ export function MaterialOutboundList() {
       >
         {/* 공통 검색바 */}
         <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
+          <NewSearchBar
+            searchOptions={[
+              { label: "매입처명", value: "companyName" }, //수정
+              { label: "품목번호", value: "materialCode" }, //수정
+              { label: "품목명", value: "materialName" }, //수정
+              { label: "출고번호", value: "outNum" },
+              { label: "출고일자", value: "outDate" },
+            ]}
+            autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
           />
         </Box>
@@ -287,7 +317,7 @@ export function MaterialOutboundList() {
             );
             return newRow;
           }}
-          rows={materialsOuts}
+          rows={filteredMaterials}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick

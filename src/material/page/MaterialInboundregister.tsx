@@ -1,10 +1,8 @@
 import { Box, Button } from "@mui/material";
-import SearchBar from "../../common/SearchBar";
 import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx-js-style";
-
 import { getMaterialData } from "../api/MaterialInboundListApi";
 import type { MaterialList } from "../type";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +13,9 @@ import NewSearchBar from "../../common/NewSearchBar";
 export function MaterialInboundregister() {
   const [materials, setMaterials] = useState<MaterialList[]>([]);
   const apiRef = useGridApiRef();
+  const [filteredMaterials, setFilteredMaterials] = useState<MaterialList[]>(
+    []
+  );
   const [autoCompleteMap, setAutoCompleteMap] = useState<
     Record<string, string[]>
   >({
@@ -63,12 +64,19 @@ export function MaterialInboundregister() {
   const navigate = useNavigate();
 
   const handleSearch = (criteria: string, query: string) => {
+    if (!query.trim()) {
+      setFilteredMaterials(materials); // 검색어 없으면 전체 리스트
+      return;
+    }
+
     const filtered = materials.filter((item) =>
       item[criteria as keyof MaterialList]
         ?.toString()
         .toLowerCase()
         .includes(query.toLowerCase())
     );
+
+    setFilteredMaterials(filtered);
   };
 
   useEffect(() => {
@@ -76,6 +84,7 @@ export function MaterialInboundregister() {
       try {
         const data = await getMaterialData();
         setMaterials(data);
+        setFilteredMaterials(data);
 
         // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
         const companyNames = Array.from(
@@ -233,7 +242,7 @@ export function MaterialInboundregister() {
 
       <Box sx={{ height: 1200, width: "100%" }}>
         <DataGrid
-          rows={materials}
+          rows={filteredMaterials}
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick

@@ -23,6 +23,7 @@ import MasterMaterialDetail from "./master/page/MasterMaterialDetail";
 import MasterOrderItem from "./master/page/MasterOrderItem";
 import MasterRoutingList from "./master/page/MasterRoutingList";
 import { MaterialTotalStock } from "./material/page/MaterialTotalStock";
+import OrderProcess from "./orderitem/page/OrderProcess";
 
 function App() {
   return (
@@ -51,7 +52,7 @@ function App() {
               element={<OrderOutboundList />}
             />
             <Route path="/shipmentInvoice/:id" element={<ShipmentInvoice />} />
-            {/* <Route path="/orderitem/process/:id" element={<OrderProcess />} /> */}
+            <Route path="/orderitem/process/:id" element={<OrderProcess />} />
 
             {/* 원자재 */}
             <Route
