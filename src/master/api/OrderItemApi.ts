@@ -58,7 +58,7 @@ export const getOrItDetail = async (id: number) => {
   return response.data;
 };
 
-//api 바꿔보기
+//api 바꾸기
 export const updateOrItDetail = (id: number, formData: FormData) => {
   return axios.put(`/api/master/orderitem/detail/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -67,4 +67,11 @@ export const updateOrItDetail = (id: number, formData: FormData) => {
 
 export const deleteImage = async (imageId: number) => {
   return axios.delete(`${BASE_URL}/master/orderitem/detail/image/${imageId}`);
+};
+
+export const updateRepImageApi = async (
+  orderItemId: number,
+  imageId: number
+) => {
+  return axios.patch(`/orderitem/${orderItemId}/repimage/${imageId}`);
 };

@@ -11,9 +11,12 @@ import {
   deleteImage,
   getOrItDetail,
   updateOrItDetail,
+  updateRepImageApi,
 } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
 import type { imgType, MasterOrItList } from "../type";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import type { DropResult } from "react-beautiful-dnd";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -110,8 +113,7 @@ export default function MasterOrderItemDetail() {
     return () => {
       imgFiles.forEach((img) => {
         if (img.file) {
-          console.log("revokeObjectURL:", img.imgUrl);
-          URL.revokeObjectURL(img.imgUrl);
+          URL.revokeObjectURL(img.file as unknown as string); // img.file로 revoke
         }
       });
     };
@@ -167,6 +169,36 @@ export default function MasterOrderItemDetail() {
     console.log("배열에서 제거 전 imgFiles:", imgFiles);
     setImgFiles((prev) => prev.filter((_, i) => i !== index));
     console.log("배열에서 제거 후 imgFiles:", imgFiles);
+  };
+
+  // 드래그앤드롭 완료 시
+  const handleDragEnd = async (result: DropResult) => {
+    const { source, destination } = result;
+    if (!destination) return; // 드롭하지 않고 놓으면 무시
+
+    const items = Array.from(imgFiles);
+    const [removed] = items.splice(source.index, 1);
+    items.splice(destination.index, 0, removed);
+
+    // repYn 업데이트: 첫 번째를 대표 이미지로
+    const updated = items.map((img, idx) => ({
+      ...img,
+      repYn: idx === 0 ? "Y" : "N",
+    }));
+
+    setImgFiles(updated);
+
+    // DB 반영: 첫 번째 이미지만 대표로 업데이트
+    const newRep = updated[0];
+    if (newRep.id) {
+      try {
+        await updateRepImageApi(orderItem.id!, newRep.id);
+        console.log("대표 이미지 DB 반영 완료");
+      } catch (error) {
+        console.error("대표 이미지 변경 실패", error);
+        alert("대표 이미지 변경 실패");
+      }
+    }
   };
 
   return (
@@ -313,43 +345,75 @@ export default function MasterOrderItemDetail() {
         </Grid>
 
         {/* 이미지 업로드 */}
-        <div className="flex items-start gap-4 flex-wrap mt-8">
-          {previewUrls.map((url, idx) => (
-            <div
-              key={idx}
-              className="relative w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
-            >
-              <img
-                src={url}
-                alt={`제품 사진 ${idx + 1}`}
-                className="w-full h-full object-cover"
-              />
-
-              {/* 삭제 버튼 (오른쪽 상단 X) */}
-              <button
-                onClick={() => handleRemoveImage(idx)}
-                className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center
-               rounded-full bg-black/60 text-white text-xs font-bold
-               hover:bg-red-600 transition duration-200"
-                title="이미지 삭제"
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="images" direction="horizontal">
+            {(provided) => (
+              <div
+                className="flex items-start gap-4 flex-wrap mt-8"
+                {...provided.droppableProps}
+                ref={provided.innerRef}
               >
-                x
-              </button>
-            </div>
-          ))}
+                {imgFiles.map((img, index) => (
+                  <Draggable
+                    key={img.id ?? index}
+                    draggableId={String(img.id ?? index)}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        className="relative w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {/* 대표 이미지 표시 */}
+                        {img.repYn === "Y" && (
+                          <div className="absolute top-0 left-0 bg-yellow-400 text-black text-xs px-1 py-0.5 z-10">
+                            대표 이미지
+                          </div>
+                        )}
 
-          <label className="flex flex-col items-center justify-center w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-            <FiCamera size={32} className="text-gray-400 mb-2" />
-            <span className="text-sm text-gray-500">사진 업로드</span>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
-        </div>
+                        <img
+                          src={
+                            img.file
+                              ? URL.createObjectURL(img.file)
+                              : img.imgUrl
+                          }
+                          alt={`제품 사진 ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+
+                        {/* 삭제 버튼 */}
+                        <button
+                          onClick={() => handleRemoveImage(index)}
+                          className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full bg-black/50 text-white text-sm hover:bg-red-600 transition"
+                          title="이미지 삭제"
+                        >
+                          x
+                        </button>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+
+                {provided.placeholder}
+
+                {/* 업로드 버튼 */}
+                <label className="flex flex-col items-center justify-center w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                  <FiCamera size={32} className="text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-500">사진 업로드</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Box>
 
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
