@@ -1,27 +1,22 @@
-import { useState, useEffect } from "react";
-import {
-  Box,
-  Grid,
-  FormLabel,
-  OutlinedInput,
-  MenuItem,
-  Select,
-  Button,
-} from "@mui/material";
+import FormLabel from "@mui/material/FormLabel";
+import Grid from "@mui/material/Grid";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import { styled } from "@mui/material/styles";
-import { Autocomplete, TextField } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import type { MasterOrItRegister } from "../type";
-import { registerOrderItem } from "../api/OrderItemApi";
+import { Box, MenuItem } from "@mui/material";
+import Button from "@mui/material/Button";
+import { useEffect, useState } from "react";
+import { Select } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { getOrItDetail, updateOrItDetail } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import { getSupplierList } from "../api/companyApi";
+import type { MasterOrItRegister } from "../type";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
   flexDirection: "column",
 }));
 
-export default function MasterOrderItem() {
+export default function MasterOrderItemDetail() {
   const [company, setCompany] = useState("");
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
@@ -30,30 +25,59 @@ export default function MasterOrderItem() {
   const [unitPrice, setUnitPrice] = useState("");
   const [color, setColor] = useState("");
   const [remark, setRemark] = useState("");
-  const [companyList, setCompanyList] = useState<string[]>([]);
-
-  // 거래처 리스트 불러오기
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const res = await getSupplierList();
-        const names = res.map((item: any) => item.companyName);
-        setCompanyList(names);
-      } catch (error) {
-        console.error("거래처 목록 불러오기 실패:", error);
-      }
-    };
-    fetchCompanies();
-  }, []);
 
   const [imgFiles, setImgFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 미리보기용
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const navigate = useNavigate();
+  const { id } = useParams();
 
-  const handleSave = async () => {
+  // 상세 정보 가져오기
+  useEffect(() => {
+    const fetchOrderItemDetail = async () => {
+      try {
+        const response = await getOrItDetail(id);
+
+        setCompany(response.company);
+        setItemCode(response.itemCode);
+        setItemName(response.itemName);
+        setType(response.type);
+        setCoatingMethod(response.coatingMethod);
+        setUnitPrice(response.unitPrice);
+        setColor(response.color);
+        setRemark(response.remark);
+
+        // 기존 이미지 URL들 미리보기용으로 세팅
+        if (response.photos) {
+          setPreviewUrls(response.photos.map((p: any) => `/api${p.imgUrl}`));
+        }
+      } catch (error) {
+        console.error("업체 정보 불러오기 실패:", error);
+      }
+    };
+    fetchOrderItemDetail();
+  }, [id]);
+
+  // 미리보기 URL 생성 및 정리
+  useEffect(() => {
+    const urls = imgFiles.map((file) => URL.createObjectURL(file));
+    setPreviewUrls((prev) => [
+      ...prev.filter((u) => !u.startsWith("blob:")),
+      ...urls,
+    ]);
+
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  }, [imgFiles]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const filesArray = Array.from(e.target.files);
+    setImgFiles((prev) => [...prev, ...filesArray]);
+  };
+
+  const handleUpdate = async () => {
     const payload: MasterOrItRegister = {
-      itemCode: itemCode,
+      itemCode: Number(itemCode),
       itemName,
       company,
       type,
@@ -66,35 +90,19 @@ export default function MasterOrderItem() {
     };
 
     try {
-      await registerOrderItem(payload);
-      alert("수주대상품목 등록 완료!");
+      await updateOrItDetail(id, payload);
+      alert("수주대상품목 수정 완료!");
       navigate("/master/orderitem/list");
     } catch (error) {
-      console.error("수주대상품목 등록 실패", error);
-      alert("등록 실패");
+      console.error("수주대상품목 수정 실패", error);
+      alert("수정 실패");
     }
   };
 
-  // 파일 선택 핸들러
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-
-    const filesArray = Array.from(e.target.files);
-    setImgFiles((prev) => [...prev, ...filesArray]);
-  };
-
-  // imgFiles가 바뀔 때마다 미리보기 URL 생성
-  useEffect(() => {
-    const urls = imgFiles.map((file) => URL.createObjectURL(file));
-    setPreviewUrls(urls);
-
-    // 언마운트 시 메모리 해제
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
-  }, [imgFiles]);
-
   return (
     <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>수주대상등록 등록</h2>
+      <h2>수주대상품목 수정</h2>
+
       <Box sx={{ height: 800, width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           {/* 거래처명 */}
@@ -102,29 +110,15 @@ export default function MasterOrderItem() {
             <FormLabel htmlFor="company" required>
               거래처명
             </FormLabel>
-            <Autocomplete
-              freeSolo
-              options={companyList}
+            <OutlinedInput
+              id="company"
               value={company}
-              onChange={(e, newValue) => setCompany(newValue || "")}
-              onInputChange={(e, newInputValue) => setCompany(newInputValue)}
-              ListboxProps={{
-                style: {
-                  maxHeight: 200, // 스크롤 생김
-                  overflowY: "auto",
-                },
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="거래처명"
-                  size="small"
-                  required
-                />
-              )}
+              onChange={(e) => setCompany(e.target.value)}
+              size="small"
+              required
             />
           </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }} />
+
           {/* 품목번호 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="itemCode" required>
@@ -134,7 +128,6 @@ export default function MasterOrderItem() {
               id="itemCode"
               value={itemCode}
               onChange={(e) => setItemCode(e.target.value)}
-              placeholder="품목번호"
               size="small"
               required
             />
@@ -149,7 +142,6 @@ export default function MasterOrderItem() {
               id="itemName"
               value={itemName}
               onChange={(e) => setItemName(e.target.value)}
-              placeholder="품목명"
               size="small"
               required
             />
@@ -164,25 +156,13 @@ export default function MasterOrderItem() {
               id="type"
               value={type}
               onChange={(e) => setType(e.target.value)}
-              input={<OutlinedInput />}
               size="small"
               required
               fullWidth
-              displayEmpty
-              renderValue={(selected) => {
-                if (!selected) {
-                  return <span style={{ color: "#aaa" }}>분류 선택</span>;
-                }
-                return (
-                  {
-                    GENERAL: "일반",
-                    CAR: "자동차",
-                    SHIPBUILDING: "조선",
-                    DEFENSE: "방산",
-                  }[selected] || selected
-                );
-              }}
             >
+              <MenuItem value="" disabled>
+                원자재 종류 선택
+              </MenuItem>
               <MenuItem value="GENERAL">일반</MenuItem>
               <MenuItem value="CAR">자동차</MenuItem>
               <MenuItem value="SHIPBUILDING">조선</MenuItem>
@@ -199,23 +179,13 @@ export default function MasterOrderItem() {
               id="coatingMethod"
               value={coatingMethod}
               onChange={(e) => setCoatingMethod(e.target.value)}
-              input={<OutlinedInput />}
               size="small"
               required
               fullWidth
-              displayEmpty
-              renderValue={(selected) => {
-                if (!selected) {
-                  return <span style={{ color: "#aaa" }}>도장 방식 선택</span>;
-                }
-                return (
-                  {
-                    POWDER: "분체",
-                    LIQUID: "액체",
-                  }[selected] || selected
-                );
-              }}
             >
+              <MenuItem value="" disabled>
+                도장 방식 선택
+              </MenuItem>
               <MenuItem value="POWDER">분체</MenuItem>
               <MenuItem value="LIQUID">액체</MenuItem>
             </Select>
@@ -230,7 +200,6 @@ export default function MasterOrderItem() {
               id="unitPrice"
               value={unitPrice}
               onChange={(e) => setUnitPrice(e.target.value)}
-              placeholder="품목단가"
               size="small"
               required
             />
@@ -243,7 +212,6 @@ export default function MasterOrderItem() {
               id="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              placeholder="색상"
               size="small"
               required
             />
@@ -254,7 +222,6 @@ export default function MasterOrderItem() {
               id="remark"
               value={remark}
               onChange={(e) => setRemark(e.target.value)}
-              placeholder="비고"
               size="small"
             />
           </FormGrid>
@@ -295,9 +262,9 @@ export default function MasterOrderItem() {
           variant="outlined"
           color="primary"
           sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-          onClick={handleSave}
+          onClick={handleUpdate}
         >
-          수주대상품목 등록
+          수정
         </Button>
       </Box>
     </Box>
