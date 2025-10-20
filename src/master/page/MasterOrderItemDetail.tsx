@@ -9,7 +9,7 @@ import { Select } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { getOrItDetail, updateOrItDetail } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import type { MasterOrItRegister } from "../type";
+import type { MasterOrItList } from "../type";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -17,18 +17,12 @@ const FormGrid = styled(Grid)(() => ({
 }));
 
 export default function MasterOrderItemDetail() {
-  // const [company, setOrderItem] = useState("");
-  const [company, setCompany] = useState("");
-  const [itemCode, setItemCode] = useState("");
-  const [itemName, setItemName] = useState("");
-  const [type, setType] = useState("");
-  const [coatingMethod, setCoatingMethod] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
-  const [color, setColor] = useState("");
-  const [remark, setRemark] = useState("");
+  const [orderItem, setOrderItem] = useState<MasterOrItList>(
+    {} as MasterOrItList
+  );
 
   const [imgFiles, setImgFiles] = useState<File[]>([]); // 새로 올린 파일
-  const [existingImages, setExistingImages] = useState<string[]>([]); // 기존 서버 이미지 URL
+  // const [existingImages, setExistingImages] = useState<string[]>([]); // 기존 서버 이미지 URL
   const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 전체 미리보기
 
   const navigate = useNavigate();
@@ -38,35 +32,27 @@ export default function MasterOrderItemDetail() {
   useEffect(() => {
     const fetchOrderItemDetail = async () => {
       try {
-        const response = await getOrItDetail(id);
-        // setOrderItem(response);//전체 dto 저장
-        setCompany(response.company);
-        setItemCode(response.itemCode);
-        setItemName(response.itemName);
-        setType(response.type);
-        setCoatingMethod(response.coatingMethod);
-        setUnitPrice(response.unitPrice);
-        setColor(response.color);
-        setRemark(response.remark);
+        const response = await getOrItDetail(Number(id));
+        setOrderItem(response);
 
-        if (response.imgUrl) {
-          const urls = response.imgUrl.map((p: any) => `${p.imgUrl}`);
-          setExistingImages(urls);
+        if (response.images) {
+          const urls = response.images.map((p: any) => p.imgUrl);
+          setPreviewUrls(urls);
         }
       } catch (error) {
-        console.error("업체 정보 불러오기 실패:", error);
+        console.error("품목 불러오기 실패:", error);
       }
     };
     fetchOrderItemDetail();
   }, [id]);
 
-  // 미리보기 URL 생성
+  // 이미지 미리보기
   useEffect(() => {
     const newUrls = imgFiles.map((file) => URL.createObjectURL(file));
-    setPreviewUrls([...existingImages, ...newUrls]);
+    setPreviewUrls((prev) => [...(prev || []), ...newUrls]);
 
     return () => newUrls.forEach((url) => URL.revokeObjectURL(url));
-  }, [imgFiles, existingImages]);
+  }, [imgFiles]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -75,49 +61,24 @@ export default function MasterOrderItemDetail() {
   };
 
   const handleUpdate = async () => {
-    const payload: MasterOrItRegister = {
-      itemCode: itemCode,
-      itemName,
-      company,
-      type,
-      unitPrice: Number(unitPrice),
-      color,
-      coatingMethod,
-      imgUrl: imgFiles, // 서버 전송용
-      routing: [],
-      remark,
-    };
+    if (!orderItem) return;
+
+    const formData = new FormData();
+
+    imgFiles.forEach((file) => formData.append("imgUrl", file));
+
+    const { images, ...rest } = orderItem;
+    Object.entries(rest).forEach(([key, value]) => {
+      if (value !== undefined && value !== null)
+        formData.append(key, value.toString());
+    });
 
     try {
-      // FormData 구성
-      const formData = new FormData();
-      if (payload.imgUrl) {
-        payload.imgUrl.forEach((file) => formData.append("imgUrl", file));
-      }
-
-      // routing 배열은 필요 시 JSON 문자열로 전송
-      if (payload.routing) {
-        formData.append("routing", JSON.stringify(payload.routing));
-      }
-
-      // imgUrl과 routing을 제외한 나머지 속성만 FormData에 추가
-      const rest = Object.fromEntries(
-        Object.entries(payload).filter(
-          ([key]) => key !== "imgUrl" && key !== "routing"
-        )
-      );
-
-      Object.entries(rest).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, value.toString());
-        }
-      });
-
-      await updateOrItDetail(id, formData);
-      alert("수주대상품목 수정 완료!");
+      await updateOrItDetail(orderItem.id, formData);
+      alert("수정 완료!");
       navigate("/master/orderitem/list");
     } catch (error) {
-      console.error("수주대상품목 수정 실패", error);
+      console.error("수정 실패:", error);
       alert("수정 실패");
     }
   };
@@ -134,21 +95,33 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="company"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
+              value={orderItem?.company}
+              onChange={(e) =>
+                setOrderItem((prev) =>
+                  prev
+                    ? { ...prev, company: e.target.value }
+                    : ({ company: e.target.value } as MasterOrItList)
+                )
+              }
               size="small"
               required
             />
           </FormGrid>
-
+          <Grid container spacing={3} sx={{ mt: 4 }} />
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="itemCode" required>
               품목번호
             </FormLabel>
             <OutlinedInput
               id="itemCode"
-              value={itemCode}
-              onChange={(e) => setItemCode(e.target.value)}
+              value={orderItem?.itemCode}
+              onChange={(e) =>
+                setOrderItem((prev) =>
+                  prev
+                    ? { ...prev, itemCode: e.target.value }
+                    : ({ company: e.target.value } as MasterOrItList)
+                )
+              }
               size="small"
               required
             />
@@ -160,8 +133,14 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="itemName"
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
+              value={orderItem?.itemName}
+              onChange={(e) =>
+                setOrderItem((prev) =>
+                  prev
+                    ? { ...prev, itemName: e.target.value }
+                    : ({ itemName: e.target.value } as MasterOrItList)
+                )
+              }
               size="small"
               required
             />
@@ -173,8 +152,14 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <Select
               id="type"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
+              value={orderItem?.type}
+              onChange={(e) =>
+                setOrderItem((prev) =>
+                  prev
+                    ? { ...prev, type: e.target.value }
+                    : ({ type: e.target.value } as MasterOrItList)
+                )
+              }
               size="small"
               required
               fullWidth
@@ -195,8 +180,14 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <Select
               id="coatingMethod"
-              value={coatingMethod}
-              onChange={(e) => setCoatingMethod(e.target.value)}
+              value={orderItem?.coatingMethod}
+              onChange={(e) =>
+                setOrderItem((prev) =>
+                  prev
+                    ? { ...prev, coatingMethod: e.target.value }
+                    : ({ coatingMethod: e.target.value } as MasterOrItList)
+                )
+              }
               size="small"
               required
               fullWidth
@@ -215,8 +206,13 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="unitPrice"
-              value={unitPrice}
-              onChange={(e) => setUnitPrice(e.target.value)}
+              value={orderItem?.unitPrice}
+              onChange={(e) =>
+                setOrderItem((prev) => ({
+                  ...prev,
+                  unitPrice: Number(e.target.value),
+                }))
+              }
               size="small"
               required
             />
@@ -228,8 +224,14 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
+              value={orderItem?.color}
+              onChange={(e) =>
+                setOrderItem((prev) =>
+                  prev
+                    ? { ...prev, color: e.target.value }
+                    : ({ color: e.target.value } as MasterOrItList)
+                )
+              }
               size="small"
               required
             />
@@ -239,8 +241,14 @@ export default function MasterOrderItemDetail() {
             <FormLabel htmlFor="remark">비고</FormLabel>
             <OutlinedInput
               id="remark"
-              value={remark}
-              onChange={(e) => setRemark(e.target.value)}
+              value={orderItem?.remark}
+              onChange={(e) =>
+                setOrderItem((prev) =>
+                  prev
+                    ? { ...prev, remark: e.target.value }
+                    : ({ remark: e.target.value } as MasterOrItList)
+                )
+              }
               size="small"
             />
           </FormGrid>
