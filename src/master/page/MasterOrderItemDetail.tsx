@@ -17,12 +17,20 @@ const FormGrid = styled(Grid)(() => ({
 }));
 
 export default function MasterOrderItemDetail() {
-  const [orderItem, setOrderItem] = useState<MasterOrItList>(
-    {} as MasterOrItList
-  );
+  const [orderItem, setOrderItem] = useState<MasterOrItList>({
+    itemCode: "",
+    itemName: "",
+    company: "",
+    type: "",
+    unitPrice: 0,
+    color: "",
+    coatingMethod: "",
+    remark: "",
+    useYn: "",
+    imgUrl: [],
+  });
 
   const [imgFiles, setImgFiles] = useState<File[]>([]); // 새로 올린 파일
-  // const [existingImages, setExistingImages] = useState<string[]>([]); // 기존 서버 이미지 URL
   const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 전체 미리보기
 
   const navigate = useNavigate();
@@ -96,13 +104,9 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="company"
-              value={orderItem?.company}
+              value={orderItem.company}
               onChange={(e) =>
-                setOrderItem((prev) =>
-                  prev
-                    ? { ...prev, company: e.target.value }
-                    : ({ company: e.target.value } as MasterOrItList)
-                )
+                setOrderItem({ ...orderItem, company: e.target.value })
               }
               size="small"
               required
@@ -115,13 +119,9 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="itemCode"
-              value={orderItem?.itemCode}
+              value={orderItem.itemCode}
               onChange={(e) =>
-                setOrderItem((prev) =>
-                  prev
-                    ? { ...prev, itemCode: e.target.value }
-                    : ({ company: e.target.value } as MasterOrItList)
-                )
+                setOrderItem({ ...orderItem, itemCode: e.target.value })
               }
               size="small"
               required
@@ -134,13 +134,9 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="itemName"
-              value={orderItem?.itemName}
+              value={orderItem.itemName}
               onChange={(e) =>
-                setOrderItem((prev) =>
-                  prev
-                    ? { ...prev, itemName: e.target.value }
-                    : ({ itemName: e.target.value } as MasterOrItList)
-                )
+                setOrderItem({ ...orderItem, itemName: e.target.value })
               }
               size="small"
               required
@@ -153,13 +149,9 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <Select
               id="type"
-              value={orderItem.type || ""} // undefined 방지
+              value={orderItem.type}
               onChange={(e) =>
-                setOrderItem((prev) =>
-                  prev
-                    ? { ...prev, type: e.target.value }
-                    : ({ type: e.target.value } as MasterOrItList)
-                )
+                setOrderItem({ ...orderItem, type: e.target.value })
               }
               size="small"
               required
@@ -181,13 +173,9 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <Select
               id="coatingMethod"
-              value={orderItem?.coatingMethod || ""} // undefined 방지
+              value={orderItem.coatingMethod}
               onChange={(e) =>
-                setOrderItem((prev) =>
-                  prev
-                    ? { ...prev, coatingMethod: e.target.value }
-                    : ({ coatingMethod: e.target.value } as MasterOrItList)
-                )
+                setOrderItem({ ...orderItem, coatingMethod: e.target.value })
               }
               size="small"
               required
@@ -207,12 +195,12 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="unitPrice"
-              value={orderItem?.unitPrice}
+              value={orderItem.unitPrice}
               onChange={(e) =>
-                setOrderItem((prev) => ({
-                  ...prev,
+                setOrderItem({
+                  ...orderItem,
                   unitPrice: Number(e.target.value),
-                }))
+                })
               }
               size="small"
               required
@@ -225,13 +213,9 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="color"
-              value={orderItem?.color}
+              value={orderItem.color}
               onChange={(e) =>
-                setOrderItem((prev) =>
-                  prev
-                    ? { ...prev, color: e.target.value }
-                    : ({ color: e.target.value } as MasterOrItList)
-                )
+                setOrderItem({ ...orderItem, color: e.target.value })
               }
               size="small"
               required
@@ -242,13 +226,9 @@ export default function MasterOrderItemDetail() {
             <FormLabel htmlFor="remark">비고</FormLabel>
             <OutlinedInput
               id="remark"
-              value={orderItem?.remark}
+              value={orderItem.remark}
               onChange={(e) =>
-                setOrderItem((prev) =>
-                  prev
-                    ? { ...prev, remark: e.target.value }
-                    : ({ remark: e.target.value } as MasterOrItList)
-                )
+                setOrderItem({ ...orderItem, remark: e.target.value })
               }
               size="small"
             />
