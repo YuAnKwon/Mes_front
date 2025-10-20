@@ -188,7 +188,7 @@ export default function OrderOutboundRegister() {
     },
     {
       field: "outAmount",
-      headerName: "출고수량 (개)",
+      headerName: "출고수량",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -236,18 +236,41 @@ export default function OrderOutboundRegister() {
       return;
     }
 
+    if (selectedRows.length === 0) {
+      alert("등록할 품목을 선택해주세요.");
+      return;
+    }
+
+    for (const row of selectedRows) {
+      if (!row.outAmount || !row.outDate) {
+        alert("출고 수량과 출고일자를 모두 입력해주세요.");
+        return;
+      }
+
+      // ❗ 출고수량 검증
+      if (row.outAmount > row.inAmount) {
+        alert(
+          `출고 수량이 입고 수량보다 많을 수 없습니다.\n품목: ${row.itemName}`
+        );
+        return;
+      }
+
+      // 출고일자 검증
+      const inDate = new Date(row.inDate);
+      const outDate = new Date(row.outDate);
+      if (outDate < inDate) {
+        alert(
+          `출고일자는 입고일자보다 앞일 수 없습니다.\n품목: ${row.itemName}`
+        );
+        return;
+      }
+    }
+
     const payload: OrderItemOutRegister[] = selectedRows.map((row) => ({
       id: row.id,
       outAmount: row.outAmount as number,
       outDate: row.outDate as string,
     }));
-
-    for (const row of payload) {
-      if (!row.outAmount || !row.outDate) {
-        alert("출고 수량과 출고일자를 모두 입력해주세요.");
-        return;
-      }
-    }
 
     try {
       await registeroutboundItem(payload);

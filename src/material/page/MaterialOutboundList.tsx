@@ -135,7 +135,7 @@ export function MaterialOutboundList() {
     {
       field: "outNum",
       headerName: "출고번호",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
     },
@@ -302,7 +302,7 @@ export function MaterialOutboundList() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>원자재 출고 등록조회</h2>
+      <h2>원자재 출고 조회</h2>
       <Box
         sx={{
           display: "flex",

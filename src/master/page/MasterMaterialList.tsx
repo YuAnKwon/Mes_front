@@ -2,15 +2,33 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import type { MasterMtList } from "../type";
 import { getMasterMtList, updateMaterialState } from "../api/MaterialApi";
 import SearchBar from "../../common/SearchBar";
+import { CloseIcon } from "flowbite-react";
+import MasterMaterial from "./MasterMaterial";
 
 export default function MasterMaterialList() {
   const navigate = useNavigate();
+  const [openRegister, setOpenRegister] = useState(false);
+
+  const handleOpenRegister = () => setOpenRegister(true);
+  const handleCloseRegister = () => setOpenRegister(false);
+
+  const handleRegisterComplete = async () => {
+    handleCloseRegister(); // 모달 닫기
+    await loadData(); // 리스트 갱신
+  };
   const loadData = async () => {
     try {
       const mcList = await getMasterMtList();
@@ -111,7 +129,37 @@ export default function MasterMaterialList() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      renderCell: (params) => {
+        const value = params.value;
+        let color = "#000"; // 기본 검정
+        if (value === "거래 종료") color = "#ee0000"; // 거래 완료 빨간색
+        else if (value === "거래 중") color = "#000"; // 거래 중 초록
+
+        return (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography
+              sx={{
+                color,
+                // fontWeight: 600,
+                textAlign: "center",
+                fontSize: "inherit",
+              }}
+            >
+              {value}
+            </Typography>
+          </Box>
+        );
+      },
     },
+
     {
       field: "actions",
       headerName: "거래 상태 변경", // 헤더 텍스트 없음
@@ -175,20 +223,13 @@ export default function MasterMaterialList() {
     try {
       //api 호출로 백엔드에 변경 요청
       await updateMaterialState(row.id, updatedState);
-      // 2. 변경된 전체 리스트 다시 불러오기
-      const refreshedRows = await getMasterMtList();
-      // 3. 상태 갱신
-      setRows(refreshedRows);
+      await loadData();
 
       alert("거래 상태가 변경되었습니다");
     } catch (error) {
       console.error(error);
       alert("상태 변경 실패");
     }
-  };
-
-  const handleRegister = async () => {
-    navigate("/master/material/register");
   };
 
   const sampleData = [
@@ -233,16 +274,14 @@ export default function MasterMaterialList() {
           />
         </Box>
         {/* 버튼 영역 */}
-        <Box sx={{ ml: "auto" }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleRegister}
-          >
-            원자재 등록
-          </Button>
-        </Box>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={{ height: 40, fontWeight: 500, px: 2.5, ml: 2 }}
+          onClick={handleOpenRegister}
+        >
+          원자재 등록
+        </Button>
       </Box>
 
       {/* 테이블 영역 */}
@@ -266,6 +305,23 @@ export default function MasterMaterialList() {
           }}
         />
       </Box>
+      {/* 등록 모달 */}
+      <Dialog
+        open={openRegister}
+        onClose={handleCloseRegister}
+        maxWidth="lg"
+        // fullWidth
+      >
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          원자재 등록
+          <IconButton onClick={handleCloseRegister}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ overflowY: "auto" }}>
+          <MasterMaterial onRegisterComplete={handleRegisterComplete} />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

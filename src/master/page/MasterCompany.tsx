@@ -15,16 +15,19 @@ import DaumPostcode from "react-daum-postcode";
 import { useState } from "react";
 import { CloseIcon } from "flowbite-react";
 import { Select } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import { registerCompany } from "../api/companyApi";
 import type { MasterCpRegister } from "../type";
+
+interface Props {
+  onRegisterComplete: () => void;
+}
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
   flexDirection: "column",
 }));
 
-export default function MasterCompany() {
+export default function MasterCompany({ onRegisterComplete }: Props) {
   const [address, setAddress] = useState("");
   const [openPostcode, setOpenPostcode] = useState(false);
 
@@ -40,6 +43,18 @@ export default function MasterCompany() {
     setOpenPostcode(true);
   };
 
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handlePhoneChange =
+    (setter: React.Dispatch<React.SetStateAction<string>>) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value.replace(/\D/g, ""); // 숫자만 남기기
+      setter(value);
+    };
+
   const [companyName, setCompanyName] = useState("");
   const [businessNum, setBusinessNum] = useState("");
   const [companyType, setCompanyType] = useState("");
@@ -53,9 +68,29 @@ export default function MasterCompany() {
   const [addressBase, setAddressBase] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
 
-  const navigate = useNavigate();
-
   const handleSave = async () => {
+    if (
+      !companyName ||
+      !businessNum ||
+      !companyType ||
+      !ceoName ||
+      !ceoPhone ||
+      !managerName ||
+      !managerPhone ||
+      !managerEmail ||
+      !zipcode ||
+      !addressBase ||
+      !addressDetail
+    ) {
+      alert("필수값을 모두 입력해주세요.");
+      return;
+    }
+
+    if (!validateEmail(managerEmail)) {
+      alert("올바른 이메일 형식을 입력해주세요.");
+      return;
+    }
+
     const payload: MasterCpRegister = {
       companyName,
       businessNum: Number(businessNum),
@@ -67,14 +102,14 @@ export default function MasterCompany() {
       managerEmail,
       remark,
       zipcode: Number(zipcode),
-      addressBase: address,
+      addressBase,
       addressDetail,
     };
 
     try {
       await registerCompany(payload);
       alert("업체 등록 완료!");
-      navigate("/master/company/list");
+      onRegisterComplete();
     } catch (error) {
       console.error("업체 등록 실패", error);
       alert("등록 실패");
@@ -116,10 +151,17 @@ export default function MasterCompany() {
               size="small"
               required
               fullWidth
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <span style={{ color: "#aaa" }}>업체 유형 선택</span>;
+                }
+                const labels: Record<string, string> = {
+                  CLIENT: "거래처",
+                  SUPPLIER: "매입처",
+                };
+                return labels[selected] || selected;
+              }}
             >
-              <MenuItem value="" disabled>
-                업체 유형 선택
-              </MenuItem>
               <MenuItem value="CLIENT">거래처</MenuItem>
               <MenuItem value="SUPPLIER">매입처</MenuItem>
             </Select>
@@ -165,8 +207,8 @@ export default function MasterCompany() {
               id="ceoPhone"
               name="ceoPhone"
               value={ceoPhone}
-              onChange={(e) => setCeoPhone(e.target.value)}
-              type="text"
+              onChange={handlePhoneChange(setCeoPhone)}
+              type="tel"
               placeholder="01012345678"
               autoComplete="tel"
               required
@@ -197,7 +239,7 @@ export default function MasterCompany() {
               id="managerPhone"
               name="managerPhone"
               value={managerPhone}
-              onChange={(e) => setManagerPhone(e.target.value)}
+              onChange={handlePhoneChange(setManagerPhone)}
               type="text"
               placeholder="01012345678"
               autoComplete="tel"
