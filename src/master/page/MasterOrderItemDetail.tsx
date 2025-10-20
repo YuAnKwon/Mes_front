@@ -9,7 +9,7 @@ import { Select } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { getOrItDetail, updateOrItDetail } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import type { MasterOrItRegister, Photo } from "../type";
+import type { MasterOrItRegister } from "../type";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -26,16 +26,18 @@ export default function MasterOrderItemDetail() {
   const [color, setColor] = useState("");
   const [remark, setRemark] = useState("");
 
-  const navigate = useNavigate();
+  const [imgFiles, setImgFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
+  const navigate = useNavigate();
   const { id } = useParams();
 
+  // 상세 정보 가져오기
   useEffect(() => {
     const fetchOrderItemDetail = async () => {
       try {
-        const response = await getOrItDetail(id); // ← API 호출
+        const response = await getOrItDetail(id);
 
-        // 상태에 기존 값 채워 넣기
         setCompany(response.company);
         setItemCode(response.itemCode);
         setItemName(response.itemName);
@@ -44,13 +46,34 @@ export default function MasterOrderItemDetail() {
         setUnitPrice(response.unitPrice);
         setColor(response.color);
         setRemark(response.remark);
+
+        // 기존 이미지 URL들 미리보기용으로 세팅
+        if (response.photos) {
+          setPreviewUrls(response.photos.map((p: any) => `/api${p.imgUrl}`));
+        }
       } catch (error) {
         console.error("업체 정보 불러오기 실패:", error);
       }
     };
-
     fetchOrderItemDetail();
   }, [id]);
+
+  // 미리보기 URL 생성 및 정리
+  useEffect(() => {
+    const urls = imgFiles.map((file) => URL.createObjectURL(file));
+    setPreviewUrls((prev) => [
+      ...prev.filter((u) => !u.startsWith("blob:")),
+      ...urls,
+    ]);
+
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  }, [imgFiles]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const filesArray = Array.from(e.target.files);
+    setImgFiles((prev) => [...prev, ...filesArray]);
+  };
 
   const handleUpdate = async () => {
     const payload: MasterOrItRegister = {
@@ -61,7 +84,7 @@ export default function MasterOrderItemDetail() {
       unitPrice: Number(unitPrice),
       color,
       coatingMethod,
-      imgUrl: imgFiles,
+      imgUrl: imgFiles, // 서버 전송용
       routing: [],
       remark,
     };
@@ -76,126 +99,63 @@ export default function MasterOrderItemDetail() {
     }
   };
 
-  const [imgFiles, setImgFiles] = useState<File[]>([]);
-
-  // 파일 선택 핸들러
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = e.target.files;
-      if (files) {
-        const fileArray = Array.from(files);
-
-        // 미리보기용 처리
-        const fileReaders: Promise<string>[] = fileArray.map(
-          (file) =>
-            new Promise((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.readAsDataURL(file);
-            })
-        );
-
-        //밑에 있는애 전 버전, photo타입 설정 전
-        // Promise.all(fileReaders).then((images) => {
-        //   setOrderInfo((prev) => ({
-        //     photos: [...prev.photos, ...images],
-        //     imgUrl: [...prev.imgUrl, ...fileArray],
-        //   }));
-        // });
-        Promise.all(fileReaders).then((images) => {
-          const newPhotos = images.map((src, i) => ({
-            orderItem: null,
-            imgOriName: fileArray[i].name,
-            imgFileName: fileArray[i].name,
-            imgUrl: src, // base64로 미리보기
-            repYn: "N",
-          }));
-
-          setOrderInfo((prev) => ({
-            photos: [...prev.photos, ...newPhotos],
-            imgUrl: [...prev.imgUrl, ...fileArray],
-          }));
-        });
-      }
-      setImgFiles(Array.from(e.target.files));
-    }
-  };
-
-  const [orderInfo, setOrderInfo] = useState<{
-    photos: Photo[]; // 미리보기용
-    imgUrl: File[]; // 서버 전송용
-  }>({
-    photos: [],
-    imgUrl: [],
-  });
-
   return (
     <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
       <h2>수주대상품목 수정</h2>
 
       <Box sx={{ height: 800, width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
+          {/* 거래처명 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="company" required>
               거래처명
             </FormLabel>
             <OutlinedInput
               id="company"
-              name="company"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              type="text"
-              placeholder="거래처명"
-              autoComplete="organization"
-              required
               size="small"
+              required
             />
           </FormGrid>
-          <FormGrid size={{ xs: 12, md: 6 }} />
+
+          {/* 품목번호 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="itemCode" required>
               품목번호
             </FormLabel>
             <OutlinedInput
               id="itemCode"
-              name="itemCode"
               value={itemCode}
               onChange={(e) => setItemCode(e.target.value)}
-              type="text"
-              placeholder="품목번호"
-              autoComplete="on"
-              required
               size="small"
+              required
             />
           </FormGrid>
+
+          {/* 품목명 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="itemName" required>
               품목명
             </FormLabel>
             <OutlinedInput
               id="itemName"
-              name="itemName"
               value={itemName}
               onChange={(e) => setItemName(e.target.value)}
-              type="text"
-              placeholder="품목명"
-              autoComplete="on"
-              required
               size="small"
+              required
             />
           </FormGrid>
 
+          {/* 분류 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="type" required>
               분류
             </FormLabel>
             <Select
               id="type"
-              name="type"
               value={type}
               onChange={(e) => setType(e.target.value)}
-              displayEmpty
-              input={<OutlinedInput />}
               size="small"
               required
               fullWidth
@@ -209,17 +169,16 @@ export default function MasterOrderItemDetail() {
               <MenuItem value="DEFENSE">방산</MenuItem>
             </Select>
           </FormGrid>
+
+          {/* 도장 방식 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="coatingMethod" required>
               도장 방식
             </FormLabel>
             <Select
               id="coatingMethod"
-              name="coatingMethod"
               value={coatingMethod}
               onChange={(e) => setCoatingMethod(e.target.value)}
-              displayEmpty
-              input={<OutlinedInput />}
               size="small"
               required
               fullWidth
@@ -231,20 +190,18 @@ export default function MasterOrderItemDetail() {
               <MenuItem value="LIQUID">액체</MenuItem>
             </Select>
           </FormGrid>
+
+          {/* 단가, 색상, 비고 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="unitPrice" required>
               품목단가
             </FormLabel>
             <OutlinedInput
               id="unitPrice"
-              name="unitPrice"
               value={unitPrice}
               onChange={(e) => setUnitPrice(e.target.value)}
-              type="text"
-              placeholder="품목단가"
-              autoComplete="on"
-              required
               size="small"
+              required
             />
           </FormGrid>
           <FormGrid size={{ xs: 12, md: 6 }}>
@@ -253,46 +210,38 @@ export default function MasterOrderItemDetail() {
             </FormLabel>
             <OutlinedInput
               id="color"
-              name="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              type="text"
-              placeholder="색상"
-              autoComplete="on"
-              required
               size="small"
+              required
             />
           </FormGrid>
           <FormGrid size={{ xs: 12 }}>
             <FormLabel htmlFor="remark">비고</FormLabel>
             <OutlinedInput
               id="remark"
-              name="remark"
               value={remark}
               onChange={(e) => setRemark(e.target.value)}
-              type="text"
-              placeholder="비고"
-              autoComplete="off"
               size="small"
             />
           </FormGrid>
         </Grid>
+
+        {/* 이미지 업로드 */}
         <div className="flex items-start gap-4 flex-wrap mt-8">
-          {orderInfo.photos.map((photo, idx) => (
+          {previewUrls.map((url, idx) => (
             <div
               key={idx}
               className="w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
             >
               <img
-                // src={photo}
-                src={`/api${photo.imgUrl}`} // 여기서 imgUrl 사용, 필요하면 /api 붙이기
+                src={url}
                 alt={`제품 사진 ${idx + 1}`}
                 className="w-full h-full object-cover"
               />
             </div>
           ))}
 
-          {/* 업로드 버튼 */}
           <label className="flex flex-col items-center justify-center w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
             <FiCamera size={32} className="text-gray-400 mb-2" />
             <span className="text-sm text-gray-500">사진 업로드</span>
@@ -307,26 +256,16 @@ export default function MasterOrderItemDetail() {
         </div>
       </Box>
 
-      {/* 버튼 영역 */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        {/* 버튼 영역 */}
-        <Box sx={{ ml: "auto" }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleUpdate}
-          >
-            수정
-          </Button>
-        </Box>
+      {/* 저장 버튼 */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={{ height: 40, fontWeight: 500, px: 2.5 }}
+          onClick={handleUpdate}
+        >
+          수정
+        </Button>
       </Box>
     </Box>
   );
