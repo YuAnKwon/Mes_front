@@ -17,6 +17,7 @@ const FormGrid = styled(Grid)(() => ({
 }));
 
 export default function MasterOrderItemDetail() {
+  // const [company, setOrderItem] = useState("");
   const [company, setCompany] = useState("");
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
@@ -26,8 +27,9 @@ export default function MasterOrderItemDetail() {
   const [color, setColor] = useState("");
   const [remark, setRemark] = useState("");
 
-  const [imgFiles, setImgFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [imgFiles, setImgFiles] = useState<File[]>([]); // 새로 올린 파일
+  const [existingImages, setExistingImages] = useState<string[]>([]); // 기존 서버 이미지 URL
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 전체 미리보기
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -37,7 +39,7 @@ export default function MasterOrderItemDetail() {
     const fetchOrderItemDetail = async () => {
       try {
         const response = await getOrItDetail(id);
-
+        // setOrderItem(response);//전체 dto 저장
         setCompany(response.company);
         setItemCode(response.itemCode);
         setItemName(response.itemName);
@@ -47,9 +49,9 @@ export default function MasterOrderItemDetail() {
         setColor(response.color);
         setRemark(response.remark);
 
-        // 기존 이미지 URL들 미리보기용으로 세팅
-        if (response.photos) {
-          setPreviewUrls(response.photos.map((p: any) => `/api${p.imgUrl}`));
+        if (response.imgUrl) {
+          const urls = response.imgUrl.map((p: any) => `${p.imgUrl}`);
+          setExistingImages(urls);
         }
       } catch (error) {
         console.error("업체 정보 불러오기 실패:", error);
@@ -58,16 +60,13 @@ export default function MasterOrderItemDetail() {
     fetchOrderItemDetail();
   }, [id]);
 
-  // 미리보기 URL 생성 및 정리
+  // 미리보기 URL 생성
   useEffect(() => {
-    const urls = imgFiles.map((file) => URL.createObjectURL(file));
-    setPreviewUrls((prev) => [
-      ...prev.filter((u) => !u.startsWith("blob:")),
-      ...urls,
-    ]);
+    const newUrls = imgFiles.map((file) => URL.createObjectURL(file));
+    setPreviewUrls([...existingImages, ...newUrls]);
 
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
-  }, [imgFiles]);
+    return () => newUrls.forEach((url) => URL.revokeObjectURL(url));
+  }, [imgFiles, existingImages]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -77,7 +76,7 @@ export default function MasterOrderItemDetail() {
 
   const handleUpdate = async () => {
     const payload: MasterOrItRegister = {
-      itemCode: Number(itemCode),
+      itemCode: itemCode,
       itemName,
       company,
       type,
@@ -90,7 +89,31 @@ export default function MasterOrderItemDetail() {
     };
 
     try {
-      await updateOrItDetail(id, payload);
+      // FormData 구성
+      const formData = new FormData();
+      if (payload.imgUrl) {
+        payload.imgUrl.forEach((file) => formData.append("imgUrl", file));
+      }
+
+      // routing 배열은 필요 시 JSON 문자열로 전송
+      if (payload.routing) {
+        formData.append("routing", JSON.stringify(payload.routing));
+      }
+
+      // imgUrl과 routing을 제외한 나머지 속성만 FormData에 추가
+      const rest = Object.fromEntries(
+        Object.entries(payload).filter(
+          ([key]) => key !== "imgUrl" && key !== "routing"
+        )
+      );
+
+      Object.entries(rest).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      await updateOrItDetail(id, formData);
       alert("수주대상품목 수정 완료!");
       navigate("/master/orderitem/list");
     } catch (error) {
@@ -105,7 +128,6 @@ export default function MasterOrderItemDetail() {
 
       <Box sx={{ height: 800, width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
-          {/* 거래처명 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="company" required>
               거래처명
@@ -119,7 +141,6 @@ export default function MasterOrderItemDetail() {
             />
           </FormGrid>
 
-          {/* 품목번호 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="itemCode" required>
               품목번호
@@ -133,7 +154,6 @@ export default function MasterOrderItemDetail() {
             />
           </FormGrid>
 
-          {/* 품목명 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="itemName" required>
               품목명
@@ -147,7 +167,6 @@ export default function MasterOrderItemDetail() {
             />
           </FormGrid>
 
-          {/* 분류 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="type" required>
               분류
@@ -170,7 +189,6 @@ export default function MasterOrderItemDetail() {
             </Select>
           </FormGrid>
 
-          {/* 도장 방식 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="coatingMethod" required>
               도장 방식
@@ -191,7 +209,6 @@ export default function MasterOrderItemDetail() {
             </Select>
           </FormGrid>
 
-          {/* 단가, 색상, 비고 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="unitPrice" required>
               품목단가
@@ -204,6 +221,7 @@ export default function MasterOrderItemDetail() {
               required
             />
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="color" required>
               색상
@@ -216,6 +234,7 @@ export default function MasterOrderItemDetail() {
               required
             />
           </FormGrid>
+
           <FormGrid size={{ xs: 12 }}>
             <FormLabel htmlFor="remark">비고</FormLabel>
             <OutlinedInput
@@ -256,7 +275,6 @@ export default function MasterOrderItemDetail() {
         </div>
       </Box>
 
-      {/* 저장 버튼 */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <Button
           variant="outlined"

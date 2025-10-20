@@ -11,6 +11,16 @@ export type MasterOrItList = {
   coatingMethod: string; //도장방식
   remark: string; //비고
   useYn: string; //거래상태
+  imgUrl?: imgType[];
+  routing?: MasterRouting[];
+};
+
+export type imgType = {
+  id: number;
+  imgFileName?: string;
+  imgOriName?: string;
+  imgUrl: string;
+  repYn: string;
 };
 
 //수주품목대상 등록
