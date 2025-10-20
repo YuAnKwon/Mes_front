@@ -3,6 +3,7 @@ import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx-js-style";
+
 import { getMaterialData } from "../api/MaterialInboundListApi";
 import type { MaterialList } from "../type";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +27,11 @@ export function MaterialInboundregister() {
 
   const handleRegister = async () => {
     // :흰색_확인_표시: DataGrid에서 선택된 행 정보 가져오기
-    const selectedRowsMap = apiRef.current.getSelectedRows();
+    const selectedRowsMap = apiRef.current?.getSelectedRows();
+    if (!selectedRowsMap) {
+      alert("선택된 데이터가 없습니다.");
+      return;
+    }
     const selectedRows = Array.from(selectedRowsMap.values());
     if (selectedRows.length === 0) {
       alert("등록할 품목을 선택해주세요.");
@@ -65,12 +70,12 @@ export function MaterialInboundregister() {
 
   const handleSearch = (criteria: string, query: string) => {
     if (!query.trim()) {
-      setFilteredMaterials(materials); // 검색어 없으면 전체 리스트
+      setFilteredMaterials(materials); // 검색어 없으면 전체 리스트 수정
       return;
     }
 
     const filtered = materials.filter((item) =>
-      item[criteria as keyof MaterialList]
+      item[criteria as keyof MaterialList] //수정
         ?.toString()
         .toLowerCase()
         .includes(query.toLowerCase())
@@ -78,7 +83,6 @@ export function MaterialInboundregister() {
 
     setFilteredMaterials(filtered);
   };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -89,14 +93,14 @@ export function MaterialInboundregister() {
         // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
         const companyNames = Array.from(
           new Set(data.map((m) => m.companyName))
-        );
+        ) as string[];
         const materialCodes = Array.from(
           new Set(data.map((m) => m.materialCode))
-        );
+        ) as string[];
         const materialNames = Array.from(
           new Set(data.map((m) => m.materialName))
-        );
-
+        ) as string[];
+        // setFilteredMaterials(data);
         setAutoCompleteMap({
           companyName: companyNames,
           materialCode: materialCodes,

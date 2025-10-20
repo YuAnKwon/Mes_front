@@ -31,6 +31,8 @@ export function MaterialOutboundList() {
     companyName: [], //수정
     materialCode: [], //수정
     materialName: [], //수정
+    outNum: [],
+    outDate: [],
   });
 
   const handleSaveRow = async (row: MaterialOutList) => {
@@ -87,7 +89,20 @@ export function MaterialOutboundList() {
           new Set(data.map((m) => m.materialName))
         ); //수정
         const outNums = Array.from(new Set(data.map((m) => m.outNum)));
-        const outDates = Array.from(new Set(data.map((m) => m.outDate)));
+        const outDates = Array.from(
+          new Set(
+            data
+              .map((m) => m.outDate)
+              .filter(Boolean)
+              .map((dateString) => {
+                const date = new Date(dateString!);
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
+                return `${yyyy}-${mm}-${dd}`;
+              })
+          )
+        );
 
         const mappedRows = data.map((item) => ({
           id: item.id,
@@ -247,20 +262,44 @@ export function MaterialOutboundList() {
   };
 
   const handleSearch = (criteria: string, query: string) => {
-    if (!query.trim()) {
-      setFilteredMaterials(materialsOuts); // 검색어 없으면 전체 리스트 수정
+    const trimmedQuery = query.trim().toLowerCase();
+    if (!trimmedQuery) {
+      setFilteredMaterials(materialsOuts);
       return;
     }
 
-    const filtered = materialsOuts.filter((item) =>
-      item[criteria as keyof MaterialOutList] //수정
-        ?.toString()
-        .toLowerCase()
-        .includes(query.toLowerCase())
-    );
+    const filtered = materialsOuts.filter((item) => {
+      const value = item[criteria as keyof MaterialOutList];
+      if (!value) return false;
+
+      // ✅ 출고일자 검색일 경우
+      if (criteria === "outDate") {
+        const dateObj = new Date(value as string | Date);
+
+        // 변환된 날짜를 다양한 형식으로 저장
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const d = String(dateObj.getDate()).padStart(2, "0");
+
+        const dateStr = `${y}-${m}-${d}`;
+        const dateStrSlash = `${y}/${m}/${d}`;
+        const shortStr = `${m}-${d}`;
+
+        // ✅ 검색어가 이 중 하나라도 포함되면 true
+        return (
+          dateStr.includes(trimmedQuery) ||
+          dateStrSlash.includes(trimmedQuery) ||
+          shortStr.includes(trimmedQuery)
+        );
+      }
+
+      // ✅ 일반 문자열 검색
+      return value.toString().toLowerCase().includes(trimmedQuery);
+    });
 
     setFilteredMaterials(filtered);
   };
+
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 출고 등록조회</h2>

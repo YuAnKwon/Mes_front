@@ -2,14 +2,12 @@ export type MaterialList = {
   id: number;
   materialName: string;
   materialCode: string;
-  companyName: string;
-
-  manufacturer: string;
-  remark: string;
+  companyName?: string;
+  manufacturer?: string;
   inDate: string;
-  specAndScale: string;
+  specAndScale?: string;
   manufactureDate: string;
-  inAmount: string;
+  inAmount: number;
 };
 
 export type MaterialInList = {
@@ -21,23 +19,23 @@ export type MaterialInList = {
   specAndScale: string;
   scale: string;
   manufacturer: string;
-  inDate: string;
-  manufactureDate: string;
+  inDate: string | Date | null;
+  manufactureDate: string | Date | null;
   inNum: string;
   totalStock: string;
 };
 
 export type MaterialOut = {
   inNum: string;
-  outNum: string;
+  outNum?: string;
   materialName: string;
-  materialCode: string;
-  companyName: string;
-  inAmount: number;
-  manufacturer: string;
+  materialCode?: string;
+  companyName?: string;
+  inAmount?: number;
+  manufacturer?: string;
   outAmount: number;
   outDate: string;
-  stock: number;
+  stock?: number;
 };
 
 export type MaterialOutList = {
@@ -50,7 +48,7 @@ export type MaterialOutList = {
   inAmount?: number;
   manufacturer: string;
   outAmount: number;
-  outDate: string;
+  outDate: string | Date | null;
   stock?: number;
 };
 

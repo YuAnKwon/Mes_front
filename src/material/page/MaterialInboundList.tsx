@@ -74,18 +74,38 @@ export function MaterialInboundList() {
   };
 
   const handleSearch = (criteria: string, query: string) => {
-    if (!query.trim()) {
-      setFilteredMaterials(materialsIn); // 검색어 없으면 전체 리스트 수정
+    const trimmedQuery = query.trim().toLowerCase();
+    if (!trimmedQuery) {
+      setFilteredMaterials(materialsIn);
       return;
     }
 
-    const filtered = materialsIn.filter((item) =>
-      item[criteria as keyof MaterialInList] //수정
-        ?.toString()
-        .toLowerCase()
-        .includes(query.toLowerCase())
-    );
+    const filtered = materialsIn.filter((item) => {
+      const value = item[criteria as keyof MaterialInList];
+      if (!value) return false;
 
+      // ✅ 입고일자 검색일 경우
+      if (criteria === "inDate") {
+        const dateObj = new Date(value as string | Date);
+
+        // 변환된 날짜를 다양한 형식으로 저장
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const d = String(dateObj.getDate()).padStart(2, "0");
+
+        const dateStr = `${y}-${m}-${d}`;
+        const dateStrSlash = `${y}/${m}/${d}`;
+        const shortStr = `${m}-${d}`;
+
+        // ✅ 검색어가 이 중 하나라도 포함되면 true
+        return (
+          dateStr.includes(trimmedQuery) ||
+          dateStrSlash.includes(trimmedQuery) ||
+          shortStr.includes(trimmedQuery)
+        );
+      }
+      return value.toString().toLowerCase().includes(trimmedQuery);
+    });
     setFilteredMaterials(filtered);
   };
 
@@ -93,7 +113,6 @@ export function MaterialInboundList() {
     const fetchData = async () => {
       try {
         const data = await getMaterialInData(); //수정
-        // setMaterialsIn(data); //수정
 
         // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
         const companyNames = Array.from(
@@ -109,7 +128,18 @@ export function MaterialInboundList() {
           new Set(data.map((m) => m.inNum))
         ) as string[];
         const inDates = Array.from(
-          new Set(data.map((m) => m.inDate))
+          new Set(
+            data
+              .map((m) => m.inDate)
+              .filter(Boolean)
+              .map((dateString) => {
+                const date = new Date(dateString!);
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
+                return `${yyyy}-${mm}-${dd}`;
+              })
+          )
         ) as string[];
 
         const mappedRows = data.map((item) => ({
@@ -310,7 +340,7 @@ export function MaterialInboundList() {
       총량: item.totalStock,
       입고일자: item.inDate ? new Date(item.inDate).toLocaleDateString() : "",
       제조일자: item.manufactureDate
-        ? new Date(item.inDate).toLocaleDateString()
+        ? new Date(item.manufactureDate).toLocaleDateString()
         : "",
 
       // "거래처명": item.companyName ?? "", // null 방지
@@ -344,8 +374,10 @@ export function MaterialInboundList() {
           <NewSearchBar
             searchOptions={[
               { label: "거래처명", value: "companyName" }, //수정
-              { label: "품목코드", value: "materialCode" }, //수정
+              { label: "품목번호", value: "materialCode" }, //수정
               { label: "품목명", value: "materialName" }, //수정
+              { label: "입고번호", value: "inNum" },
+              { label: "입고일자", value: "inDate" },
             ]}
             autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}

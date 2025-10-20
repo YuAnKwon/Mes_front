@@ -92,6 +92,11 @@ export default function NewSearchBar({
             {...params}
             size="small"
             placeholder="검색어를 입력해주세요"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
             sx={{
               "& .MuiInputBase-input": {
                 py: 0,
