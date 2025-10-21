@@ -23,13 +23,18 @@ export const registerOrderItem = async (data: MasterOrItRegister) => {
     color: data.color,
     coatingMethod: data.coatingMethod,
     remark: data.remark,
-    routing: data.routing,
   });
   //JSON을 data라는 파트로 넣음. 서버(백앤드?)에서 @RequestPart("data")로 받음.
   formData.append("data", new Blob([json], { type: "application/json" }));
 
   //업로드할 파일들을 같은 파트명 imgUrl으로 여러번 FormData에 추가(파일 리스트 전송).
-  data.imgUrl.forEach((file) => formData.append("imgUrl", file));
+
+  data.imgUrl?.forEach((file) => {
+    if (file.file) {
+      formData.append("imgUrl", file.file); // 실제 File 객체만 append
+    }
+  });
+  console.log(formData);
 
   //서버의 등록 엔드포인트(?)로 multipart 형식으로 POST 요청 전송.
   return axios.post(`${BASE_URL}/master/orderitem/register`, formData, {
@@ -74,5 +79,7 @@ export const updateRepImageApi = async (
   orderItemId: number,
   imageId: number
 ) => {
-  return axios.patch(`/orderitem/${orderItemId}/repimage/${imageId}`);
+  return axios.patch(
+    `${BASE_URL}/master/orderitem/${orderItemId}/repimage/${imageId}`
+  );
 };
