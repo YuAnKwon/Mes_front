@@ -32,20 +32,7 @@ export const getOrItDetail = async (id: number) => {
 
 //api 바꾸기
 export const updateOrItDetail = (id: number, formData: FormData) => {
-  return axios.put(`/api/master/orderitem/detail/${id}`, formData, {
+  return axios.put(`${BASE_URL}/master/orderitem/detail/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-};
-
-export const deleteImage = async (imageId: number) => {
-  return axios.delete(`${BASE_URL}/master/orderitem/detail/image/${imageId}`);
-};
-
-export const updateRepImageApi = async (
-  orderItemId: number,
-  imageId: number
-) => {
-  return axios.patch(
-    `${BASE_URL}/master/orderitem/${orderItemId}/repimage/${imageId}`
-  );
 };

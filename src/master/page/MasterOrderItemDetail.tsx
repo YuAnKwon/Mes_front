@@ -6,18 +6,14 @@ import { Box, Checkbox, MenuItem, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
-import {
-  deleteImage,
-  getOrItDetail,
-  updateOrItDetail,
-  updateRepImageApi,
-} from "../api/OrderItemApi";
+import { getOrItDetail, updateOrItDetail } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
 import type { imgType, MasterOrItRegister, MasterRouting } from "../type";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import type { DropResult } from "react-beautiful-dnd";
 import { getRoutingList } from "../api/RoutingApi";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { useNavigate, useParams } from "react-router-dom";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -50,35 +46,55 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
     routing: [],
   });
 
+  // const handleUpdate = async () => {
+  //   const formData = new FormData();
+
+  //   // 업데이트된 데이터 담기
+  //   // selectedRoutings → orderItem.routing에 반영
+  //   const updatedOrderItem = {
+  //     ...orderItem,
+  // routing: selectedRoutings.map((r, idx) => ({
+  //   routingId: r.id,
+  //   routingOrder: idx + 1, // 순서 반영
+  // })),
+  //   };
+
+  //   // JSON 객체를 "data" key로 추가
+  //   formData.append(
+  //     "data",
+  //     new Blob([JSON.stringify(updatedOrderItem)], { type: "application/json" })
+  //   );
+
+  //이미지파일 덮어쓰기를 위한 기존, 새 이미지 전송
   const handleUpdate = async () => {
     const formData = new FormData();
 
-    // 업데이트된 데이터 담기
-    // selectedRoutings → orderItem.routing에 반영
-    const updatedOrderItem = {
+    // ✅ JSON 객체 구성 (기존 orderItem + 이미지 정보 포함)
+    const jsonData = JSON.stringify({
       ...orderItem,
+      images: imgFiles.map((img, index) => ({
+        id: img.id ?? null, // 기존 이미지면 id 있음
+        repYn: index === 0 ? "Y" : "N", // 첫 번째 이미지를 대표로 설정
+      })),
       routing: selectedRoutings.map((r, idx) => ({
         routingId: r.id,
         routingOrder: idx + 1, // 순서 반영
       })),
-    };
+    });
 
-    // JSON 객체를 "data" key로 추가
-    formData.append(
-      "data",
-      new Blob([JSON.stringify(updatedOrderItem)], { type: "application/json" })
-    );
+    // ✅ JSON을 Blob으로 감싸서 formData에 추가
+    formData.append("data", new Blob([jsonData], { type: "application/json" }));
 
-    // 파일 배열을 "imgUrl" key로 추가
+    // ✅ 새 이미지 파일만 formData에 추가 (기존 이미지는 file이 없음)
     if (imgFiles && imgFiles.length > 0) {
       imgFiles.forEach((img) => {
         if (img.file) formData.append("imgUrl", img.file);
       });
     }
-    console.log("보내는 데이터:", updatedOrderItem);
+    console.log("보내는 데이터:", jsonData);
 
     try {
-      await updateOrItDetail(orderItem.id!, formData); // api 함수 호출
+      await updateOrItDetail(orderItem.id!, formData); // API 호출
       alert("수정 완료!");
       onClose();
     } catch (error) {
@@ -97,12 +113,24 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
 
         // 기존 이미지 처리
         if (response.images) {
-          const existingImgs: imgType[] = response.images.map((img: any) => ({
+          // ✅ repYn === "Y" 인 이미지를 맨 앞으로 정렬
+          const sortedImages = [...response.images].sort((a, b) => {
+            if (a.repYn === "Y" && b.repYn !== "Y") return -1;
+            if (a.repYn !== "Y" && b.repYn === "Y") return 1;
+            return 0;
+          });
+
+          // 정렬된 이미지들로 imgFiles 세팅
+          const existingImgs: imgType[] = sortedImages.map((img: any) => ({
             id: img.id,
             imgUrl: img.imgUrl,
             repYn: img.repYn,
+            file: undefined, // 기존 이미지는 파일 없음
           }));
+
           setImgFiles(existingImgs);
+
+          // 미리보기용 URL도 같은 순서로
           const urls = existingImgs.map((img) => img.imgUrl);
           setPreviewUrls(urls);
         }
@@ -144,15 +172,19 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
   // ----------------------------
   // 이미지 미리보기 useEffect
   useEffect(() => {
+    // ✅ 파일이 있으면 blob URL, 없으면 서버 URL 사용
     const urls = imgFiles.map((img) =>
       img.file ? URL.createObjectURL(img.file) : img.imgUrl
     );
+
+    console.log("previewUrls 생성:", urls);
     setPreviewUrls(urls);
 
+    // ✅ 메모리 누수 방지 - blob URL 정리
     return () => {
-      imgFiles.forEach((img) => {
-        if (img.file) {
-          URL.revokeObjectURL(img.file as unknown as string); // img.file로 revoke
+      urls.forEach((url, idx) => {
+        if (imgFiles[idx]?.file) {
+          URL.revokeObjectURL(url);
         }
       });
     };
@@ -184,30 +216,17 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
     });
   };
 
-  // ----------------------------
   // 이미지 삭제
-  const handleRemoveImage = async (index: number) => {
-    console.log("삭제 요청 index:", index);
-    const targetImg = imgFiles[index];
-    console.log("삭제할 이미지:", targetImg);
-    if (!targetImg) return;
+  const handleRemoveImage = (index: number) => {
+    setImgFiles((prev) => {
+      const newImgs = prev.filter((_, i) => i !== index);
 
-    if (targetImg.id && !targetImg.file) {
-      // 기존 이미지(DB) 삭제
-      try {
-        console.log("DB 이미지 삭제 API 호출:", targetImg.id);
-        await deleteImage(targetImg.id); // API 호출
-        alert("이미지 삭제 완료");
-      } catch (error) {
-        console.error("이미지 삭제 실패:", error);
-        alert("이미지 삭제 실패");
-        return;
-      }
-    }
-
-    console.log("배열에서 제거 전 imgFiles:", imgFiles);
-    setImgFiles((prev) => prev.filter((_, i) => i !== index));
-    console.log("배열에서 제거 후 imgFiles:", imgFiles);
+      // 대표 이미지(repYn) 재설정
+      return newImgs.map((img, idx) => ({
+        ...img,
+        repYn: idx === 0 ? "Y" : "N",
+      }));
+    });
   };
 
   // 드래그앤드롭 완료 시
@@ -222,22 +241,12 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
     // repYn 업데이트: 첫 번째를 대표 이미지로
     const updated = items.map((img, idx) => ({
       ...img,
+      // 기존 ID 그대로 유지
+      id: img.id,
       repYn: idx === 0 ? "Y" : "N",
     }));
 
     setImgFiles(updated);
-
-    // DB 반영: 첫 번째 이미지만 대표로 업데이트
-    const newRep = updated[0];
-    if (newRep.id) {
-      try {
-        await updateRepImageApi(orderItem.id!, newRep.id);
-        console.log("대표 이미지 DB 반영 완료");
-      } catch (error) {
-        console.error("대표 이미지 변경 실패", error);
-        alert("대표 이미지 변경 실패");
-      }
-    }
   };
 
   const handleRoutingDragEnd = (result: DropResult) => {
