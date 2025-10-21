@@ -16,11 +16,12 @@ export type MasterOrItList = {
 };
 
 export type imgType = {
-  id: number;
+  id?: number;
   imgFileName?: string;
   imgOriName?: string;
   imgUrl: string;
   repYn: string;
+  file?: File; // ✅ 추가
 };
 
 //수주품목대상 등록

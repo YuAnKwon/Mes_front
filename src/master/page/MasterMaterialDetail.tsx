@@ -7,11 +7,7 @@ import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  getMaterialDetail,
-  registerMaterial,
-  updateMaterialDetail,
-} from "../api/MaterialApi";
+import { getMaterialDetail, updateMaterialDetail } from "../api/MaterialApi";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
