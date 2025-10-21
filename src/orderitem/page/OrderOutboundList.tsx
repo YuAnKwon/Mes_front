@@ -5,7 +5,7 @@ import {
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Modal, Typography } from "@mui/material";
 import * as XLSX from "xlsx-js-style";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -17,9 +17,12 @@ import {
 import type { OrderItemList } from "../type";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
 import NewSearchBar from "../../common/NewSearchBar";
+import ShipmentInvoice from "./ShipmentInvoice";
 
 export default function OrderOutboundList() {
   const navigate = useNavigate();
+  const [openInvoice, setOpenInvoice] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const apiRef = useGridApiRef();
   const [filteredMaterials, setFilteredMaterials] = useState<OrderItemList[]>(
     []
@@ -174,6 +177,17 @@ export default function OrderOutboundList() {
     }
   };
 
+  // 모달 상태변경
+  const handleOpenInvoice = (id: number) => {
+    setSelectedId(id);
+    setOpenInvoice(true);
+  };
+
+  const handleCloseInvoice = () => {
+    setOpenInvoice(false);
+    setSelectedId(null);
+  };
+
   const columns: GridColDef[] = [
     {
       field: "outNum",
@@ -247,9 +261,7 @@ export default function OrderOutboundList() {
         <Button
           variant="outlined"
           size="small"
-          onClick={() => {
-            navigate(`/shipmentInvoice/${params.row.id}`);
-          }}
+          onClick={() => handleOpenInvoice(params.row.id)}
         >
           출하증
         </Button>
@@ -422,6 +434,12 @@ export default function OrderOutboundList() {
           }}
         />
       </Box>
+
+      <ShipmentInvoice
+        open={openInvoice}
+        onClose={handleCloseInvoice}
+        id={selectedId}
+      />
     </Box>
   );
 }
