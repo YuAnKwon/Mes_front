@@ -21,7 +21,7 @@ export type imgType = {
   imgOriName?: string;
   imgUrl: string;
   repYn: string;
-  file?: File; // ✅ 추가
+  file?: File;
 };
 
 //수주품목대상 등록
@@ -35,7 +35,7 @@ export type MasterOrItRegister = {
   color: string; //색상
   coatingMethod: string; //도장방식
   remark: string; //비고
-  imgUrl: File[];
+  imgUrl?: imgType[];
   routing: {
     routingId: number | string;
     routingOrder: number;

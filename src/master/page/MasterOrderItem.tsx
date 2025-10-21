@@ -18,7 +18,7 @@ import {
   Draggable,
   type DropResult,
 } from "react-beautiful-dnd";
-import type { MasterOrItRegister, MasterRouting } from "../type";
+import type { imgType, MasterOrItRegister, MasterRouting } from "../type";
 import { registerOrderItem } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
 import { getClientList } from "../api/companyApi";
@@ -54,6 +54,10 @@ export default function MasterOrderItem({
   //사용자가 선택한 공정 목록,
   const [selectedRoutings, setSelectedRoutings] = useState<MasterRouting[]>([]);
 
+  const [imgFiles, setImgFiles] = useState<imgType[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 미리보기용
+  const [unitPriceError, setUnitPriceError] = useState(false);
+
   // 거래처 리스트 불러오기
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -68,6 +72,70 @@ export default function MasterOrderItem({
     fetchCompanies();
   }, []);
 
+  // ----------------------------
+  // 파일 선택 시
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const filesArray = Array.from(e.target.files);
+
+    const newImgs: imgType[] = filesArray.map((file) => ({
+      id: undefined,
+      imgUrl: URL.createObjectURL(file),
+      repYn: "N",
+      file,
+    }));
+
+    setImgFiles((prev) => {
+      const combined = [...prev, ...newImgs];
+      return combined.map((img, idx) => ({
+        ...img,
+        repYn: idx === 0 ? "Y" : "N", // 첫 번째 이미지를 대표로
+      }));
+    });
+  };
+
+  // ----------------------------
+  // 이미지 삭제
+  const handleRemoveImage = (index: number) => {
+    const updated = imgFiles.filter((_, i) => i !== index);
+    const reflagged = updated.map((img, idx) => ({
+      ...img,
+      repYn: idx === 0 ? "Y" : "N",
+    }));
+    setImgFiles(reflagged);
+  };
+
+  // 이미지 드래그용
+  const handleImageDragEnd = async (result: DropResult) => {
+    const { source, destination } = result;
+    if (!destination) return;
+
+    const items = Array.from(imgFiles);
+    const [removed] = items.splice(source.index, 1);
+    items.splice(destination.index, 0, removed);
+
+    const updated = items.map((img, idx) => ({
+      ...img,
+      repYn: idx === 0 ? "Y" : "N",
+    }));
+
+    setImgFiles(updated);
+  };
+  // ----------------------------
+  // 이미지 미리보기 갱신
+  useEffect(() => {
+    const urls = imgFiles.map((img) =>
+      img.file ? URL.createObjectURL(img.file) : img.imgUrl
+    );
+    setPreviewUrls(urls);
+
+    return () => {
+      imgFiles.forEach((img) => {
+        if (img.file) URL.revokeObjectURL(img.imgUrl);
+      });
+    };
+  }, [imgFiles]);
+
   // 공정 리스트 가져오기
   useEffect(() => {
     const fetchRoutings = async () => {
@@ -81,19 +149,14 @@ export default function MasterOrderItem({
     fetchRoutings();
   }, []);
 
-  const [imgFiles, setImgFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 미리보기용
-  const [unitPriceError, setUnitPriceError] = useState(false);
-
-  // 드래그시 핸들링
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return; // 드롭 위치가 없으면 종료
+  // 공정 드래그용
+  const handleRoutingDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
 
     const items = Array.from(selectedRoutings);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    // 순서 변경
     setSelectedRoutings(items);
   };
 
@@ -107,6 +170,7 @@ export default function MasterOrderItem({
       );
     }
   };
+
   const handleSave = async () => {
     const missingFields = [];
 
@@ -117,14 +181,18 @@ export default function MasterOrderItem({
     if (!coatingMethod) missingFields.push("도장 방식");
     if (!unitPrice) missingFields.push("품목단가");
     if (!color) missingFields.push("색상");
-    if (selectedRoutings.length === 0) missingFields.push("공정 선택");
+    if (selectedRoutings.length === 0) missingFields.push("공정");
 
     if (missingFields.length > 0) {
-      alert(`${missingFields.join(", ")}을(를) 입력해주세요.`);
+      alert(`${missingFields.join(", ")} 입력해주세요.`);
       return;
     }
 
-    const payload: MasterOrItRegister = {
+    // FormData 생성
+    const formData = new FormData();
+
+    // JSON 데이터
+    const json = JSON.stringify({
       itemCode,
       itemName,
       company,
@@ -132,55 +200,36 @@ export default function MasterOrderItem({
       unitPrice: Number(unitPrice),
       color,
       coatingMethod,
-      imgUrl: imgFiles,
       routing: selectedRoutings.map((r, index) => ({
         routingId: r.id,
         routingOrder: index + 1,
       })),
       remark,
-    };
+    });
+    formData.append("data", new Blob([json], { type: "application/json" }));
+
+    // 실제 File 객체만 append
+    imgFiles.forEach((img) => {
+      if (img.file) {
+        formData.append("imgUrl", img.file);
+      }
+    });
 
     try {
-      await registerOrderItem(payload);
-      console.log(payload);
+      console.log("등록한 formdata", formData.get);
+      await registerOrderItem(formData); // 이제 formData 전달
+      console.log("등록 완료!", formData);
       alert("수주대상품목 등록 완료!");
       onRegisterComplete?.();
     } catch (error) {
-      console.error("등록 실패", error);
-      alert("등록 실패");
+      if (error.response?.data?.message?.includes("이미 존재하는 품목번호")) {
+        alert("이미 존재하는 품목번호입니다.");
+      } else {
+        console.error("등록 실패", error);
+        alert("등록 실패");
+      }
     }
   };
-
-  // 파일 선택 핸들러
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-
-    const filesArray = Array.from(e.target.files);
-    setImgFiles((prev) => [...prev, ...filesArray]);
-  };
-
-  // imgFiles가 바뀔 때마다 미리보기 URL 생성
-  useEffect(() => {
-    const urls = imgFiles.map((file) => URL.createObjectURL(file));
-    setPreviewUrls(urls);
-
-    // 언마운트 시 메모리 해제
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
-  }, [imgFiles]);
-
-  useEffect(() => {
-    // 거래처 리스트 가져오기
-    const fetchCompanies = async () => {
-      try {
-        const response = await getClientList();
-        const names = response.map((item: any) => item.companyName);
-        setCompanyList(names);
-      } catch (error) {
-        console.error("매입처 목록 불러오기 실패:", error);
-      }
-    };
-    fetchCompanies();
-  }, []);
 
   const totalMinutes = selectedRoutings.reduce(
     (sum, r) => sum + Number(r.processTime),
@@ -428,34 +477,75 @@ export default function MasterOrderItem({
             />
           </FormGrid>
         </Grid>
+        <DragDropContext onDragEnd={handleImageDragEnd}>
+          <Droppable droppableId="images" direction="horizontal">
+            {(provided) => (
+              <div
+                className="flex items-start gap-4 flex-wrap mt-8"
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                {imgFiles.map((img, index) => (
+                  <Draggable
+                    key={img.id ?? index}
+                    draggableId={String(img.id ?? index)}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        className="relative w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {/* 대표 이미지 표시 */}
+                        {img.repYn === "Y" && (
+                          <div className="absolute top-0 left-0 bg-yellow-400 text-black text-xs px-1 py-0.5 z-10">
+                            대표 이미지
+                          </div>
+                        )}
 
-        {/* 이미지 업로드 */}
-        <div className="flex items-start gap-4 flex-wrap mt-8">
-          {previewUrls.map((url, idx) => (
-            <div
-              key={idx}
-              className="w-48 h-48 border-2 border-gray-200 rounded-lg overflow-hidden"
-            >
-              <img
-                src={url}
-                alt={`제품 사진 ${idx + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
+                        <img
+                          src={
+                            img.file
+                              ? URL.createObjectURL(img.file)
+                              : img.imgUrl
+                          }
+                          alt={`제품 사진 ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
 
-          <label className="flex flex-col items-center justify-center w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-            <FiCamera size={32} className="text-gray-400 mb-2" />
-            <span className="text-sm text-gray-500">사진 업로드</span>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
-        </div>
+                        {/* 삭제 버튼 */}
+                        <button
+                          onClick={() => handleRemoveImage(index)}
+                          className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full bg-black/50 text-white text-sm hover:bg-red-600 transition"
+                          title="이미지 삭제"
+                        >
+                          x
+                        </button>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+
+                {provided.placeholder}
+
+                {/* 업로드 버튼 */}
+                <label className="flex flex-col items-center justify-center w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                  <FiCamera size={32} className="text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-500">사진 업로드</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Box>
 
       {/* 공정 선택 및 드래그 테이블 */}
@@ -498,7 +588,7 @@ export default function MasterOrderItem({
               <span>비고</span>
             </Box>
 
-            <DragDropContext onDragEnd={handleDragEnd}>
+            <DragDropContext onDragEnd={handleRoutingDragEnd}>
               <Droppable droppableId="selected-routings">
                 {(provided) => (
                   <div ref={provided.innerRef} {...provided.droppableProps}>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { MasterOrItList, MasterOrItRegister } from "../type";
+import type { MasterOrItList } from "../type";
 
 export const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -10,28 +10,8 @@ export const getMasterOrItList = async (): Promise<MasterOrItList[]> => {
   return response.data;
 };
 
-export const registerOrderItem = async (data: MasterOrItRegister) => {
-  const formData = new FormData();
-
-  //입력한 필드를 하나의 JSON 문자열 데이터로 직렬화
-  const json = JSON.stringify({
-    itemCode: data.itemCode,
-    itemName: data.itemName,
-    company: data.company,
-    type: data.type,
-    unitPrice: data.unitPrice,
-    color: data.color,
-    coatingMethod: data.coatingMethod,
-    remark: data.remark,
-    routing: data.routing,
-  });
-  //JSON을 data라는 파트로 넣음. 서버(백앤드?)에서 @RequestPart("data")로 받음.
-  formData.append("data", new Blob([json], { type: "application/json" }));
-
-  //업로드할 파일들을 같은 파트명 imgUrl으로 여러번 FormData에 추가(파일 리스트 전송).
-  data.imgUrl.forEach((file) => formData.append("imgUrl", file));
-
-  //서버의 등록 엔드포인트(?)로 multipart 형식으로 POST 요청 전송.
+// 기존 payload 받는 거 아니라 FormData를 바로 받도록
+export const registerOrderItem = async (formData: FormData) => {
   return axios.post(`${BASE_URL}/master/orderitem/register`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
