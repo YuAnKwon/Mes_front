@@ -79,17 +79,24 @@ export default function MasterOrderItemDetail() {
         console.log("response :", response);
 
         if (response.images) {
-          // 기존 이미지도 imgFiles에 추가
-          const existingImgs: imgType[] = response.images.map((img: any) => ({
+          // ✅ repYn === "Y" 인 이미지를 맨 앞으로 정렬
+          const sortedImages = [...response.images].sort((a, b) => {
+            if (a.repYn === "Y" && b.repYn !== "Y") return -1;
+            if (a.repYn !== "Y" && b.repYn === "Y") return 1;
+            return 0;
+          });
+
+          // 정렬된 이미지들로 imgFiles 세팅
+          const existingImgs: imgType[] = sortedImages.map((img: any) => ({
             id: img.id,
             imgUrl: img.imgUrl,
             repYn: img.repYn,
-            file: img.file,
-            // file은 기존 이미지라 undefined
+            file: undefined, // 기존 이미지는 파일 없음
           }));
+
           setImgFiles(existingImgs);
 
-          // 미리보기용 URL
+          // 미리보기용 URL도 같은 순서로
           const urls = existingImgs.map((img) => img.imgUrl);
           setPreviewUrls(urls);
         }
@@ -103,19 +110,19 @@ export default function MasterOrderItemDetail() {
   // ----------------------------
   // 이미지 미리보기 useEffect
   useEffect(() => {
-    console.log("=== imgFiles 변경됨 ===");
-    console.log("imgFiles:", imgFiles);
-
+    // ✅ 파일이 있으면 blob URL, 없으면 서버 URL 사용
     const urls = imgFiles.map((img) =>
       img.file ? URL.createObjectURL(img.file) : img.imgUrl
     );
+
     console.log("previewUrls 생성:", urls);
     setPreviewUrls(urls);
 
+    // ✅ 메모리 누수 방지 - blob URL 정리
     return () => {
-      imgFiles.forEach((img) => {
-        if (img.file) {
-          URL.revokeObjectURL(img.file as unknown as string); // img.file로 revoke
+      urls.forEach((url, idx) => {
+        if (imgFiles[idx]?.file) {
+          URL.revokeObjectURL(url);
         }
       });
     };
