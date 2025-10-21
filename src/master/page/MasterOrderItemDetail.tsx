@@ -84,6 +84,7 @@ export default function MasterOrderItemDetail() {
             id: img.id,
             imgUrl: img.imgUrl,
             repYn: img.repYn,
+            file: img.file,
             // file은 기존 이미지라 undefined
           }));
           setImgFiles(existingImgs);
