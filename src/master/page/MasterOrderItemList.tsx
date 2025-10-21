@@ -2,13 +2,22 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import { getMasterOrItList, updateOrItState } from "../api/OrderItemApi";
 import type { MasterOrItList } from "../type";
 import SearchBar from "../../common/SearchBar";
+import { CloseIcon } from "flowbite-react";
+import MasterOrderItem from "./MasterOrderItem";
 
 export default function MasterOrderItemList() {
   const sampleData = [
@@ -31,6 +40,14 @@ export default function MasterOrderItemList() {
   };
 
   const navigate = useNavigate();
+  const [openRegister, setOpenRegister] = useState(false);
+
+  const handleOpenRegister = () => setOpenRegister(true);
+  const handleCloseRegister = () => setOpenRegister(false);
+  const handleRegisterComplete = async () => {
+    handleCloseRegister(); // 모달 닫기
+    await loadData(); // 리스트 갱신
+  };
 
   const loadData = async () => {
     try {
@@ -294,7 +311,7 @@ export default function MasterOrderItemList() {
             variant="outlined"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleRegister}
+            onClick={handleOpenRegister}
           >
             수주대상품목 등록
           </Button>
@@ -314,6 +331,7 @@ export default function MasterOrderItemList() {
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
+            sorting: { sortModel: [{ field: "id", sort: "asc" }] },
           }}
           slotProps={{
             basePagination: {
@@ -344,6 +362,17 @@ export default function MasterOrderItemList() {
           }}
         />
       </Box>
+      <Dialog open={openRegister} onClose={handleCloseRegister} maxWidth="lg">
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          수주대상품목 등록
+          <IconButton onClick={handleCloseRegister}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ overflowY: "auto" }}>
+          <MasterOrderItem onRegisterComplete={handleRegisterComplete} />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

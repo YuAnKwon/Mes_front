@@ -35,7 +35,10 @@ export type MasterOrItRegister = {
   coatingMethod: string; //도장방식
   remark: string; //비고
   imgUrl: File[];
-  routing: MasterRouting[];
+  routing: {
+    routingId: number | string;
+    routingOrder: number;
+  }[];
 };
 
 /* 원자재 */
@@ -84,11 +87,11 @@ export type MasterCpRegister = {
   id?: number;
   companyName: string; //거래처명
   companyType: string; //업체유형
-  businessNum: number; //사업자 등록번호
+  businessNum: string; //사업자 등록번호
   ceoName: string; //대표명
-  ceoPhone: number; //대표 전화번호
+  ceoPhone: string; //대표 전화번호
   managerName: string; //담당자
-  managerPhone: number; //담당자 전화번호
+  managerPhone: string; //담당자 전화번호
   managerEmail: string; //담당자 이메일
   zipcode: number; //우편번호
   addressBase: string; //기업주소
