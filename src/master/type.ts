@@ -35,8 +35,8 @@ export type MasterOrItRegister = {
   color: string; //색상
   coatingMethod: string; //도장방식
   remark: string; //비고
-  imgUrl: File[];
-  routing: {
+  imgUrl?: imgType[];
+  routing?: {
     routingId: number | string;
     routingOrder: number;
   }[];

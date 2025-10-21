@@ -14,7 +14,7 @@ import {
   updateRepImageApi,
 } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import type { imgType, MasterOrItList } from "../type";
+import type { imgType, MasterOrItRegister } from "../type";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import type { DropResult } from "react-beautiful-dnd";
 
@@ -24,7 +24,7 @@ const FormGrid = styled(Grid)(() => ({
 }));
 
 export default function MasterOrderItemDetail() {
-  const [orderItem, setOrderItem] = useState<MasterOrItList>({
+  const [orderItem, setOrderItem] = useState<MasterOrItRegister>({
     itemCode: "",
     itemName: "",
     company: "",
@@ -33,7 +33,6 @@ export default function MasterOrderItemDetail() {
     color: "",
     coatingMethod: "",
     remark: "",
-    useYn: "",
     imgUrl: [],
   });
 
@@ -60,7 +59,7 @@ export default function MasterOrderItemDetail() {
     }
 
     try {
-      await updateOrItDetail(orderItem.id, formData); // api 함수 호출
+      await updateOrItDetail(orderItem.id!, formData); // api 함수 호출
       alert("수정 완료!");
       navigate("/master/orderitem/list");
     } catch (error) {
