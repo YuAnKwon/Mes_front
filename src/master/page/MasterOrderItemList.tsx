@@ -394,7 +394,7 @@ export default function MasterOrderItemList() {
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
           }}
           sortingOrder={["desc", "asc"]}
-          sortModel={[{ field: "id", sort: "desc" }]}
+          // sortModel={[{ field: "id", sort: "desc" }]}
           slotProps={{
             basePagination: {
               material: {
