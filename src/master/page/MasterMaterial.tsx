@@ -6,10 +6,9 @@ import { Autocomplete, Box, MenuItem, TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import { registerMaterial } from "../api/MaterialApi";
 import type { MasterMtRegister } from "../type";
-import { getClientList, getSupplierList } from "../api/companyApi";
+import { getSupplierList } from "../api/companyApi";
 
 interface Props {
   onRegisterComplete: () => void;
@@ -77,30 +76,52 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
             <FormLabel htmlFor="companyName" required>
               매입처명
             </FormLabel>
+
             <Autocomplete
-              freeSolo // 직접 입력 가능
-              options={companyList} // 자동완성 데이터
+              freeSolo
+              options={companyList}
               value={companyName}
               onChange={(e, newValue) => setCompanyName(newValue || "")}
               onInputChange={(e, newInputValue) =>
                 setCompanyName(newInputValue)
               }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="매입처명"
-                  size="small"
-                  required
-                />
-              )}
+              renderInput={(params) => {
+                // 리스트에 없는 값이면 에러 표시
+                const isError =
+                  companyName.trim() !== "" &&
+                  !companyList.includes(companyName);
+                return (
+                  <TextField
+                    {...params}
+                    placeholder="매입처명"
+                    size="small"
+                    required
+                    error={isError}
+                    helperText={
+                      isError ? "등록된 매입처만 선택 가능합니다." : ""
+                    }
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: isError ? "red" : "black",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: isError ? "red" : "black",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: isError ? "red" : "black",
+                        },
+                      },
+                    }}
+                  />
+                );
+              }}
               ListboxProps={{
-                style: {
-                  maxHeight: 200, // 최대 높이 제한
-                  overflowY: "auto", // 세로 스크롤 가능
-                },
+                style: { maxHeight: 200, overflowY: "auto" },
               }}
             />
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 6 }} />
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="materialCode" required>

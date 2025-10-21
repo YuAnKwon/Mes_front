@@ -280,9 +280,9 @@ export default function WorkOrderSheet() {
               공정 순서
             </Typography>
             <Typography sx={{ fontSize: "15px" }}>
-              총 공정 시간:{" "}
+              총 공정 시간 :{" "}
               <strong>
-                {totalTime}분 ({Math.floor(totalTime / 60)}시간 {totalTime % 60}
+                {Math.floor(totalTime / 60)}시간 {totalTime % 60}분 ({totalTime}
                 분)
               </strong>
             </Typography>

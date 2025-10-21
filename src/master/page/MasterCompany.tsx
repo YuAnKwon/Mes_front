@@ -9,6 +9,7 @@ import {
   DialogTitle,
   IconButton,
   MenuItem,
+  TextField,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import DaumPostcode from "react-daum-postcode";
@@ -43,17 +44,8 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
     setOpenPostcode(true);
   };
 
-  const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
-  const handlePhoneChange =
-    (setter: React.Dispatch<React.SetStateAction<string>>) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.replace(/\D/g, ""); // 숫자만 남기기
-      setter(value);
-    };
+  const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const [companyName, setCompanyName] = useState("");
   const [businessNum, setBusinessNum] = useState("");
@@ -93,12 +85,12 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
 
     const payload: MasterCpRegister = {
       companyName,
-      businessNum: Number(businessNum),
+      businessNum: businessNum,
       companyType,
       ceoName,
-      ceoPhone: Number(ceoPhone),
+      ceoPhone: ceoPhone,
       managerName,
-      managerPhone: Number(managerPhone),
+      managerPhone: managerPhone,
       managerEmail,
       remark,
       zipcode: Number(zipcode),
@@ -203,16 +195,14 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
             <FormLabel htmlFor="ceoPhone" required>
               대표 전화번호
             </FormLabel>
-            <OutlinedInput
+            <TextField
               id="ceoPhone"
               name="ceoPhone"
               value={ceoPhone}
-              onChange={handlePhoneChange(setCeoPhone)}
-              type="tel"
-              placeholder="01012345678"
-              autoComplete="tel"
-              required
+              onChange={(e) => setCeoPhone(e.target.value)}
+              placeholder="010-1234-5678"
               size="small"
+              required
             />
           </FormGrid>
           <FormGrid size={{ xs: 12, md: 6 }}>
@@ -231,36 +221,40 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
               size="small"
             />
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="managerPhone" required>
               담당자 전화번호
             </FormLabel>
-            <OutlinedInput
+            <TextField
               id="managerPhone"
               name="managerPhone"
               value={managerPhone}
-              onChange={handlePhoneChange(setManagerPhone)}
-              type="text"
-              placeholder="01012345678"
-              autoComplete="tel"
-              required
+              onChange={(e) => setManagerPhone(e.target.value)}
+              placeholder="010-1234-5678"
               size="small"
+              required
             />
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="managerEmail" required>
               담당자 이메일
             </FormLabel>
-            <OutlinedInput
+            <TextField
               id="managerEmail"
               name="managerEmail"
               value={managerEmail}
               onChange={(e) => setManagerEmail(e.target.value)}
-              type="email"
               placeholder="example@gmail.com"
-              autoComplete="email"
-              required
               size="small"
+              required
+              error={managerEmail !== "" && !validateEmail(managerEmail)}
+              helperText={
+                managerEmail !== "" && !validateEmail(managerEmail)
+                  ? "올바른 이메일 형식이 아닙니다."
+                  : ""
+              }
             />
           </FormGrid>
           <FormGrid size={{ xs: 12, md: 6 }}>

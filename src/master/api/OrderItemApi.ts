@@ -23,6 +23,7 @@ export const registerOrderItem = async (data: MasterOrItRegister) => {
     color: data.color,
     coatingMethod: data.coatingMethod,
     remark: data.remark,
+    routing: data.routing,
   });
   //JSON을 data라는 파트로 넣음. 서버(백앤드?)에서 @RequestPart("data")로 받음.
   formData.append("data", new Blob([json], { type: "application/json" }));

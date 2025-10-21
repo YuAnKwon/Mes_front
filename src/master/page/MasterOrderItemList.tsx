@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
@@ -10,6 +17,8 @@ import { getMasterOrItList, updateOrItState } from "../api/OrderItemApi";
 import type { MasterOrItList } from "../type";
 import NewSearchBar from "../../common/NewSearchBar";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
+import { CloseIcon } from "flowbite-react";
+import MasterOrderItem from "./MasterOrderItem";
 
 export default function MasterOrderItemList() {
   const navigate = useNavigate();
@@ -38,6 +47,40 @@ export default function MasterOrderItemList() {
     );
 
     setFilteredMaterials(filtered);
+  };
+
+  const [openRegister, setOpenRegister] = useState(false);
+
+  const handleOpenRegister = () => setOpenRegister(true);
+  const handleCloseRegister = () => setOpenRegister(false);
+
+  const handleRegisterComplete = async () => {
+    handleCloseRegister(); // 모달 닫기
+    await loadData(); // 리스트 갱신
+  };
+
+  const loadData = async () => {
+    try {
+      const oiList = await getMasterOrItList();
+
+      // 서버 데이터 → DataGrid rows 형식으로 매핑
+      const mappedRows = oiList.map((item) => ({
+        id: item.id,
+        itemCode: item.itemCode,
+        itemName: item.itemName,
+        company: item.company,
+        type: item.type,
+        unitPrice: item.unitPrice,
+        color: item.color,
+        coatingMethod: item.coatingMethod,
+        remark: item.remark,
+        useYn: item.useYn,
+      }));
+
+      setRows(mappedRows);
+    } catch (error) {
+      console.error("수주품목대상 데이터 조회 실패", error);
+    }
   };
 
   useEffect(() => {
@@ -288,10 +331,6 @@ export default function MasterOrderItemList() {
     XLSX.writeFile(workbook, "수주대상품목_목록(기준정보관리).xlsx");
   };
 
-  const handleRegister = async () => {
-    navigate("/master/orderitem/register");
-  };
-
   return (
     <Box sx={{ p: 2 }}>
       <h2>수주대상품목 조회</h2>
@@ -332,7 +371,7 @@ export default function MasterOrderItemList() {
             variant="outlined"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
-            onClick={handleRegister}
+            onClick={handleOpenRegister}
           >
             수주대상품목 등록
           </Button>
@@ -352,6 +391,7 @@ export default function MasterOrderItemList() {
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
+            sorting: { sortModel: [{ field: "id", sort: "asc" }] },
           }}
           slotProps={{
             basePagination: {
@@ -382,6 +422,17 @@ export default function MasterOrderItemList() {
           }}
         />
       </Box>
+      <Dialog open={openRegister} onClose={handleCloseRegister} maxWidth="lg">
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          수주대상품목 등록
+          <IconButton onClick={handleCloseRegister}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ overflowY: "auto" }}>
+          <MasterOrderItem onRegisterComplete={handleRegisterComplete} />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

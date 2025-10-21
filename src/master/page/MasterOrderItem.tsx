@@ -7,21 +7,36 @@ import {
   MenuItem,
   Select,
   Button,
+  Checkbox,
+  Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Autocomplete, TextField } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import type { MasterOrItRegister } from "../type";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  type DropResult,
+} from "react-beautiful-dnd";
+import type { MasterOrItRegister, MasterRouting } from "../type";
 import { registerOrderItem } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import { getClientList, getSupplierList } from "../api/companyApi";
+import { getClientList } from "../api/companyApi";
+import { getRoutingList } from "../api/RoutingApi";
+import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
   flexDirection: "column",
 }));
 
-export default function MasterOrderItem() {
+interface MasterOrderItemProps {
+  onRegisterComplete?: () => void;
+}
+
+export default function MasterOrderItem({
+  onRegisterComplete,
+}: MasterOrderItemProps) {
   const [company, setCompany] = useState("");
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
@@ -31,6 +46,13 @@ export default function MasterOrderItem() {
   const [color, setColor] = useState("");
   const [remark, setRemark] = useState("");
   const [companyList, setCompanyList] = useState<string[]>([]);
+
+  //서버에서 가져온 전체 공정 리스트
+  const [availableRoutings, setAvailableRoutings] = useState<MasterRouting[]>(
+    []
+  );
+  //사용자가 선택한 공정 목록,
+  const [selectedRoutings, setSelectedRoutings] = useState<MasterRouting[]>([]);
 
   // 거래처 리스트 불러오기
   useEffect(() => {
@@ -46,31 +68,85 @@ export default function MasterOrderItem() {
     fetchCompanies();
   }, []);
 
+  // 공정 리스트 가져오기
+  useEffect(() => {
+    const fetchRoutings = async () => {
+      try {
+        const list = await getRoutingList();
+        setAvailableRoutings(list);
+      } catch (error) {
+        console.error("공정 리스트 불러오기 실패", error);
+      }
+    };
+    fetchRoutings();
+  }, []);
+
   const [imgFiles, setImgFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 미리보기용
+  const [unitPriceError, setUnitPriceError] = useState(false);
 
-  const navigate = useNavigate();
+  // 드래그시 핸들링
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return; // 드롭 위치가 없으면 종료
 
+    const items = Array.from(selectedRoutings);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    // 순서 변경
+    setSelectedRoutings(items);
+  };
+
+  // 체크박스 클릭 시
+  const handleCheck = (routing: MasterRouting, checked: boolean) => {
+    if (checked) {
+      setSelectedRoutings((prev) => [...prev, routing]);
+    } else {
+      setSelectedRoutings((prev) =>
+        prev.filter((r) => r.processCode !== routing.processCode)
+      );
+    }
+  };
   const handleSave = async () => {
+    const missingFields = [];
+
+    if (!company) missingFields.push("거래처명");
+    if (!itemCode) missingFields.push("품목번호");
+    if (!itemName) missingFields.push("품목명");
+    if (!type) missingFields.push("분류");
+    if (!coatingMethod) missingFields.push("도장 방식");
+    if (!unitPrice) missingFields.push("품목단가");
+    if (!color) missingFields.push("색상");
+    if (selectedRoutings.length === 0) missingFields.push("공정 선택");
+
+    if (missingFields.length > 0) {
+      alert(`${missingFields.join(", ")}을(를) 입력해주세요.`);
+      return;
+    }
+
     const payload: MasterOrItRegister = {
-      itemCode: itemCode,
+      itemCode,
       itemName,
       company,
       type,
       unitPrice: Number(unitPrice),
       color,
       coatingMethod,
-      imgUrl: imgFiles, // 서버 전송용
-      routing: [],
+      imgUrl: imgFiles,
+      routing: selectedRoutings.map((r, index) => ({
+        routingId: r.id,
+        routingOrder: index + 1,
+      })),
       remark,
     };
 
     try {
       await registerOrderItem(payload);
+      console.log(payload);
       alert("수주대상품목 등록 완료!");
-      navigate("/master/orderitem/list");
+      onRegisterComplete?.();
     } catch (error) {
-      console.error("수주대상품목 등록 실패", error);
+      console.error("등록 실패", error);
       alert("등록 실패");
     }
   };
@@ -92,49 +168,118 @@ export default function MasterOrderItem() {
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [imgFiles]);
 
+  useEffect(() => {
+    // 거래처 리스트 가져오기
+    const fetchCompanies = async () => {
+      try {
+        const response = await getClientList();
+        const names = response.map((item: any) => item.companyName);
+        setCompanyList(names);
+      } catch (error) {
+        console.error("매입처 목록 불러오기 실패:", error);
+      }
+    };
+    fetchCompanies();
+  }, []);
+
+  const totalMinutes = selectedRoutings.reduce(
+    (sum, r) => sum + Number(r.processTime),
+    0
+  );
+
+  const columns: GridColDef[] = [
+    {
+      field: "check",
+      headerName: "",
+      width: 110,
+      renderCell: (params) => {
+        const checked = selectedRoutings.some(
+          (r) => r.processCode === params.row.processCode
+        );
+        return (
+          <Checkbox
+            checked={checked}
+            onChange={(e) => handleCheck(params.row, e.target.checked)}
+          />
+        );
+      },
+    },
+    {
+      field: "processCode",
+      headerName: "공정코드",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+    },
+    {
+      field: "processName",
+      headerName: "공정명",
+      headerAlign: "center",
+      align: "center",
+      width: 200,
+    },
+    {
+      field: "processTime",
+      headerName: "공정시간(분)",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+    },
+    { field: "remark", headerName: "비고", width: 300, headerAlign: "center" },
+  ];
+
   return (
-    <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>수주대상등록 등록</h2>
-      <Box sx={{ height: 800, width: "100%" }}>
+    <Box sx={{ p: 2, maxWidth: 1000, mx: "auto" }}>
+      <Box sx={{ width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           {/* 거래처명 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="company" required>
               거래처명
             </FormLabel>
-            {/* <Autocomplete
+            <Autocomplete
               freeSolo
               options={companyList}
               value={company}
               onChange={(e, newValue) => setCompany(newValue || "")}
               onInputChange={(e, newInputValue) => setCompany(newInputValue)}
-              ListboxProps={{
-                style: {
-                  maxHeight: 200, // 스크롤 생김
-                  overflowY: "auto",
-                },
+              renderInput={(params) => {
+                // 리스트에 없는 값이면 에러 표시
+                const isError =
+                  company.trim() !== "" && !companyList.includes(company);
+
+                return (
+                  <TextField
+                    {...params}
+                    placeholder="거래처명"
+                    size="small"
+                    required
+                    error={isError}
+                    helperText={
+                      isError ? "등록된 거래처만 선택 가능합니다." : ""
+                    }
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: isError ? "red" : undefined,
+                        },
+                        "&:hover fieldset": {
+                          borderColor: isError ? "red" : undefined,
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: isError ? "red" : undefined,
+                        },
+                      },
+                    }}
+                  />
+                );
               }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="거래처명"
-                  size="small"
-                  required
-                />
-              )}
-            /> */}
-            <OutlinedInput
-              id="company"
-              name="company"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              type="text"
-              placeholder="거래처명"
-              autoComplete="organization"
-              required
-              size="small"
+              ListboxProps={{
+                style: { maxHeight: 200, overflowY: "auto" },
+              }}
             />
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 6 }} />
           {/* 품목번호 */}
           <FormGrid size={{ xs: 12, md: 6 }}>
@@ -240,11 +385,24 @@ export default function MasterOrderItem() {
             <OutlinedInput
               id="unitPrice"
               value={unitPrice}
-              onChange={(e) => setUnitPrice(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setUnitPrice(value);
+                  setUnitPriceError(false);
+                } else {
+                  setUnitPriceError(true);
+                }
+              }}
               placeholder="품목단가"
               size="small"
               required
             />
+            {unitPriceError && (
+              <Typography variant="caption" color="error">
+                숫자만 입력해주세요.
+              </Typography>
+            )}
           </FormGrid>
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="color" required>
@@ -298,6 +456,109 @@ export default function MasterOrderItem() {
             />
           </label>
         </div>
+      </Box>
+
+      {/* 공정 선택 및 드래그 테이블 */}
+      <Box sx={{ mt: 4 }}>
+        <Typography fontWeight="bold">공정 선택</Typography>
+        <Box sx={{ width: "100%", mt: 2 }}>
+          {/* 전체 DataGrid */}
+          <Box sx={{ height: 350 }}>
+            <DataGrid
+              rows={availableRoutings.map((r) => ({ ...r, id: r.id }))}
+              columns={columns}
+              hideFooter
+            />
+          </Box>
+
+          {/* 선택된 공정 (드래그 가능) */}
+          <Box sx={{ mt: 4 }}>
+            <Typography>선택된 공정 (드래그로 순서 조정)</Typography>
+            {/* 헤더 */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "50px 50px 150px 200px 150px 250px",
+                alignItems: "center",
+                p: 1,
+                mt: 1,
+                mb: 1,
+                border: "1px solid #ccc",
+                borderRadius: 1,
+                bgcolor: "#fff",
+                // fontWeight: "bold",
+                textAlign: "center",
+              }}
+            >
+              <span>선택</span>
+              <span>순서</span>
+              <span>공정코드</span>
+              <span>공정명</span>
+              <span>공정시간</span>
+              <span>비고</span>
+            </Box>
+
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="selected-routings">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {selectedRoutings.map((r, index) => (
+                      <Draggable
+                        key={r.processCode}
+                        draggableId={r.processCode}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <Box
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            sx={{
+                              display: "grid",
+                              gridTemplateColumns:
+                                "50px 50px 150px 200px 150px 250px",
+                              alignItems: "center",
+                              textAlign: "center",
+                              p: 1,
+                              mb: 1,
+                              border: "1px solid #ccc",
+                              borderRadius: 1,
+                              bgcolor: "#fff",
+                            }}
+                          >
+                            <Checkbox
+                              checked
+                              onChange={(e) => {
+                                if (!e.target.checked) {
+                                  setSelectedRoutings((prev) =>
+                                    prev.filter(
+                                      (sel) => sel.processCode !== r.processCode
+                                    )
+                                  );
+                                }
+                              }}
+                            />
+                            <span>{index + 1}</span>
+                            <span>{r.processCode}</span>
+                            <span>{r.processName}</span>
+                            <span>{r.processTime}</span>
+                            <span>{r.remark}</span>
+                          </Box>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </Box>
+          {/* 선택된 공정 리스트 아래 */}
+          <Box sx={{ mt: 2 }}>
+            총 공정 시간 : {Math.floor(totalMinutes / 60)}시간{" "}
+            {totalMinutes % 60}분 ({totalMinutes}분)
+          </Box>
+        </Box>
       </Box>
 
       {/* 저장 버튼 */}
