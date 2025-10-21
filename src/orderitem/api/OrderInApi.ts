@@ -82,8 +82,8 @@ export const updateProcessStatus = async (
   data: { startTime: string; completedStatus: string }
 ) => (await axios.put(`${BASE_URL}/orderitem/process/${id}`, data)).data;
 
-// 출하증
-export const getWorkOrder = async (id: number): Promise<WorkOrder[]> => {
+// 작업지시서
+export const getWorkOrder = async (id: number): Promise<WorkOrder> => {
   const response = await axios.get(`${BASE_URL}/orderitem/workorder/${id}`);
   console.log(response.data);
   return response.data;

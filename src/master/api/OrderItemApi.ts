@@ -26,16 +26,7 @@ export const updateOrItState = async (id: number, updatedState: string) => {
 };
 
 export const getOrItDetail = async (id: number) => {
-  const response = await axios.get(
-    `${BASE_URL}/master/orderitem/detail/${id}`,
-    {
-      headers: {
-        // 꼭 필요한 헤더만 추가.요청 파라미터가 너무 길어서 제한 하는 거임.
-        "Content-Type": "application/json",
-        // "Authorization": "Bearer ..." // 필요한 경우만
-      },
-    }
-  );
+  const response = await axios.get(`${BASE_URL}/master/orderitem/detail/${id}`);
   return response.data;
 };
 

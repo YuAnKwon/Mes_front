@@ -265,7 +265,9 @@ export default function OrderInboundList() {
           variant="outlined"
           size="small"
           onClick={() => {
-            navigate(`/orderitem/workorder/${params.row.id}`);
+            navigate(
+              `/orderitem/workorder/${params.row.id}?lotNum=${params.row.lotNum}`
+            );
           }}
         >
           작업지시서

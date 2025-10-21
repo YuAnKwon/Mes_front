@@ -1,4 +1,8 @@
-import type { MasterOrItList, MasterRouting } from "../master/type";
+import type {
+  MasterOrItList,
+  MasterOrItRegister,
+  MasterRouting,
+} from "../master/type";
 
 export type OrderItemList = {
   id: number;
@@ -30,8 +34,15 @@ export type OrderItemOutRegister = {
 
 //작업지시서
 export type WorkOrder = {
-  item: MasterOrItList; // 수주품목 정보
-  processes: MasterRouting[]; // 공정(라우팅) 리스트
+  orderItem: MasterOrItRegister; // 수주품목 정보
+  routingList: {
+    id: number;
+    routingOrder: number; // 순서
+    processCode: string;
+    processName: string;
+    processTime: number;
+    remark: string;
+  }[];
 };
 
 // 출하증

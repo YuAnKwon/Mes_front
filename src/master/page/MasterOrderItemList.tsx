@@ -19,6 +19,7 @@ import NewSearchBar from "../../common/NewSearchBar";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
 import { CloseIcon } from "flowbite-react";
 import MasterOrderItem from "./MasterOrderItem";
+import MasterOrderItemDetail from "./MasterOrderItemDetail";
 
 export default function MasterOrderItemList() {
   const navigate = useNavigate();
@@ -32,6 +33,9 @@ export default function MasterOrderItemList() {
     itemCode: [], //수정
     itemName: [], //수정
   });
+
+  const [openDetail, setOpenDetail] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
 
   const handleSearch = (criteria: string, query: string) => {
     if (!query.trim()) {
@@ -58,6 +62,17 @@ export default function MasterOrderItemList() {
     handleCloseRegister(); // 모달 닫기
     await loadData(); // 리스트 갱신
   };
+
+  const handleOpenDetail = (id: number) => {
+    setSelectedItemId(id);
+    setOpenDetail(true);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedItemId(null);
+    setOpenDetail(false);
+  };
+
   const loadData = async () => {
     try {
       const oiList = await getMasterOrItList();
@@ -169,9 +184,7 @@ export default function MasterOrderItemList() {
               cursor: "pointer",
               fontSize: "inherit",
             }}
-            onClick={() =>
-              navigate(`/master/orderitem/detail/${params.row.id}`)
-            }
+            onClick={() => handleOpenDetail(params.row.id)}
           >
             {params.value}
           </Typography>
@@ -394,7 +407,7 @@ export default function MasterOrderItemList() {
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
           }}
           sortingOrder={["desc", "asc"]}
-          sortModel={[{ field: "id", sort: "desc" }]}
+          // sortModel={[{ field: "id", sort: "desc" }]}
           slotProps={{
             basePagination: {
               material: {
@@ -424,6 +437,8 @@ export default function MasterOrderItemList() {
           }}
         />
       </Box>
+
+      {/* 등록 모달 */}
       <Dialog open={openRegister} onClose={handleCloseRegister} maxWidth="lg">
         <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
           수주대상품목 등록
@@ -433,6 +448,29 @@ export default function MasterOrderItemList() {
         </DialogTitle>
         <DialogContent dividers sx={{ overflowY: "auto" }}>
           <MasterOrderItem onRegisterComplete={handleRegisterComplete} />
+        </DialogContent>
+      </Dialog>
+
+      {/* 등록 상세페이지 */}
+      <Dialog
+        open={openDetail}
+        onClose={handleCloseDetail}
+        maxWidth="lg"
+        // fullWidth
+      >
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          수주대상품목 상세정보
+          <IconButton onClick={handleCloseDetail}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ overflowY: "auto" }}>
+          {selectedItemId && (
+            <MasterOrderItemDetail
+              itemId={selectedItemId}
+              onClose={handleCloseDetail}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Box>

@@ -2,11 +2,10 @@ import FormLabel from "@mui/material/FormLabel";
 import Grid from "@mui/material/Grid";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { styled } from "@mui/material/styles";
-import { Box, MenuItem } from "@mui/material";
+import { Box, Checkbox, MenuItem, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
 import {
   deleteImage,
   getOrItDetail,
@@ -14,16 +13,30 @@ import {
   updateRepImageApi,
 } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
-import type { imgType, MasterOrItRegister } from "../type";
+import type { imgType, MasterOrItRegister, MasterRouting } from "../type";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import type { DropResult } from "react-beautiful-dnd";
+import { getRoutingList } from "../api/RoutingApi";
+import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
   flexDirection: "column",
 }));
 
-export default function MasterOrderItemDetail() {
+interface Props {
+  itemId: number;
+  onClose: () => void;
+}
+
+export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
+  const [imgFiles, setImgFiles] = useState<imgType[]>([]); // 새로 올린 파일
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 전체 미리보기
+  const [availableRoutings, setAvailableRoutings] = useState<MasterRouting[]>(
+    []
+  ); // 전체 공정
+  const [selectedRoutings, setSelectedRoutings] = useState<MasterRouting[]>([]); // 선택된 공정
+
   const [orderItem, setOrderItem] = useState<MasterOrItRegister>({
     itemCode: "",
     itemName: "",
@@ -34,34 +47,40 @@ export default function MasterOrderItemDetail() {
     coatingMethod: "",
     remark: "",
     imgUrl: [],
+    routing: [],
   });
-
-  const [imgFiles, setImgFiles] = useState<imgType[]>([]); // 새로 올린 파일
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // 전체 미리보기
-
-  const navigate = useNavigate();
-  const { id } = useParams();
 
   const handleUpdate = async () => {
     const formData = new FormData();
 
+    // 업데이트된 데이터 담기
+    // selectedRoutings → orderItem.routing에 반영
+    const updatedOrderItem = {
+      ...orderItem,
+      routing: selectedRoutings.map((r, idx) => ({
+        routingId: r.id,
+        routingOrder: idx + 1, // 순서 반영
+      })),
+    };
+
     // JSON 객체를 "data" key로 추가
     formData.append(
       "data",
-      new Blob([JSON.stringify(orderItem)], { type: "application/json" })
+      new Blob([JSON.stringify(updatedOrderItem)], { type: "application/json" })
     );
 
     // 파일 배열을 "imgUrl" key로 추가
     if (imgFiles && imgFiles.length > 0) {
       imgFiles.forEach((img) => {
-        if (img.file) formData.append("imgUrl", img.file); // ✅ file만 append
+        if (img.file) formData.append("imgUrl", img.file);
       });
     }
+    console.log("보내는 데이터:", updatedOrderItem);
 
     try {
       await updateOrItDetail(orderItem.id!, formData); // api 함수 호출
       alert("수정 완료!");
-      navigate("/master/orderitem/list");
+      onClose();
     } catch (error) {
       console.error("수정 실패:", error);
       alert("수정 실패");
@@ -72,21 +91,18 @@ export default function MasterOrderItemDetail() {
   useEffect(() => {
     const fetchOrderItemDetail = async () => {
       try {
-        const response = await getOrItDetail(Number(id));
+        const response = await getOrItDetail(itemId);
         setOrderItem(response);
         console.log("response :", response);
 
+        // 기존 이미지 처리
         if (response.images) {
-          // 기존 이미지도 imgFiles에 추가
           const existingImgs: imgType[] = response.images.map((img: any) => ({
             id: img.id,
             imgUrl: img.imgUrl,
             repYn: img.repYn,
-            // file은 기존 이미지라 undefined
           }));
           setImgFiles(existingImgs);
-
-          // 미리보기용 URL
           const urls = existingImgs.map((img) => img.imgUrl);
           setPreviewUrls(urls);
         }
@@ -95,18 +111,42 @@ export default function MasterOrderItemDetail() {
       }
     };
     fetchOrderItemDetail();
-  }, [id]);
+  }, [itemId]);
+
+  // 공정 리스트 가져오기
+  useEffect(() => {
+    const fetchRoutings = async () => {
+      try {
+        const list = await getRoutingList();
+        setAvailableRoutings(list);
+      } catch (error) {
+        console.error("공정 리스트 불러오기 실패", error);
+      }
+    };
+    fetchRoutings();
+  }, []);
+
+  // availableRoutings와 orderItem.routing 모두 준비되면 selectedRoutings 세팅
+  useEffect(() => {
+    if (availableRoutings.length && orderItem.routing) {
+      const initialSelectedRoutings: MasterRouting[] = orderItem.routing
+        .map((r: any) => availableRoutings.find((ar) => ar.id === r.routingId))
+        .filter((proc): proc is MasterRouting => !!proc) // proc가 MasterRouting임을 TS에게 알림
+        .map((proc, idx) => ({
+          ...proc,
+          routingOrder: orderItem.routing[idx].routingOrder,
+          id: proc.id!,
+        }));
+      setSelectedRoutings(initialSelectedRoutings);
+    }
+  }, [availableRoutings, orderItem.routing]);
 
   // ----------------------------
   // 이미지 미리보기 useEffect
   useEffect(() => {
-    console.log("=== imgFiles 변경됨 ===");
-    console.log("imgFiles:", imgFiles);
-
     const urls = imgFiles.map((img) =>
       img.file ? URL.createObjectURL(img.file) : img.imgUrl
     );
-    console.log("previewUrls 생성:", urls);
     setPreviewUrls(urls);
 
     return () => {
@@ -200,11 +240,70 @@ export default function MasterOrderItemDetail() {
     }
   };
 
-  return (
-    <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>수주대상품목 수정</h2>
+  const handleRoutingDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
 
-      <Box sx={{ height: 800, width: "100%" }}>
+    const items = Array.from(selectedRoutings);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setSelectedRoutings(items);
+  };
+
+  const handleCheck = (routing: MasterRouting, checked: boolean) => {
+    if (checked) {
+      setSelectedRoutings((prev) => [...prev, routing]);
+    } else {
+      setSelectedRoutings((prev) =>
+        prev.filter((r) => r.processCode !== routing.processCode)
+      );
+    }
+  };
+
+  const columns: GridColDef[] = [
+    {
+      field: "check",
+      headerName: "",
+      width: 110,
+      renderCell: (params) => {
+        const checked = selectedRoutings.some(
+          (r) => r.processCode === params.row.processCode
+        );
+        return (
+          <Checkbox
+            checked={checked}
+            onChange={(e) => handleCheck(params.row, e.target.checked)}
+          />
+        );
+      },
+    },
+    {
+      field: "processCode",
+      headerName: "공정코드",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "processName",
+      headerName: "공정명",
+      width: 200,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "processTime",
+      headerName: "공정시간(분)",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    { field: "remark", headerName: "비고", width: 300, headerAlign: "center" },
+  ];
+
+  return (
+    <Box sx={{ p: 2, maxWidth: 1000, mx: "auto" }}>
+      <Box sx={{ width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="company" required>
@@ -413,6 +512,116 @@ export default function MasterOrderItemDetail() {
             )}
           </Droppable>
         </DragDropContext>
+      </Box>
+
+      <Box sx={{ mt: 4 }}>
+        <Typography fontWeight="bold">공정 선택</Typography>
+
+        {/* 전체 공정 DataGrid */}
+        <Box sx={{ height: 350, mt: 2 }}>
+          <DataGrid
+            rows={availableRoutings.map((r) => ({ ...r, id: r.id }))}
+            columns={columns}
+            hideFooter
+          />
+        </Box>
+
+        {/* 선택된 공정 드래그 */}
+        <Box sx={{ mt: 4 }}>
+          <Typography>선택된 공정 (드래그로 순서 조정)</Typography>
+          {/* 헤더 */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "50px 50px 150px 200px 150px 250px",
+              alignItems: "center",
+              p: 1,
+              mt: 1,
+              mb: 1,
+              border: "1px solid #ccc",
+              borderRadius: 1,
+              bgcolor: "#fff",
+              // fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            <span>선택</span>
+            <span>순서</span>
+            <span>공정코드</span>
+            <span>공정명</span>
+            <span>공정시간</span>
+            <span>비고</span>
+          </Box>
+          <DragDropContext onDragEnd={handleRoutingDragEnd}>
+            <Droppable droppableId="selected-routings">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {selectedRoutings.map((r, index) => (
+                    <Draggable
+                      key={r.processCode}
+                      draggableId={r.processCode}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <Box
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          sx={{
+                            display: "grid",
+                            gridTemplateColumns:
+                              "50px 50px 150px 200px 150px 250px",
+                            alignItems: "center",
+                            textAlign: "center",
+                            p: 1,
+                            mb: 1,
+                            border: "1px solid #ccc",
+                            borderRadius: 1,
+                            bgcolor: "#fff",
+                          }}
+                        >
+                          <Checkbox
+                            checked
+                            onChange={(e) => {
+                              if (!e.target.checked) {
+                                setSelectedRoutings((prev) =>
+                                  prev.filter(
+                                    (sel) => sel.processCode !== r.processCode
+                                  )
+                                );
+                              }
+                            }}
+                          />
+                          <span>{index + 1}</span>
+                          <span>{r.processCode}</span>
+                          <span>{r.processName}</span>
+                          <span>{r.processTime}</span>
+                          <span>{r.remark}</span>
+                        </Box>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </Box>
+
+        {/* 총 공정 시간 */}
+        <Box sx={{ mt: 2 }}>
+          총 공정 시간 :{" "}
+          {Math.floor(
+            selectedRoutings.reduce(
+              (sum, r) => sum + Number(r.processTime),
+              0
+            ) / 60
+          )}
+          시간{" "}
+          {selectedRoutings.reduce((sum, r) => sum + Number(r.processTime), 0) %
+            60}
+          분
+        </Box>
       </Box>
 
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>

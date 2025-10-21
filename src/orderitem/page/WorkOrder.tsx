@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Typography,
@@ -11,72 +11,73 @@ import {
   Paper,
   Button,
 } from "@mui/material";
+import { getOrItDetail } from "../../master/api/OrderItemApi";
+import { useLocation, useParams } from "react-router-dom";
+import type { WorkOrder } from "../type";
+import { getWorkOrder } from "../api/OrderInApi";
 
 export default function WorkOrderSheet() {
   const printRef = useRef<HTMLDivElement>(null);
+  const { id } = useParams<{ id: string }>(); // URL에서 id 가져오기
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const lotNum = searchParams.get("lotNum");
 
-  const [workOrder] = useState({
-    item: {
-      lotNumber: "LOT-20241017-001",
-      itemName: "알루미늄 프레임",
-      itemNumber: "AF-100-250",
-      category: "A급 프레임",
-      color: "실버 그레이",
-      paintingMethod: "정전 분체도장",
-      remarks: "표면 품질 A등급 기준",
-      photoUrl:
-        "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=300&h=300&fit=crop",
+  const [workOrder, setWorkOrder] = useState<WorkOrder>({
+    orderItem: {
+      id: 0,
+      itemCode: "",
+      itemName: "",
+      company: "",
+      type: "",
+      unitPrice: 0,
+      color: "",
+      coatingMethod: "",
+      remark: "",
+      imgUrl: [],
+      routing: [],
     },
-    processes: [
-      {
-        code: "LC-10",
-        name: "입고/수입검사",
-        time: 10,
-        remarks: "찍힘, Burr 등 유해한 흠 없을 것",
-      },
-      {
-        code: "LC-20",
-        name: "이물질 제거",
-        time: 15,
-        remarks: "유분/이물질/먼지 제거",
-      },
-      {
-        code: "LC-30",
-        name: "마스킹 1홀(4개소)",
-        time: 20,
-        remarks: "내부마스킹 (홀 마스킹 필름)",
-      },
-      {
-        code: "LC-40",
-        name: "마스킹 2",
-        time: 15,
-        remarks: "바닥면 마스킹 (마스킹 테이프)",
-      },
-      {
-        code: "LC-50",
-        name: "Loading/도장",
-        time: 25,
-        remarks: "도장망 제품 정렬/상부 도장",
-      },
-      { code: "LC-60", name: "건조 1", time: 1440, remarks: "자연건조 1day" },
-      {
-        code: "LC-70",
-        name: "Loading/도장",
-        time: 25,
-        remarks: "제품 반전 / 하부 도장",
-      },
-      { code: "LC-80", name: "건조 2", time: 1440, remarks: "자연건조 1day" },
-      {
-        code: "LC-90",
-        name: "마스킹 제거",
-        time: 15,
-        remarks: "마스킹 테이프/필름 제거",
-      },
-      { code: "LC-100", name: "포장", time: 10, remarks: "비닐 개별포장" },
-    ],
+    routingList: [],
   });
 
-  const totalTime = workOrder.processes.reduce((sum, p) => sum + p.time, 0);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getWorkOrder(Number(id));
+        // 서버 데이터 -> workOrder 형식으로 변환
+        setWorkOrder({
+          orderItem: {
+            ...response.orderItem,
+            imgUrl: response.orderItem.images?.map((img: any) => ({
+              id: img.id,
+              imgUrl: img.imgUrl,
+              repYn: img.repYn,
+            })),
+          },
+          routingList: response.routingList.map((r) => ({
+            id: r.id,
+            routingOrder: r.routingOrder,
+            processCode: r.processCode,
+            processName: r.processName,
+            processTime: r.processTime,
+            remark: r.remark,
+          })),
+        });
+      } catch (error) {
+        console.error("상세 데이터 불러오기 실패:", error);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  const mainImage =
+    workOrder.orderItem.imgUrl?.find((img) => img.repYn === "Y")?.imgUrl || "";
+
+  const totalTime = workOrder.routingList.reduce(
+    (sum, r) => sum + r.processTime,
+    0
+  );
+
   const handlePrint = () => {
     if (!printRef.current) return;
 
@@ -169,7 +170,7 @@ export default function WorkOrderSheet() {
               }}
             >
               <Typography sx={{ fontWeight: "bold", fontSize: "18px" }}>
-                {workOrder.item.lotNumber}
+                {lotNum}
               </Typography>
             </Box>
           </Box>
@@ -198,7 +199,7 @@ export default function WorkOrderSheet() {
           {/* 대표 사진 */}
           <Box sx={{ width: "50%", display: "flex", justifyContent: "center" }}>
             <img
-              src={workOrder.item.photoUrl}
+              src={mainImage}
               alt="제품 이미지"
               style={{ height: "100%", objectFit: "cover" }}
             />
@@ -217,44 +218,42 @@ export default function WorkOrderSheet() {
               <TableBody>
                 <TableRow>
                   <TableCell sx={labelCellStyle}>LOT 번호</TableCell>
-                  <TableCell sx={valueCellStyle}>
-                    {workOrder.item.lotNumber}
-                  </TableCell>
+                  <TableCell sx={valueCellStyle}>{lotNum}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell sx={labelCellStyle}>품목명</TableCell>
                   <TableCell sx={{ ...valueCellStyle, fontWeight: "bold" }}>
-                    {workOrder.item.itemName}
+                    {workOrder.orderItem.itemName}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell sx={labelCellStyle}>품목 번호</TableCell>
                   <TableCell sx={valueCellStyle}>
-                    {workOrder.item.itemNumber}
+                    {workOrder.orderItem.itemCode}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell sx={labelCellStyle}>분류</TableCell>
                   <TableCell sx={valueCellStyle}>
-                    {workOrder.item.category}
+                    {workOrder.orderItem.type}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell sx={labelCellStyle}>색상</TableCell>
                   <TableCell sx={valueCellStyle}>
-                    {workOrder.item.color}
+                    {workOrder.orderItem.color}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell sx={labelCellStyle}>도장 방식</TableCell>
                   <TableCell sx={valueCellStyle}>
-                    {workOrder.item.paintingMethod}
+                    {workOrder.orderItem.coatingMethod}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell sx={labelCellStyle}>비고</TableCell>
                   <TableCell sx={valueCellStyle}>
-                    {workOrder.item.remarks}
+                    {workOrder.orderItem.remark}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -327,18 +326,18 @@ export default function WorkOrderSheet() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {workOrder.processes.map((process, index) => (
-                <TableRow key={index}>
-                  <TableCell sx={cellStyle}>{index + 1}</TableCell>
-                  <TableCell sx={cellStyle}>{process.code}</TableCell>
+              {workOrder.routingList.map((process, index) => (
+                <TableRow key={process.id}>
+                  <TableCell sx={cellStyle}>{process.routingOrder}</TableCell>
+                  <TableCell sx={cellStyle}>{process.processCode}</TableCell>
                   <TableCell sx={{ ...cellStyle, fontWeight: "bold" }}>
-                    {process.name}
+                    {process.processName}
                   </TableCell>
-                  <TableCell sx={cellStyle}>{process.time}</TableCell>
+                  <TableCell sx={cellStyle}>{process.processTime}</TableCell>
                   <TableCell
-                    sx={{ ...cellStyle, textAlign: "left", fontSize: "14px" }}
+                    sx={{ ...cellStyle, textAlign: "left", fontSize: 14 }}
                   >
-                    {process.remarks}
+                    {process.remark}
                   </TableCell>
                   <TableCell sx={cellStyle}></TableCell>
                 </TableRow>
