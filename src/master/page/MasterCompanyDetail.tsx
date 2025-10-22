@@ -25,11 +25,11 @@ const FormGrid = styled(Grid)(() => ({
 }));
 
 interface Props {
-  itemId: number;
+  companyId: number;
   onClose: () => void;
 }
 
-export default function MasterCompanyDetail({ itemId, onClose }: Props) {
+export default function MasterCompanyDetail({ companyId, onClose }: Props) {
   const [companyName, setCompanyName] = useState("");
   const [businessNum, setBusinessNum] = useState("");
   const [companyType, setCompanyType] = useState("");
@@ -43,39 +43,34 @@ export default function MasterCompanyDetail({ itemId, onClose }: Props) {
   const [addressBase, setAddressBase] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
 
-  const [address, setAddress] = useState("");
   const [openPostcode, setOpenPostcode] = useState(false);
-
-  const navigate = useNavigate();
-
-  const { id } = useParams();
 
   //상세 정보 가져오기
   useEffect(() => {
-    const fetchCompanyDetail = async () => {
-      try {
-        const response = await getCompanyDetail(itemId); // ← API 호출
-
-        // 상태에 기존 값 채워 넣기
-        setCompanyName(response.companyName);
-        setBusinessNum(response.businessNum);
-        setCompanyType(response.companyType);
-        setCeoName(response.ceoName);
-        setCeoPhone(response.ceoPhone);
-        setManagerName(response.managerName);
-        setManagerPhone(response.managerPhone);
-        setManagerEmail(response.managerEmail);
-        setRemark(response.remark);
-        setZipcode(response.zipcode);
-        setAddressBase(response.addressBase);
-        setAddressDetail(response.addressDetail);
-      } catch (error) {
-        console.error("업체 정보 불러오기 실패:", error);
-      }
-    };
-
     fetchCompanyDetail();
-  }, [itemId]);
+  }, [companyId]);
+
+  const fetchCompanyDetail = async () => {
+    try {
+      const response = await getCompanyDetail(companyId); // ← API 호출
+
+      // 상태에 기존 값 채워 넣기
+      setCompanyName(response.companyName);
+      setBusinessNum(response.businessNum);
+      setCompanyType(response.companyType);
+      setCeoName(response.ceoName);
+      setCeoPhone(response.ceoPhone);
+      setManagerName(response.managerName);
+      setManagerPhone(response.managerPhone);
+      setManagerEmail(response.managerEmail);
+      setRemark(response.remark);
+      setZipcode(response.zipcode);
+      setAddressBase(response.addressBase);
+      setAddressDetail(response.addressDetail);
+    } catch (error) {
+      console.error("업체 정보 불러오기 실패:", error);
+    }
+  };
 
   const handleComplete = (data) => {
     //data는 주소 검색 전체 결과 객체
@@ -105,9 +100,10 @@ export default function MasterCompanyDetail({ itemId, onClose }: Props) {
     };
 
     try {
-      await updateCompanyDetail(id, payload);
+      await updateCompanyDetail(Number(companyId), payload);
       alert("업체 정보가 수정되었습니다");
       onClose();
+      fetchCompanyDetail();
     } catch (error) {
       console.error(error);
       alert("수정 실패");

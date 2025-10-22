@@ -348,7 +348,7 @@ export default function MasterCompanyList() {
         <DialogContent dividers sx={{ overflowY: "auto" }}>
           {selectedItemId && (
             <MasterCompanyDetail
-              itemId={selectedItemId}
+              companyId={selectedItemId}
               onClose={handleCloseDetail}
             />
           )}

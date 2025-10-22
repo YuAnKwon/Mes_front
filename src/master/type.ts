@@ -94,7 +94,7 @@ export type MasterCpRegister = {
   managerName: string; //담당자
   managerPhone: string; //담당자 전화번호
   managerEmail: string; //담당자 이메일
-  zipcode: number; //우편번호
+  zipcode: string; //우편번호
   addressBase: string; //기업주소
   addressDetail: string; //기업주소 상세
   remark: string; //비고
