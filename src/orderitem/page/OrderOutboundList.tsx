@@ -5,9 +5,8 @@ import {
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
-import { Box, Button, Modal, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, Typography } from "@mui/material";
 import * as XLSX from "xlsx-js-style";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   deleteOrderItemOut,
@@ -20,13 +19,17 @@ import NewSearchBar from "../../common/NewSearchBar";
 import ShipmentInvoice from "./ShipmentInvoice";
 
 export default function OrderOutboundList() {
-  const navigate = useNavigate();
-  const [openInvoice, setOpenInvoice] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const apiRef = useGridApiRef();
   const [filteredMaterials, setFilteredMaterials] = useState<OrderItemList[]>(
     []
   ); //수정
+  const [openInvoice, setOpenInvoice] = useState(false); // 모달 상태 추가
+
+  const handleCloseInvoice = () => {
+    setSelectedId(null);
+    setOpenInvoice(false); // 모달 닫기
+  };
 
   const [autoCompleteMap, setAutoCompleteMap] = useState<
     Record<string, string[]>
@@ -181,11 +184,6 @@ export default function OrderOutboundList() {
   const handleOpenInvoice = (id: number) => {
     setSelectedId(id);
     setOpenInvoice(true);
-  };
-
-  const handleCloseInvoice = () => {
-    setOpenInvoice(false);
-    setSelectedId(null);
   };
 
   const columns: GridColDef[] = [
@@ -435,11 +433,21 @@ export default function OrderOutboundList() {
         />
       </Box>
 
-      <ShipmentInvoice
+      {/* 출하증 모달 */}
+      <Dialog
         open={openInvoice}
         onClose={handleCloseInvoice}
-        id={selectedId}
-      />
+        maxWidth="lg"
+        PaperProps={{ sx: { borderRadius: 2, p: 1 } }}
+      >
+        <DialogContent dividers>
+          <ShipmentInvoice
+            open={openInvoice}
+            onClose={handleCloseInvoice}
+            id={selectedId}
+          />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

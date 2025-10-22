@@ -10,22 +10,16 @@ import OrderInboundList from "./orderitem/page/OrderInboundList";
 import OrderOutboundRegister from "./orderitem/page/OrderOutboundRegister";
 import MasterOrderItemList from "./master/page/MasterOrderItemList";
 import MasterCompanyList from "./master/page/MasterCompanyList";
-import MasterCompany from "./master/page/MasterCompany";
 import OrderOutboundList from "./orderitem/page/OrderOutboundList";
-import ShipmentInvoice from "./orderitem/page/ShipmentInvoice";
 import { MaterialOutboundRegister } from "./material/page/MaterialOutboundRegister";
 import MasterCompanyDetail from "./master/page/MasterCompanyDetail";
 import { MaterialOutboundList } from "./material/page/MaterialOutboundList";
-
 import MasterMaterialList from "./master/page/MasterMaterialList";
-import MasterMaterial from "./master/page/MasterMaterial";
 import MasterMaterialDetail from "./master/page/MasterMaterialDetail";
 import MasterOrderItem from "./master/page/MasterOrderItem";
 import MasterRoutingList from "./master/page/MasterRoutingList";
 import { MaterialTotalStock } from "./material/page/MaterialTotalStock";
 import OrderProcess from "./orderitem/page/OrderProcess";
-import WorkOrder from "./orderitem/page/WorkOrder";
-import MasterOrderItemDetail from "./master/page/MasterOrderItemDetail";
 
 function App() {
   return (
@@ -53,9 +47,7 @@ function App() {
               path="/orderitem/outbound/list"
               element={<OrderOutboundList />}
             />
-            <Route path="/shipmentInvoice/:id" element={<ShipmentInvoice />} />
             <Route path="/orderitem/process/:id" element={<OrderProcess />} />
-            <Route path="/orderitem/workorder/:id" element={<WorkOrder />} />
 
             {/* 원자재 */}
             <Route
@@ -84,10 +76,7 @@ function App() {
               path="/master/company/list"
               element={<MasterCompanyList />}
             />
-            <Route
-              path="/master/company/register"
-              element={<MasterCompany />}
-            />
+
             <Route
               path="/master/company/detail/:id"
               element={<MasterCompanyDetail />}
@@ -97,10 +86,7 @@ function App() {
               path="/master/material/list"
               element={<MasterMaterialList />}
             />
-            <Route
-              path="/master/material/register"
-              element={<MasterMaterial />}
-            />
+
             <Route
               path="/master/material/detail/:id"
               element={<MasterMaterialDetail />}
@@ -114,19 +100,9 @@ function App() {
               element={<MasterOrderItem />}
             />
             <Route
-              path="/master/orderitem/detail/:id"
-              element={<MasterOrderItemDetail />}
-            />
-            {/*
-            <Route path="/master/routing" element={<MasterRouting />} />
-            <Route path="/master/company" element={<MasterCompany />} />  */}
-            {/* <Route path="/master/orderitem" element={<MasterOrderItem />} />*/}
-
-            <Route
               path="/master/routing/list"
               element={<MasterRoutingList />}
             />
-            {/*<Route path="/master/company" element={<MasterCompany />} />  */}
           </Routes>
         </div>
       </div>

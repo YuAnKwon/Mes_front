@@ -5,7 +5,15 @@ import {
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
-import { Box, Button, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import * as XLSX from "xlsx-js-style";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -17,6 +25,8 @@ import {
 import type { OrderItemList } from "../type";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
 import NewSearchBar from "../../common/NewSearchBar";
+import { CloseIcon } from "flowbite-react";
+import WorkOrder from "./WorkOrder";
 
 export default function OrderInboundList() {
   const navigate = useNavigate();
@@ -24,6 +34,17 @@ export default function OrderInboundList() {
   const [filteredMaterials, setFilteredMaterials] = useState<OrderItemList[]>(
     []
   );
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedLotNum, setSelectedLotNum] = useState<string>("");
+
+  const handleOpenWorkOrder = (id: number, lotNum: string) => {
+    setSelectedId(id);
+    setSelectedLotNum(lotNum);
+    setOpenModal(true);
+  };
+
+  const handleClose = () => setOpenModal(false);
   const [autoCompleteMap, setAutoCompleteMap] = useState<
     Record<string, string[]>
   >({
@@ -264,11 +285,7 @@ export default function OrderInboundList() {
         <Button
           variant="outlined"
           size="small"
-          onClick={() => {
-            navigate(
-              `/orderitem/workorder/${params.row.id}?lotNum=${params.row.lotNum}`
-            );
-          }}
+          onClick={() => handleOpenWorkOrder(params.row.id, params.row.lotNum)}
         >
           작업지시서
         </Button>
@@ -447,6 +464,21 @@ export default function OrderInboundList() {
           }}
         />
       </Box>
+
+      {/* ✅ 모달 추가 */}
+      <Dialog
+        open={openModal}
+        onClose={handleClose}
+        // fullWidth
+
+        maxWidth="lg"
+        PaperProps={{ sx: { borderRadius: 2, p: 1 } }}
+      >
+        <DialogContent dividers sx={{}}>
+          {" "}
+          {selectedId && <WorkOrder id={selectedId} lotNum={selectedLotNum} />}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

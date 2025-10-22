@@ -45,43 +45,50 @@ export default function ShipmentInvoice({
   const handlePrint = () => {
     if (!printRef.current) return;
 
-    // 사이드바, 다른 요소 숨기기
+    const tempPrint = document.createElement("div");
+    tempPrint.id = "print-area-temp";
+
+    // 모달 스타일 완전히 제거, 인쇄용 고정
+    tempPrint.style.position = "absolute";
+    tempPrint.style.top = "0";
+    tempPrint.style.left = "0";
+    tempPrint.style.width = "100%";
+    tempPrint.style.boxSizing = "border-box";
+    tempPrint.style.backgroundColor = "#fff";
+    tempPrint.style.visibility = "visible";
+
+    const clone = printRef.current.cloneNode(true) as HTMLElement;
+
+    // 클론 안쪽 Box 폭 100% + 테이블 폭 100%
+    clone.style.width = "100%";
+    clone.querySelectorAll("table").forEach((t) => {
+      (t as HTMLElement).style.width = "100%";
+      (t as HTMLElement).style.borderCollapse = "collapse";
+    });
+
+    tempPrint.appendChild(clone);
+    document.body.appendChild(tempPrint);
+
     const style = document.createElement("style");
     style.innerHTML = `
-   @media print {
-      body * {
-        visibility: hidden !important;
-      }
-
-      #print-area, #print-area * {
-        visibility: visible !important;
-      }
-
-      #print-area {
-        position: relative !important;
-        left: 0;
+    @media print {
+      body * { visibility: hidden; margin:0; padding:0; }
+      #print-area-temp, #print-area-temp * { visibility: visible; }
+      #print-area-temp {
+        position: absolute;
         top: 0;
-        width: 285mm !important; /* ✅ 실제 A4 landscape 폭보다 약간 작게 */
-        max-width: 285mm !important;
-        height: auto !important;
-        overflow: visible !important;
-        page-break-inside: avoid !important;
-        margin: 0 auto;
-        transform: scale(0.95); /* ✅ 한 페이지에 정확히 맞춤 */
-        transform-origin: top center;
-        background: white;
+        left: 0;
+        width: 210mm;
+        box-sizing: border-box;
       }
-
-      html, body {
-        height: auto !important;
-        overflow: visible !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white !important;
+      table, tr, td, th { 
+        page-break-inside: auto !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
-
-      @page {
-        size: A4 landscape; /* ✅ 기본 가로 출력 */
+      img { max-width: 100%; height: auto; }
+      @page { 
+        size: A4 portrait;
         margin: 10mm;
       }
     }
@@ -90,6 +97,7 @@ export default function ShipmentInvoice({
 
     window.print();
 
+    document.body.removeChild(tempPrint);
     document.head.removeChild(style);
   };
 

@@ -11,18 +11,16 @@ import {
   Paper,
   Button,
 } from "@mui/material";
-import { getOrItDetail } from "../../master/api/OrderItemApi";
-import { useLocation, useParams } from "react-router-dom";
 import type { WorkOrder } from "../type";
 import { getWorkOrder } from "../api/OrderInApi";
 
-export default function WorkOrderSheet() {
-  const printRef = useRef<HTMLDivElement>(null);
-  const { id } = useParams<{ id: string }>(); // URL에서 id 가져오기
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const lotNum = searchParams.get("lotNum");
+interface Props {
+  id: number;
+  lotNum: string;
+}
 
+export default function WorkOrder({ id, lotNum }: Props) {
+  const printRef = useRef<HTMLDivElement>(null);
   const [workOrder, setWorkOrder] = useState<WorkOrder>({
     orderItem: {
       id: 0,
@@ -43,8 +41,7 @@ export default function WorkOrderSheet() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getWorkOrder(Number(id));
-        // 서버 데이터 -> workOrder 형식으로 변환
+        const response = await getWorkOrder(id);
         setWorkOrder({
           orderItem: {
             ...response.orderItem,
@@ -54,25 +51,26 @@ export default function WorkOrderSheet() {
               repYn: img.repYn,
             })),
           },
-          routingList: response.routingList.map((r) => ({
-            id: r.id,
-            routingOrder: r.routingOrder,
-            processCode: r.processCode,
-            processName: r.processName,
-            processTime: r.processTime,
-            remark: r.remark,
-          })),
+          routingList: response.routingList
+            .map((r) => ({
+              id: r.id,
+              routingOrder: r.routingOrder,
+              processCode: r.processCode,
+              processName: r.processName,
+              processTime: r.processTime,
+              remark: r.remark,
+            }))
+            .sort((a, b) => a.routingOrder - b.routingOrder),
         });
       } catch (error) {
         console.error("상세 데이터 불러오기 실패:", error);
       }
     };
-    fetchData();
+    if (id) fetchData();
   }, [id]);
 
   const mainImage =
     workOrder.orderItem.imgUrl?.find((img) => img.repYn === "Y")?.imgUrl || "";
-
   const totalTime = workOrder.routingList.reduce(
     (sum, r) => sum + r.processTime,
     0
@@ -118,7 +116,7 @@ export default function WorkOrderSheet() {
     border: "1px solid #999",
     textAlign: "center",
     fontSize: "16px",
-    py: 1.3,
+    py: 1.2,
     px: 1,
   };
 
@@ -133,6 +131,33 @@ export default function WorkOrderSheet() {
     ...cellStyle,
     textAlign: "left",
     pl: 2,
+  };
+
+  // enum → 한글 변환 함수
+  const formatType = (type: string) => {
+    switch (type) {
+      case "GENERAL":
+        return "일반";
+      case "CAR":
+        return "자동차";
+      case "SHIPBUILDING":
+        return "조선";
+      case "DEFENSE":
+        return "방산";
+      default:
+        return "기타";
+    }
+  };
+
+  const formatCoating = (coating: string) => {
+    switch (coating) {
+      case "POWDER":
+        return "분체";
+      case "LIQUID":
+        return "액체";
+      default:
+        return "기타";
+    }
   };
 
   return (
@@ -197,12 +222,29 @@ export default function WorkOrderSheet() {
 
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
           {/* 대표 사진 */}
-          <Box sx={{ width: "50%", display: "flex", justifyContent: "center" }}>
-            <img
-              src={mainImage}
-              alt="제품 이미지"
-              style={{ height: "100%", objectFit: "cover" }}
-            />
+          <Box
+            sx={{
+              width: "50%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {mainImage ? (
+              <img
+                src={mainImage}
+                alt="제품 이미지"
+                style={{ height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <Typography
+                sx={{
+                  color: "#999",
+                }}
+              >
+                등록된 이미지가 없습니다
+              </Typography>
+            )}
           </Box>
 
           {/* 품목 정보 테이블 */}
@@ -235,7 +277,7 @@ export default function WorkOrderSheet() {
                 <TableRow>
                   <TableCell sx={labelCellStyle}>분류</TableCell>
                   <TableCell sx={valueCellStyle}>
-                    {workOrder.orderItem.type}
+                    {formatType(workOrder.orderItem.type)}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -247,7 +289,7 @@ export default function WorkOrderSheet() {
                 <TableRow>
                   <TableCell sx={labelCellStyle}>도장 방식</TableCell>
                   <TableCell sx={valueCellStyle}>
-                    {workOrder.orderItem.coatingMethod}
+                    {formatCoating(workOrder.orderItem.coatingMethod)}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -311,9 +353,9 @@ export default function WorkOrderSheet() {
                   공정명
                 </TableCell>
                 <TableCell
-                  sx={{ ...cellStyle, fontWeight: "bold", width: "12%" }}
+                  sx={{ ...cellStyle, fontWeight: "bold", width: "15%" }}
                 >
-                  공정 시간(분)
+                  공정 시간 (분)
                 </TableCell>
                 <TableCell sx={{ ...cellStyle, fontWeight: "bold" }}>
                   비고
@@ -328,7 +370,7 @@ export default function WorkOrderSheet() {
             <TableBody>
               {workOrder.routingList.map((process, index) => (
                 <TableRow key={process.id}>
-                  <TableCell sx={cellStyle}>{process.routingOrder}</TableCell>
+                  <TableCell sx={cellStyle}>{index + 1}</TableCell>
                   <TableCell sx={cellStyle}>{process.processCode}</TableCell>
                   <TableCell sx={{ ...cellStyle, fontWeight: "bold" }}>
                     {process.processName}
