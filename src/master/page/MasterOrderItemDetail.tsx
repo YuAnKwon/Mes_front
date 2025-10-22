@@ -13,7 +13,6 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import type { DropResult } from "react-beautiful-dnd";
 import { getRoutingList } from "../api/RoutingApi";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import { useNavigate, useParams } from "react-router-dom";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -56,6 +55,7 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
       images: imgFiles.map((img, index) => ({
         id: img.id ?? null, // 기존 이미지면 id 있음
         repYn: index === 0 ? "Y" : "N", // 첫 번째 이미지를 대표로 설정
+        imgOriName: img.imgOriName,
       })),
       routing: selectedRoutings.map((r, idx) => ({
         routingId: r.id,

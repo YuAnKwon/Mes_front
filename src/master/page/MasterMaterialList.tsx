@@ -11,7 +11,6 @@ import {
   Typography,
 } from "@mui/material";
 import Pagination from "../../common/Pagination";
-import { useNavigate } from "react-router-dom";
 import type { MasterMtList } from "../type";
 import { getMasterMtList, updateMaterialState } from "../api/MaterialApi";
 import { CloseIcon } from "flowbite-react";
@@ -19,9 +18,9 @@ import MasterMaterial from "./MasterMaterial";
 import NewSearchBar from "../../common/NewSearchBar";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
 import * as XLSX from "xlsx-js-style";
+import MasterMaterialDetail from "./MasterMaterialDetail";
 
 export default function MasterMaterialList() {
-  const navigate = useNavigate();
   const [openRegister, setOpenRegister] = useState(false);
   const [filteredMaterials, setFilteredMaterials] = useState<MasterMtList[]>(
     []
@@ -136,7 +135,7 @@ export default function MasterMaterialList() {
               cursor: "pointer",
               fontSize: "inherit",
             }}
-            onClick={() => navigate(`/master/material/detail/${params.row.id}`)}
+            onClick={() => handleOpenDetail(params.row.id)}
           >
             {params.value}
           </Typography>
@@ -298,6 +297,19 @@ export default function MasterMaterialList() {
     XLSX.writeFile(workbook, "원자재_목록(기준정보관리).xlsx");
   };
 
+  const [openDetail, setOpenDetail] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+
+  const handleOpenDetail = (id: number) => {
+    setSelectedItemId(id);
+    setOpenDetail(true);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedItemId(null);
+    setOpenDetail(false);
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <h2>원자재 조회</h2>
@@ -381,6 +393,29 @@ export default function MasterMaterialList() {
         </DialogTitle>
         <DialogContent dividers sx={{ overflowY: "auto" }}>
           <MasterMaterial onRegisterComplete={handleRegisterComplete} />
+        </DialogContent>
+      </Dialog>
+
+      {/* 등록 상세페이지 */}
+      <Dialog
+        open={openDetail}
+        onClose={handleCloseDetail}
+        maxWidth="lg"
+        // fullWidth
+      >
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          수주대상품목 상세정보
+          <IconButton onClick={handleCloseDetail}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ overflowY: "auto" }}>
+          {selectedItemId && (
+            <MasterMaterialDetail
+              itemId={selectedItemId}
+              onClose={handleCloseDetail}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Box>

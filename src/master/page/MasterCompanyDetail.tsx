@@ -24,7 +24,12 @@ const FormGrid = styled(Grid)(() => ({
   flexDirection: "column",
 }));
 
-export default function MasterCompanyDetail() {
+interface Props {
+  itemId: number;
+  onClose: () => void;
+}
+
+export default function MasterCompanyDetail({ itemId, onClose }: Props) {
   const [companyName, setCompanyName] = useState("");
   const [businessNum, setBusinessNum] = useState("");
   const [companyType, setCompanyType] = useState("");
@@ -45,10 +50,11 @@ export default function MasterCompanyDetail() {
 
   const { id } = useParams();
 
+  //상세 정보 가져오기
   useEffect(() => {
     const fetchCompanyDetail = async () => {
       try {
-        const response = await getCompanyDetail(id); // ← API 호출
+        const response = await getCompanyDetail(itemId); // ← API 호출
 
         // 상태에 기존 값 채워 넣기
         setCompanyName(response.companyName);
@@ -69,7 +75,7 @@ export default function MasterCompanyDetail() {
     };
 
     fetchCompanyDetail();
-  }, [id]);
+  }, [itemId]);
 
   const handleComplete = (data) => {
     //data는 주소 검색 전체 결과 객체
@@ -101,7 +107,7 @@ export default function MasterCompanyDetail() {
     try {
       await updateCompanyDetail(id, payload);
       alert("업체 정보가 수정되었습니다");
-      navigate("/master/company/list");
+      onClose();
     } catch (error) {
       console.error(error);
       alert("수정 실패");

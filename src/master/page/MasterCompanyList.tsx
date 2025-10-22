@@ -13,7 +13,6 @@ import {
   IconButton,
 } from "@mui/material";
 import Pagination from "../../common/Pagination";
-import { useNavigate } from "react-router-dom";
 import type { MasterCpList } from "../type";
 import {
   getClientList,
@@ -24,9 +23,9 @@ import {
 import SearchBar from "../../common/SearchBar";
 import MasterCompany from "./MasterCompany";
 import CloseIcon from "@mui/icons-material/Close";
+import MasterCompanyDetail from "./MasterCompanyDetail";
 
 export default function MasterCompanyList() {
-  const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState<number>(0);
   const [rows, setRows] = useState<MasterCpList[]>([]);
   const [openRegister, setOpenRegister] = useState(false); // ✅ 등록 모달 상태 추가
@@ -113,7 +112,7 @@ export default function MasterCompanyList() {
         >
           <Typography
             sx={{ textDecoration: "underline", cursor: "pointer" }}
-            onClick={() => navigate(`/master/company/detail/${params.row.id}`)}
+            onClick={() => handleOpenDetail(params.row.id)}
           >
             {params.value}
           </Typography>
@@ -248,6 +247,19 @@ export default function MasterCompanyList() {
       ? rows
       : rows.filter((row) => row.companyType === tabList[currentTab]);
 
+  const [openDetail, setOpenDetail] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+
+  const handleOpenDetail = (id: number) => {
+    setSelectedItemId(id);
+    setOpenDetail(true);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedItemId(null);
+    setOpenDetail(false);
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h5" sx={{ mb: 1 }}>
@@ -317,6 +329,29 @@ export default function MasterCompanyList() {
         </DialogTitle>
         <DialogContent dividers sx={{ maxHeight: "80vh", overflowY: "auto" }}>
           <MasterCompany onRegisterComplete={handleRegisterComplete} />
+        </DialogContent>
+      </Dialog>
+
+      {/* 상세페이지 */}
+      <Dialog
+        open={openDetail}
+        onClose={handleCloseDetail}
+        maxWidth="lg"
+        // fullWidth
+      >
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          업체 상세정보
+          <IconButton onClick={handleCloseDetail}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ overflowY: "auto" }}>
+          {selectedItemId && (
+            <MasterCompanyDetail
+              itemId={selectedItemId}
+              onClose={handleCloseDetail}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Box>
