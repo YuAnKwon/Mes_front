@@ -46,25 +46,6 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
     routing: [],
   });
 
-  // const handleUpdate = async () => {
-  //   const formData = new FormData();
-
-  //   // 업데이트된 데이터 담기
-  //   // selectedRoutings → orderItem.routing에 반영
-  //   const updatedOrderItem = {
-  //     ...orderItem,
-  // routing: selectedRoutings.map((r, idx) => ({
-  //   routingId: r.id,
-  //   routingOrder: idx + 1, // 순서 반영
-  // })),
-  //   };
-
-  //   // JSON 객체를 "data" key로 추가
-  //   formData.append(
-  //     "data",
-  //     new Blob([JSON.stringify(updatedOrderItem)], { type: "application/json" })
-  //   );
-
   //이미지파일 덮어쓰기를 위한 기존, 새 이미지 전송
   const handleUpdate = async () => {
     const formData = new FormData();
