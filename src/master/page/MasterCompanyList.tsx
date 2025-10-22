@@ -255,9 +255,13 @@ export default function MasterCompanyList() {
     setOpenDetail(true);
   };
 
-  const handleCloseDetail = () => {
+  const handleCloseDetail = async (refresh = false) => {
     setSelectedItemId(null);
     setOpenDetail(false);
+
+    if (refresh) {
+      await loadData(); // 모달 수정 후 테이블 갱신
+    }
   };
 
   return (

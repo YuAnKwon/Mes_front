@@ -66,11 +66,14 @@ export default function MasterOrderItemList() {
     setOpenDetail(true);
   };
 
-  const handleCloseDetail = () => {
+  const handleCloseDetail = async (refresh = false) => {
     setSelectedItemId(null);
     setOpenDetail(false);
-  };
 
+    if (refresh) {
+      await loadData(); // 모달 수정 후 테이블 갱신
+    }
+  };
   //loadData와 useEffect안의 FetchData 통합
   const loadData = async () => {
     try {
@@ -124,6 +127,7 @@ export default function MasterOrderItemList() {
       // 3. 상태 갱신
       setRows(refreshedRows);
 
+      await loadData();
       alert("거래 상태가 변경되었습니다");
     } catch (error) {
       console.error(error);

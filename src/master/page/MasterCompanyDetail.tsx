@@ -16,7 +16,7 @@ import DaumPostcode from "react-daum-postcode";
 import { useEffect, useState } from "react";
 import { CloseIcon } from "flowbite-react";
 import { Select } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getCompanyDetail, updateCompanyDetail } from "../api/companyApi";
 
 const FormGrid = styled(Grid)(() => ({
@@ -25,11 +25,11 @@ const FormGrid = styled(Grid)(() => ({
 }));
 
 interface Props {
-  itemId: number;
-  onClose: () => void;
+  companyId: number;
+  onClose: (refresh?: boolean) => void; // refresh 옵션 추가
 }
 
-export default function MasterCompanyDetail({ itemId, onClose }: Props) {
+export default function MasterCompanyDetail({ companyId, onClose }: Props) {
   const [companyName, setCompanyName] = useState("");
   const [businessNum, setBusinessNum] = useState("");
   const [companyType, setCompanyType] = useState("");
@@ -42,11 +42,7 @@ export default function MasterCompanyDetail({ itemId, onClose }: Props) {
   const [zipcode, setZipcode] = useState("");
   const [addressBase, setAddressBase] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
-
-  const [address, setAddress] = useState("");
   const [openPostcode, setOpenPostcode] = useState(false);
-
-  const navigate = useNavigate();
 
   const { id } = useParams();
 
@@ -54,7 +50,7 @@ export default function MasterCompanyDetail({ itemId, onClose }: Props) {
   useEffect(() => {
     const fetchCompanyDetail = async () => {
       try {
-        const response = await getCompanyDetail(itemId); // ← API 호출
+        const response = await getCompanyDetail(companyId); // ← API 호출
 
         // 상태에 기존 값 채워 넣기
         setCompanyName(response.companyName);
@@ -75,7 +71,7 @@ export default function MasterCompanyDetail({ itemId, onClose }: Props) {
     };
 
     fetchCompanyDetail();
-  }, [itemId]);
+  }, [companyId]);
 
   const handleComplete = (data) => {
     //data는 주소 검색 전체 결과 객체
@@ -105,9 +101,9 @@ export default function MasterCompanyDetail({ itemId, onClose }: Props) {
     };
 
     try {
-      await updateCompanyDetail(id, payload);
+      await updateCompanyDetail(companyId, payload);
       alert("업체 정보가 수정되었습니다");
-      onClose();
+      onClose(true); // true 전달 → 테이블 갱신
     } catch (error) {
       console.error(error);
       alert("수정 실패");
