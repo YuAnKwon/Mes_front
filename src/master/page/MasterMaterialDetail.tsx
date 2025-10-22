@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
 import { getMaterialDetail, updateMaterialDetail } from "../api/MaterialApi";
+import type { MasterMtRegister } from "../type";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -19,31 +20,26 @@ interface Props {
 }
 
 export default function MasterMaterialDetail({ itemId, onClose }: Props) {
-  const [materialCode, setMaterialCode] = useState("");
-  const [materialName, setMaterialName] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [type, setType] = useState("");
-  const [color, setColor] = useState("");
-  const [spec, setSpec] = useState("");
-  const [scale, setScale] = useState("");
-  const [manufacturer, setManufacturer] = useState("");
-  const [remark, setRemark] = useState("");
+  const [material, setMaterial] = useState<MasterMtRegister>({
+    materialName: "",
+    materialCode: "",
+    companyName: "",
+    type: "",
+    color: "",
+    spec: 0,
+    scale: "",
+    manufacturer: "",
+    remark: "",
+  });
 
+  //상세정보 불러오기
   useEffect(() => {
     const fetchMaterialDetail = async () => {
       try {
         const response = await getMaterialDetail(itemId); // ← API 호출
 
         // 상태에 기존 값 채워 넣기
-        setMaterialCode(response.materialCode);
-        setMaterialName(response.materialName);
-        setCompanyName(response.companyName);
-        setType(response.type);
-        setColor(response.color);
-        setSpec(response.spec);
-        setScale(response.scale);
-        setManufacturer(response.manufacturer);
-        setRemark(response.remark);
+        setMaterial(response);
       } catch (error) {
         console.error("업체 정보 불러오기 실패:", error);
       }
@@ -53,20 +49,8 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
   }, [itemId]);
 
   const handleUpdate = async () => {
-    const payload = {
-      materialCode,
-      materialName,
-      companyName,
-      type,
-      color,
-      spec,
-      scale,
-      manufacturer,
-      remark,
-    };
-
     try {
-      await updateMaterialDetail(itemId, payload);
+      await updateMaterialDetail(itemId, material);
       alert("원자재 수정 완료!");
       onClose(true); // true 전달 → 테이블 갱신
     } catch (error) {
@@ -88,8 +72,13 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <OutlinedInput
               id="companyName"
               name="companyName"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
+              value={material.companyName}
+              onChange={(e) =>
+                setMaterial((prev) => ({
+                  ...prev,
+                  companyName: e.target.value,
+                }))
+              }
               type="text"
               placeholder="매입명"
               autoComplete="organization"
@@ -105,8 +94,13 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <OutlinedInput
               id="materialCode"
               name="materialCode"
-              value={materialCode}
-              onChange={(e) => setMaterialCode(e.target.value)}
+              value={material.materialCode}
+              onChange={(e) =>
+                setMaterial((prev) => ({
+                  ...prev,
+                  materialCode: e.target.value,
+                }))
+              }
               type="text"
               placeholder="품목번호"
               autoComplete="on"
@@ -121,8 +115,13 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <OutlinedInput
               id="materialName"
               name="materialName"
-              value={materialName}
-              onChange={(e) => setMaterialName(e.target.value)}
+              value={material.materialName}
+              onChange={(e) =>
+                setMaterial((prev) => ({
+                  ...prev,
+                  materialName: e.target.value,
+                }))
+              }
               type="text"
               placeholder="품목명"
               autoComplete="on"
@@ -138,8 +137,10 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <Select
               id="type"
               name="type"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
+              value={material.type}
+              onChange={(e) =>
+                setMaterial((prev) => ({ ...prev, type: e.target.value }))
+              }
               displayEmpty
               input={<OutlinedInput />}
               size="small"
@@ -162,8 +163,10 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <OutlinedInput
               id="color"
               name="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
+              value={material.color}
+              onChange={(e) =>
+                setMaterial((prev) => ({ ...prev, color: e.target.value }))
+              }
               type="text"
               placeholder="색상"
               autoComplete="on"
@@ -178,8 +181,13 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <OutlinedInput
               id="spec"
               name="spec"
-              value={spec}
-              onChange={(e) => setSpec(e.target.value)}
+              value={material.spec}
+              onChange={(e) =>
+                setMaterial((prev) => ({
+                  ...prev,
+                  spec: Number(e.target.value),
+                }))
+              }
               type="text"
               placeholder="규격"
               autoComplete="on"
@@ -194,8 +202,10 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <OutlinedInput
               id="scale"
               name="scale"
-              value={scale}
-              onChange={(e) => setScale(e.target.value)}
+              value={material.scale}
+              onChange={(e) =>
+                setMaterial((prev) => ({ ...prev, scale: e.target.value }))
+              }
               type="text"
               placeholder="규격단위"
               autoComplete="on"
@@ -210,8 +220,13 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <OutlinedInput
               id="manufacturer"
               name="manufacturer"
-              value={manufacturer}
-              onChange={(e) => setManufacturer(e.target.value)}
+              value={material.manufacturer}
+              onChange={(e) =>
+                setMaterial((prev) => ({
+                  ...prev,
+                  manufacturer: e.target.value,
+                }))
+              }
               type="text"
               placeholder="제조사"
               autoComplete="organization"
@@ -224,8 +239,10 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
             <OutlinedInput
               id="remark"
               name="remark"
-              value={remark}
-              onChange={(e) => setRemark(e.target.value)}
+              value={material.remark}
+              onChange={(e) =>
+                setMaterial((prev) => ({ ...prev, remark: e.target.value }))
+              }
               type="text"
               placeholder="비고"
               autoComplete="off"

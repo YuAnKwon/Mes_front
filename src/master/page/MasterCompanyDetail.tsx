@@ -16,7 +16,6 @@ import DaumPostcode from "react-daum-postcode";
 import { useEffect, useState } from "react";
 import { CloseIcon } from "flowbite-react";
 import { Select } from "@mui/material";
-import { useParams } from "react-router-dom";
 import { getCompanyDetail, updateCompanyDetail } from "../api/companyApi";
 import type { MasterCpRegister } from "../type";
 
