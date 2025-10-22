@@ -26,6 +26,7 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
   const [type, setType] = useState("");
   const [color, setColor] = useState("");
   const [spec, setSpec] = useState("");
+  const [specError, setSpecError] = useState(false); // 에러 상태
   const [scale, setScale] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [remark, setRemark] = useState("");
@@ -46,6 +47,27 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
   }, []);
 
   const handleSave = async () => {
+    // 필수값 체크
+    if (
+      !companyName ||
+      !materialCode ||
+      !materialName ||
+      !type ||
+      !color ||
+      !spec ||
+      !scale ||
+      !manufacturer
+    ) {
+      alert("모든 필수 항목을 입력해주세요.");
+      return;
+    }
+
+    // 규격이 숫자인지 확인
+    if (!/^\d+$/.test(spec)) {
+      alert("규격에는 숫자만 입력해주세요.");
+      return;
+    }
+
     const payload: MasterMtRegister = {
       materialCode,
       materialName,
@@ -63,8 +85,12 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
       alert("원자재 등록 완료!");
       onRegisterComplete();
     } catch (error) {
-      console.error("원자재 등록 실패", error);
-      alert("등록 실패");
+      if (error.response?.data?.message?.includes("이미 존재하는 품목번호")) {
+        alert("이미 존재하는 품목번호입니다.");
+      } else {
+        console.error("등록 실패", error);
+        alert("등록 실패");
+      }
     }
   };
 
@@ -215,14 +241,29 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
               id="spec"
               name="spec"
               value={spec}
-              onChange={(e) => setSpec(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // 숫자만 허용 (빈 값도 가능)
+                if (/^\d*$/.test(value)) {
+                  setSpec(value);
+                  setSpecError(false);
+                } else {
+                  setSpecError(true);
+                }
+              }}
               type="text"
               placeholder="규격"
               autoComplete="on"
               required
               size="small"
             />
+            {specError && (
+              <span style={{ color: "red", fontSize: "0.75rem" }}>
+                숫자만 입력해주세요.
+              </span>
+            )}
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 3 }}>
             <FormLabel htmlFor="scale" required>
               규격단위

@@ -155,7 +155,6 @@ export default function OrderOutboundList() {
       alert("수정에 실패하였습니다.");
     }
   };
-
   const handleDeleteRow = async (id: number) => {
     const confirmDelete = window.confirm("삭제하시겠습니까?");
     if (!confirmDelete) return;
@@ -163,10 +162,13 @@ export default function OrderOutboundList() {
     try {
       await deleteOrderItemOut(id);
 
-      // 성공 시 로컬 상태에서 삭제
+      // rows 상태 갱신
       setRows((prev) => prev.filter((row) => row.id !== id));
 
-      // 편집 상태도 초기화
+      // filteredMaterials도 갱신
+      setFilteredMaterials((prev) => prev.filter((row) => row.id !== id));
+
+      // 편집 상태 초기화
       setEditedRows((prev) => {
         const newState = { ...prev };
         delete newState[id];

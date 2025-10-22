@@ -52,20 +52,27 @@ export function MaterialInboundList() {
       alert("저장 실패");
     }
   };
+
   const handleDeleteRow = async (id: number) => {
     const confirmDelete = window.confirm("삭제하시겠습니까?");
     if (!confirmDelete) return;
+
     try {
-      // API 호출 예시
       await softDeleteMaterialIn(id);
-      // 성공 시 로컬 상태에서 삭제
+
+      // rows 상태 갱신
       setMaterialsIn((prev) => prev.filter((row) => row.id !== id));
-      // 편집 상태도 초기화
+
+      // filteredMaterials도 갱신
+      setFilteredMaterials((prev) => prev.filter((row) => row.id !== id));
+
+      // 편집 상태 초기화
       setEditedRows((prev) => {
         const newState = { ...prev };
         delete newState[id];
         return newState;
       });
+
       alert("삭제 완료");
     } catch (error) {
       console.error("삭제 실패", error);

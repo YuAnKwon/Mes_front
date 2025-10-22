@@ -110,14 +110,27 @@ export default function MasterRoutingList() {
       }
     }
 
+    const codes = filledRows.map((r) => r.processCode);
+    const duplicates = codes.filter(
+      (code, index) => codes.indexOf(code) !== index
+    );
+    if (duplicates.length > 0) {
+      alert(`공정코드 "${duplicates[0]}" 가 중복되었습니다.`);
+      return;
+    }
+
     try {
       await newRouting(filledRows);
       alert("저장 완료되었습니다.");
       setOpenModal(false);
       loadData();
     } catch (error) {
-      console.log("저장실패", error);
-      alert("저장에 실패했습니다.");
+      if (error.response?.data?.message?.includes("이미 존재하는 공정코드")) {
+        alert("이미 존재하는 공정코드입니다.");
+      } else {
+        console.error("등록 실패", error);
+        alert("등록 실패");
+      }
     }
   };
 
