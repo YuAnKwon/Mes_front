@@ -3,16 +3,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* important 삭제 */
 @layer components {
   .sidebar-custom a {
-    @apply text-black !important;
+    @apply text-black;
   }
 
   .main-content {
-    @apply w-full max-w-5xl !important;
+    @apply w-full max-w-5xl;
   }
 
   .main-content h2 {
-    @apply text-2xl font-semibold mb-4 !important;
+    @apply text-2xl font-semibold mb-4;
   }
 }
