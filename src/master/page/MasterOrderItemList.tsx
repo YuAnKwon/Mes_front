@@ -323,7 +323,9 @@ export default function MasterOrderItemList() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>수주대상품목 조회</h2>
+      <Typography variant="h5" sx={{ mb: 1 }}>
+        수주대상품목 조회
+      </Typography>
       {/* 버튼 영역 */}
       <Box
         sx={{

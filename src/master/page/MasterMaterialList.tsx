@@ -312,7 +312,9 @@ export default function MasterMaterialList() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <h2>원자재 조회</h2>
+      <Typography variant="h5" sx={{ mb: 1 }}>
+        원자재 조회
+      </Typography>
       {/* 버튼 영역 */}
       <Box
         sx={{
