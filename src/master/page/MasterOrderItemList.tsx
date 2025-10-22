@@ -244,8 +244,9 @@ export default function MasterOrderItemList() {
     },
     {
       field: "actions",
-      headerName: "", // 헤더 텍스트 없음
+      headerName: "거래 상태 변경",
       width: 150,
+      headerAlign: "center",
       sortable: false,
       filterable: false,
       disableColumnMenu: true,

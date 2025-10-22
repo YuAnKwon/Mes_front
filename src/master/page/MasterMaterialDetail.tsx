@@ -31,8 +31,6 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
 
   const navigate = useNavigate();
 
-  const { id } = useParams();
-
   useEffect(() => {
     const fetchMaterialDetail = async () => {
       try {
@@ -70,7 +68,7 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
     };
 
     try {
-      await updateMaterialDetail(id, payload);
+      await updateMaterialDetail(itemId, payload);
       alert("원자재 수정 완료!");
       onClose();
     } catch (error) {
