@@ -1,5 +1,6 @@
 "use client";
 
+import { Box } from "@mui/material";
 import {
   Sidebar,
   SidebarCollapse,
@@ -21,9 +22,10 @@ import {
   RiInboxUnarchiveFill,
   RiInboxUnarchiveLine,
 } from "react-icons/ri";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export function SideNav() {
+  const navigate = useNavigate();
   const location = useLocation(); // 현재 URL 정보
   const pathname = location.pathname;
   const isActive = (href: string) => pathname === href; // 활성 상태 판단
@@ -33,6 +35,28 @@ export function SideNav() {
       aria-label="Sidebar with multi-level dropdown example "
       className="w-80"
     >
+      {/* 로고 */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center", // 수평 중앙
+          alignItems: "center", // 수직 중앙 (필요시)
+          // height: "100vh", // 전체 높이 예시
+        }}
+      >
+        <Box
+          component="img"
+          sx={{
+            width: 250,
+            p: 1,
+            cursor: "pointer",
+          }}
+          onClick={() => navigate("/")}
+          alt="이미지 설명"
+          src="/daewon.png"
+        />
+      </Box>
+
       <SidebarItems>
         <SidebarItemGroup>
           {/* 현재 페이지이면 파랑 */}

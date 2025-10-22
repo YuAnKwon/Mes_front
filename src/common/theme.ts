@@ -22,7 +22,7 @@ const theme = createTheme({
       main: "#42C38C",
     },
     background: {
-      default: "#F8F9FA",
+      default: "#F8F9FA", //배경색
       paper: "#FFFFFF",
     },
   },
