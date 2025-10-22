@@ -110,6 +110,12 @@ export default function OrderOutboundRegister() {
       width: 200,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
       renderCell: (params) => (
         <Box
           sx={{
@@ -139,6 +145,12 @@ export default function OrderOutboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
     },
     {
       field: "itemCode",
@@ -376,7 +388,7 @@ export default function OrderOutboundRegister() {
         </Box>
       </Box>
 
-      <Box sx={{ height: 1200, width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
           rows={filteredMaterials}

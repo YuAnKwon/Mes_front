@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { DataGrid, useGridApiRef, type GridColDef } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
 import * as XLSX from "xlsx-js-style";
@@ -29,6 +29,12 @@ export function MaterialOutboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
     },
     {
       field: "materialName",
@@ -36,6 +42,12 @@ export function MaterialOutboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
     },
     {
       field: "materialCode",
@@ -53,10 +65,11 @@ export function MaterialOutboundRegister() {
     },
     {
       field: "stock",
-      headerName: "재고량(개)",
+      headerName: "재고량",
       width: 120,
       headerAlign: "center",
       align: "center",
+      type: "number",
     },
     {
       field: "manufacturer",
@@ -221,7 +234,9 @@ export function MaterialOutboundRegister() {
   };
   return (
     <Box sx={{ p: 2 }}>
-      <h2>원자재 출고 등록</h2>
+      <Typography variant="h5" sx={{ mb: 2 }}>
+        원자재 출고 등록
+      </Typography>
       <Box
         sx={{
           display: "flex",
@@ -260,12 +275,12 @@ export function MaterialOutboundRegister() {
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleRegister}
           >
-            등록
+            출고
           </Button>
         </Box>
       </Box>
 
-      <Box sx={{ height: 1200, width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <DataGrid
           rows={filteredMaterials}
           columns={columns}

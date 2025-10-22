@@ -84,6 +84,7 @@ export default function NewSearchBar({
           "& .MuiInputBase-root": {
             height: "100%",
             paddingRight: "0 !important",
+            backgroundColor: "#fff",
           },
         }}
         onInputChange={(_, value) => setQuery(value)}

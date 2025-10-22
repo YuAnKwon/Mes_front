@@ -7,6 +7,7 @@ import { Box, Button, Typography, Modal } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { MasterRouting } from "../type";
 import { deleteRouting, getRoutingList, newRouting } from "../api/RoutingApi";
+import Pagination from "../../common/Pagination";
 
 export default function MasterRoutingList() {
   const [rows, setRows] = useState<MasterRouting[]>([]);
@@ -149,6 +150,12 @@ export default function MasterRoutingList() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
     },
     {
       field: "processName",
@@ -247,7 +254,7 @@ export default function MasterRoutingList() {
 
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <Button variant="outlined" onClick={handleOpenModal}>
-          라우팅 추가
+          라우팅 등록
         </Button>
       </Box>
 
@@ -257,9 +264,16 @@ export default function MasterRoutingList() {
           columns={viewColumns.map((col) => ({ ...col, editable: false }))} // 조회용 수정 불가
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
-          hideFooter
+          pageSizeOptions={[10, 20, 30]}
           initialState={{
-            sorting: { sortModel: [{ field: "id", sort: "asc" }] },
+            pagination: { paginationModel: { page: 0, pageSize: 20 } },
+          }}
+          slotProps={{
+            basePagination: {
+              material: {
+                ActionsComponent: Pagination,
+              },
+            },
           }}
         />
       </Box>

@@ -2,6 +2,8 @@ import "./tailwind.css";
 // import "bootstrap/dist/css/bootstrap.min.css";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ThemeProvider, CssBaseline } from "@mui/material"; // 추가
+
 import { SideNav } from "./common/SideNav";
 import OrderInboundRegister from "./orderitem/page/OrderInboundRegister";
 import { MaterialInboundregister } from "./material/page/MaterialInboundregister";
@@ -12,101 +14,100 @@ import MasterOrderItemList from "./master/page/MasterOrderItemList";
 import MasterCompanyList from "./master/page/MasterCompanyList";
 import OrderOutboundList from "./orderitem/page/OrderOutboundList";
 import { MaterialOutboundRegister } from "./material/page/MaterialOutboundRegister";
-import MasterCompanyDetail from "./master/page/MasterCompanyDetail";
 import { MaterialOutboundList } from "./material/page/MaterialOutboundList";
 import MasterMaterialList from "./master/page/MasterMaterialList";
-import MasterMaterialDetail from "./master/page/MasterMaterialDetail";
 import MasterOrderItem from "./master/page/MasterOrderItem";
 import MasterRoutingList from "./master/page/MasterRoutingList";
 import { MaterialTotalStock } from "./material/page/MaterialTotalStock";
 import OrderProcess from "./orderitem/page/OrderProcess";
+import theme from "./common/theme";
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="flex h-screen">
-        {/* 사이드바 (왼쪽 고정) */}
-        <div className="w-80">
-          <SideNav />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <div className="flex h-screen">
+          {/* 사이드바 (왼쪽 고정) */}
+          <div className="w-80">
+            <SideNav />
+          </div>
+
+          {/* 본문 (오른쪽 영역) */}
+          <div className="flex-1 p-6 flex justify-center">
+            {/* w-full 제거, max-w-6xl + mx-auto 로 너비 제약 및 중앙 정렬 */}
+            <div className="max-w-6xl mx-auto">
+              <Routes>
+                {/* 수주대상품목 */}
+                <Route path="/" element={<OrderInboundRegister />} />
+                <Route
+                  path="/orderitem/inbound/list"
+                  element={<OrderInboundList />}
+                />
+                <Route
+                  path="/orderitem/outbound/register"
+                  element={<OrderOutboundRegister />}
+                />
+                <Route
+                  path="/orderitem/outbound/list"
+                  element={<OrderOutboundList />}
+                />
+                <Route
+                  path="/orderitem/process/:id"
+                  element={<OrderProcess />}
+                />
+
+                {/* 원자재 */}
+                <Route
+                  path="/material/inbound/register"
+                  element={<MaterialInboundregister />}
+                />
+                <Route
+                  path="/material/inbound/list"
+                  element={<MaterialInboundList />}
+                />
+                <Route
+                  path="/material/outbound/register"
+                  element={<MaterialOutboundRegister />}
+                />
+                <Route
+                  path="/material/outbound/list"
+                  element={<MaterialOutboundList />}
+                />
+                <Route
+                  path="/material/totalstock"
+                  element={<MaterialTotalStock />}
+                />
+
+                {/* 기준정보관리 */}
+                <Route
+                  path="/master/company/list"
+                  element={<MasterCompanyList />}
+                />
+
+                <Route
+                  path="/master/material/list"
+                  element={<MasterMaterialList />}
+                />
+
+                <Route
+                  path="/master/orderitem/list"
+                  element={<MasterOrderItemList />}
+                />
+                <Route
+                  path="/master/orderitem/register"
+                  element={<MasterOrderItem />}
+                />
+                <Route
+                  path="/master/routing/list"
+                  element={<MasterRoutingList />}
+                />
+              </Routes>
+            </div>
+          </div>
         </div>
-
-        {/* 본문 (오른쪽 영역) */}
-        <div className="flex-1 p-6  ">
-          <Routes>
-            {/* 수주대상품목 */}
-            <Route path="/" element={<OrderInboundRegister />} />
-            <Route
-              path="/orderitem/inbound/list"
-              element={<OrderInboundList />}
-            />
-            <Route
-              path="/orderitem/outbound/register"
-              element={<OrderOutboundRegister />}
-            />
-            <Route
-              path="/orderitem/outbound/list"
-              element={<OrderOutboundList />}
-            />
-            <Route path="/orderitem/process/:id" element={<OrderProcess />} />
-
-            {/* 원자재 */}
-            <Route
-              path="/material/inbound/register"
-              element={<MaterialInboundregister />}
-            />
-            <Route
-              path="/material/inbound/list"
-              element={<MaterialInboundList />}
-            />
-            <Route
-              path="/material/outbound/register"
-              element={<MaterialOutboundRegister />}
-            />
-            <Route
-              path="/material/outbound/list"
-              element={<MaterialOutboundList />}
-            />
-            <Route
-              path="/material/totalstock"
-              element={<MaterialTotalStock />}
-            />
-
-            {/* 기준정보관리 */}
-            <Route
-              path="/master/company/list"
-              element={<MasterCompanyList />}
-            />
-
-            <Route
-              path="/master/company/detail/:id"
-              element={<MasterCompanyDetail />}
-            />
-
-            <Route
-              path="/master/material/list"
-              element={<MasterMaterialList />}
-            />
-
-            <Route
-              path="/master/material/detail/:id"
-              element={<MasterMaterialDetail />}
-            />
-            <Route
-              path="/master/orderitem/list"
-              element={<MasterOrderItemList />}
-            />
-            <Route
-              path="/master/orderitem/register"
-              element={<MasterOrderItem />}
-            />
-            <Route
-              path="/master/routing/list"
-              element={<MasterRoutingList />}
-            />
-          </Routes>
-        </div>
-      </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

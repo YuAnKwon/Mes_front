@@ -13,6 +13,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import type { DropResult } from "react-beautiful-dnd";
 import { getRoutingList } from "../api/RoutingApi";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { useNavigate, useParams } from "react-router-dom";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -21,7 +22,7 @@ const FormGrid = styled(Grid)(() => ({
 
 interface Props {
   itemId: number;
-  onClose: (refresh?: boolean) => void; // refresh 옵션 추가
+  onClose: () => void;
 }
 
 export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
@@ -45,85 +46,97 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
     routing: [],
   });
 
-  // 1️⃣ 상세 데이터 로드
-  const loadData = async () => {
-    try {
-      const response = await getOrItDetail(itemId);
-      setOrderItem(response);
-
-      if (response.images) {
-        const sortedImages = response.images.sort((a, b) =>
-          a.repYn === "Y" ? -1 : b.repYn === "Y" ? 1 : 0
-        );
-
-        const existingImgs: imgType[] = sortedImages.map((img) => ({
-          id: img.id,
-          imgUrl: img.imgUrl,
-          repYn: img.repYn,
-          file: undefined,
-        }));
-
-        setImgFiles(existingImgs);
-        setPreviewUrls(existingImgs.map((img) => img.imgUrl));
-      }
-    } catch (error) {
-      console.error("품목 불러오기 실패:", error);
-    }
-  };
-
-  // 2️⃣ 공정 리스트 로드
-  const loadRoutings = async () => {
-    try {
-      const list = await getRoutingList();
-      setAvailableRoutings(list);
-    } catch (error) {
-      console.error("공정 리스트 불러오기 실패", error);
-    }
-  };
-
-  // 3️⃣ 수정 처리
+  //이미지파일 덮어쓰기를 위한 기존, 새 이미지 전송
   const handleUpdate = async () => {
-    try {
-      const formData = new FormData();
+    const formData = new FormData();
 
-      // JSON 데이터 + 이미지 메타
-      const jsonData = JSON.stringify({
-        ...orderItem,
-        images: imgFiles.map((img, index) => ({
-          id: img.id ?? null,
-          repYn: index === 0 ? "Y" : "N",
-          imgOriName: img.imgOriName,
-        })),
-        routing: selectedRoutings.map((r, idx) => ({
-          routingId: r.id,
-          routingOrder: idx + 1,
-        })),
+    // ✅ JSON 객체 구성 (기존 orderItem + 이미지 정보 포함)
+    const jsonData = JSON.stringify({
+      ...orderItem,
+      images: imgFiles.map((img, index) => ({
+        id: img.id ?? null, // 기존 이미지면 id 있음
+        repYn: index === 0 ? "Y" : "N", // 첫 번째 이미지를 대표로 설정
+      })),
+      routing: selectedRoutings.map((r, idx) => ({
+        routingId: r.id,
+        routingOrder: idx + 1, // 순서 반영
+      })),
+    });
+
+    // ✅ JSON을 Blob으로 감싸서 formData에 추가
+    formData.append("data", new Blob([jsonData], { type: "application/json" }));
+
+    // ✅ 새 이미지 파일만 formData에 추가 (기존 이미지는 file이 없음)
+    if (imgFiles && imgFiles.length > 0) {
+      imgFiles.forEach((img) => {
+        if (img.file) formData.append("imgUrl", img.file);
       });
+    }
+    console.log("보내는 데이터:", jsonData);
 
-      formData.append(
-        "data",
-        new Blob([jsonData], { type: "application/json" })
-      );
-
-      // 새 이미지만 첨부
-      imgFiles.forEach(
-        (img) => img.file && formData.append("imgUrl", img.file)
-      );
-
-      await updateOrItDetail(orderItem.id!, formData);
-
+    try {
+      await updateOrItDetail(orderItem.id!, formData); // API 호출
       alert("수정 완료!");
-      onClose(true); // true 전달 → 테이블 갱신
+      onClose();
     } catch (error) {
-      console.error("수정 실패:", error);
-      alert("수정 실패");
+      if (error.response?.data?.message?.includes("이미 존재하는 품목번호")) {
+        alert("이미 존재하는 품목번호입니다.");
+      } else {
+        console.error("등록 실패", error);
+        alert("등록 실패");
+      }
     }
   };
 
-  // 4️⃣ useEffect 통합
+  // 상세 정보 가져오기
   useEffect(() => {
-    loadData();
-    loadRoutings();
+    const fetchOrderItemDetail = async () => {
+      try {
+        const response = await getOrItDetail(itemId);
+        setOrderItem(response);
+        console.log("response :", response);
+
+        // 기존 이미지 처리
+        if (response.images) {
+          // ✅ repYn === "Y" 인 이미지를 맨 앞으로 정렬
+          const sortedImages = [...response.images].sort((a, b) => {
+            if (a.repYn === "Y" && b.repYn !== "Y") return -1;
+            if (a.repYn !== "Y" && b.repYn === "Y") return 1;
+            return 0;
+          });
+
+          // 정렬된 이미지들로 imgFiles 세팅
+          const existingImgs: imgType[] = sortedImages.map((img: any) => ({
+            id: img.id,
+            imgUrl: img.imgUrl,
+            repYn: img.repYn,
+            file: undefined, // 기존 이미지는 파일 없음
+          }));
+
+          setImgFiles(existingImgs);
+
+          // 미리보기용 URL도 같은 순서로
+          const urls = existingImgs.map((img) => img.imgUrl);
+          setPreviewUrls(urls);
+        }
+      } catch (error) {
+        console.error("품목 불러오기 실패:", error);
+      }
+    };
+    fetchOrderItemDetail();
+  }, [itemId]);
+
+  // 공정 리스트 가져오기
+  useEffect(() => {
+    const fetchRoutings = async () => {
+      try {
+        const list = await getRoutingList();
+        setAvailableRoutings(list);
+      } catch (error) {
+        console.error("공정 리스트 불러오기 실패", error);
+      }
+    };
+    fetchRoutings();
   }, []);
 
   // availableRoutings와 orderItem.routing 모두 준비되면 selectedRoutings 세팅
@@ -287,9 +300,7 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
       <Box sx={{ width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="company" required>
-              거래처명
-            </FormLabel>
+            <FormLabel htmlFor="company">거래처명</FormLabel>
             <OutlinedInput
               id="company"
               value={orderItem.company}
@@ -297,7 +308,7 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
                 setOrderItem({ ...orderItem, company: e.target.value })
               }
               size="small"
-              required
+              disabled
             />
           </FormGrid>
           <Grid container spacing={3} sx={{ mt: 4 }} />

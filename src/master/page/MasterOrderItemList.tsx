@@ -147,6 +147,12 @@ export default function MasterOrderItemList() {
       headerAlign: "center",
       align: "center",
       //언더바(상세 페이지)
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
       renderCell: (params) => (
         <Box
           sx={{
@@ -320,6 +326,7 @@ export default function MasterOrderItemList() {
       색상: item.color,
       도정방식: item.coatingMethod,
       거래상태: item.useYn,
+      비고: item.remark,
     }));
 
     const worksheet = createStyledWorksheet(excelData);
@@ -377,7 +384,7 @@ export default function MasterOrderItemList() {
           </Button>
         </Box>
       </Box>
-      <Box sx={{ height: 1200, width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
           rows={filteredMaterials}

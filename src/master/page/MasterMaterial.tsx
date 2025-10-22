@@ -330,7 +330,7 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
             sx={{ height: 40, fontWeight: 500 }}
             onClick={handleSave}
           >
-            원자재 등록
+            저장
           </Button>
         </Box>
       </Box>

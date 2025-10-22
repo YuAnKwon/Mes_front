@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import Pagination from "../../common/Pagination";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
@@ -10,6 +17,9 @@ import { getOrderItemInRegiList, registerInboundItem } from "../api/OrderInApi";
 import type { OrderItemList, OrderItemInRegister } from "../type";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
 import NewSearchBar from "../../common/NewSearchBar";
+import OrderDetailModal from "./OrderDetail";
+import OrderDetail from "./OrderDetail";
+import { CloseIcon } from "flowbite-react";
 
 export default function OrderInboundRegister() {
   const [filteredMaterials, setFilteredMaterials] = useState<OrderItemList[]>(
@@ -24,6 +34,21 @@ export default function OrderInboundRegister() {
     itemName: [], //수정
   });
 
+  // 상태 추가
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  // 품목명 클릭 시
+  const handleItemClick = (id: number) => {
+    setSelectedItemId(id);
+    setDetailOpen(true);
+  };
+
+  // 모달 닫기
+  const handleDetailClose = () => {
+    setDetailOpen(false);
+    setSelectedItemId(null);
+  };
   const handleSearch = (criteria: string, query: string) => {
     if (!query.trim()) {
       setFilteredMaterials(rows); // 검색어 없으면 전체 리스트 수정
@@ -85,7 +110,12 @@ export default function OrderInboundRegister() {
       width: 150,
       headerAlign: "center",
       align: "center",
-      //언더바(상세 페이지)
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
       renderCell: (params) => (
         <Box
           sx={{
@@ -102,7 +132,7 @@ export default function OrderInboundRegister() {
               cursor: "pointer",
               fontSize: "inherit",
             }}
-            onClick={() => navigate(`/orderitem/detail/${params.row.id}`)}
+            onClick={() => handleItemClick(params.row.id)}
           >
             {params.value}
           </Typography>
@@ -187,6 +217,7 @@ export default function OrderInboundRegister() {
       품목번호: item.itemCode,
       거래처명: item.company,
       분류: item.type,
+      비고: item.remark,
     }));
 
     const worksheet = createStyledWorksheet(excelData);
@@ -285,7 +316,7 @@ export default function OrderInboundRegister() {
           </Button>
         </Box>
       </Box>
-      <Box sx={{ height: 1200, width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
           rows={filteredMaterials}
@@ -326,6 +357,35 @@ export default function OrderInboundRegister() {
           }}
         />
       </Box>
+      <Dialog
+        open={detailOpen}
+        onClose={handleDetailClose}
+        maxWidth="lg"
+        // fullWidth
+      >
+        <DialogTitle sx={{ m: 0, p: 2 }}>
+          품목 상세정보
+          <IconButton
+            aria-label="close"
+            onClick={handleDetailClose}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <OrderDetail
+            itemId={selectedItemId}
+            open={detailOpen} // 내부에서 굳이 안 써도 됨
+            onClose={handleDetailClose}
+          />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

@@ -9,7 +9,6 @@ import {
 } from "flowbite-react";
 import { FaBoxArchive } from "react-icons/fa6";
 import {
-  HiChartPie,
   HiClipboard,
   HiClipboardList,
   HiCube,
@@ -31,9 +30,6 @@ export function SideNav() {
     >
       <SidebarItems>
         <SidebarItemGroup>
-          <SidebarItem href="/" icon={HiChartPie}>
-            대시보드
-          </SidebarItem>
           <SidebarCollapse
             icon={HiClipboardList}
             label="수주대상 입출고 관리"

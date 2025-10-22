@@ -659,7 +659,7 @@ export default function MasterOrderItem({
           sx={{ height: 40, fontWeight: 500, px: 2.5 }}
           onClick={handleSave}
         >
-          수주대상품목 등록
+          저장
         </Button>
       </Box>
     </Box>

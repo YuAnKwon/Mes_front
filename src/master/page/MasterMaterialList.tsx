@@ -115,6 +115,12 @@ export default function MasterMaterialList() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
     },
     {
       field: "materialName",
@@ -353,13 +359,13 @@ export default function MasterMaterialList() {
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleOpenRegister}
           >
-            수주대상품목 등록
+            원자재 등록
           </Button>
         </Box>
       </Box>
 
       {/* 테이블 영역 */}
-      <Box sx={{ height: 1200, width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
           rows={filteredMaterials}

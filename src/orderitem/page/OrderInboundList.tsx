@@ -5,15 +5,7 @@ import {
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
 import Pagination from "../../common/Pagination";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Dialog, DialogContent, Typography } from "@mui/material";
 import * as XLSX from "xlsx-js-style";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -25,7 +17,6 @@ import {
 import type { OrderItemList } from "../type";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
 import NewSearchBar from "../../common/NewSearchBar";
-import { CloseIcon } from "flowbite-react";
 import WorkOrder from "./WorkOrder";
 
 export default function OrderInboundList() {
@@ -200,6 +191,12 @@ export default function OrderInboundList() {
       width: 200,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
       renderCell: (params) => (
         <Box
           sx={{
@@ -229,6 +226,12 @@ export default function OrderInboundList() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
     },
     {
       field: "itemCode",
@@ -405,7 +408,7 @@ export default function OrderInboundList() {
           </Button>
         </Box>
       </Box>
-      <Box sx={{ height: 1200, width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <DataGrid
           apiRef={apiRef}
           rows={filteredMaterials}

@@ -70,8 +70,12 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
       alert("원자재 수정 완료!");
       onClose(true); // true 전달 → 테이블 갱신
     } catch (error) {
-      console.error("원자재 등록 실패", error);
-      alert("등록 실패");
+      if (error.response?.data?.message?.includes("이미 존재하는 품목번호")) {
+        alert("이미 존재하는 품목번호입니다.");
+      } else {
+        console.error("등록 실패", error);
+        alert("등록 실패");
+      }
     }
   };
 
@@ -80,9 +84,7 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
       <Box sx={{ width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 1 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="companyName" required>
-              매입처명
-            </FormLabel>
+            <FormLabel htmlFor="companyName">매입처명</FormLabel>
             <OutlinedInput
               id="companyName"
               name="companyName"
@@ -91,7 +93,7 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
               type="text"
               placeholder="매입명"
               autoComplete="organization"
-              required
+              disabled
               size="small"
             />
           </FormGrid>

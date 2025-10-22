@@ -93,7 +93,7 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
       managerPhone: managerPhone,
       managerEmail,
       remark,
-      zipcode: Number(zipcode),
+      zipcode: zipcode,
       addressBase,
       addressDetail,
     };
@@ -368,7 +368,7 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleSave}
           >
-            업체 등록
+            저장
           </Button>
         </Box>
       </Box>

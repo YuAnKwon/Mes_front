@@ -100,6 +100,12 @@ export default function MasterCompanyList() {
       width: 150,
       headerAlign: "center",
       align: "center",
+      sortComparator: (a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, "")) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, "")) || 0;
+        if (numA !== numB) return numA - numB;
+        return a.localeCompare(b);
+      },
       renderCell: (params) => (
         <Box
           sx={{
@@ -297,7 +303,7 @@ export default function MasterCompanyList() {
       </Tabs>
 
       {/* 테이블 */}
-      <Box sx={{ height: 800 }}>
+      <Box sx={{}}>
         <DataGrid
           apiRef={apiRef}
           rows={filteredRows}
