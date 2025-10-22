@@ -80,6 +80,7 @@ export default function MasterMaterialList() {
       const materialNames = Array.from(
         new Set(mcList.map((m) => m.materialName))
       ); //수정
+      const useYns = Array.from(new Set(mcList.map((m) => m.useYn)));
 
       setFilteredMaterials(mappedRows); //초기값
 
@@ -87,6 +88,7 @@ export default function MasterMaterialList() {
         companyName: companies, //수정
         materialCode: materialCodes, //수정
         materialName: materialNames, //수정
+        useYn: useYns,
       });
     } catch (error) {
       console.error("업체 데이터 조회 실패", error); //수정
@@ -333,6 +335,7 @@ export default function MasterMaterialList() {
               { label: "거래처명", value: "companyName" }, //수정
               { label: "품목코드", value: "materialCode" }, //수정
               { label: "품목명", value: "materialName" }, //수정
+              { label: "거래상태", value: "useYn" },
             ]}
             autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}

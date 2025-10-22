@@ -98,11 +98,13 @@ export default function MasterOrderItemList() {
       const companys = Array.from(new Set(oiList.map((m) => m.company)));
       const itemCodes = Array.from(new Set(oiList.map((m) => m.itemCode)));
       const itemNames = Array.from(new Set(oiList.map((m) => m.itemName)));
+      const useYns = Array.from(new Set(oiList.map((m) => m.useYn)));
 
       setAutoCompleteMap({
         company: companys,
         itemCode: itemCodes,
         itemName: itemNames,
+        useYn: useYns,
       });
     } catch (error) {
       console.error("수주품목대상 데이터 조회 실패", error);
@@ -343,6 +345,7 @@ export default function MasterOrderItemList() {
               { label: "거래처명", value: "company" }, //수정
               { label: "품목번호", value: "itemCode" }, //수정
               { label: "품목명", value: "itemName" }, //수정
+              { label: "거래상태", value: "useYn" },
             ]}
             autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
