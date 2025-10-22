@@ -240,21 +240,12 @@ export default function MasterMaterialList() {
       renderCell: (params) => (
         <Box
           sx={{
-            width: "100%",
-            height: "100%",
-            overflowX: "auto", // 가로 스크롤
-            overflowY: "hidden",
+            whiteSpace: "normal", // 줄바꿈 허용
+            wordBreak: "break-word", // 단어 단위 줄바꿈 허용
+            px: 0.5,
           }}
         >
-          <Box
-            sx={{
-              display: "inline-block", // 실제 내용 길이만큼 폭 확장
-              whiteSpace: "nowrap", // 줄바꿈 방지
-              px: 0.5,
-            }}
-          >
-            {params.value}
-          </Box>
+          {params.value}
         </Box>
       ),
     },
@@ -409,7 +400,7 @@ export default function MasterMaterialList() {
         // fullWidth
       >
         <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
-          수주대상품목 상세정보
+          원자재 상세정보
           <IconButton onClick={handleCloseDetail}>
             <CloseIcon />
           </IconButton>
