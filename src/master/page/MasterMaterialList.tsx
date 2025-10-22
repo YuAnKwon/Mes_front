@@ -11,7 +11,6 @@ import {
   Typography,
 } from "@mui/material";
 import Pagination from "../../common/Pagination";
-import { useNavigate } from "react-router-dom";
 import type { MasterMtList } from "../type";
 import { getMasterMtList, updateMaterialState } from "../api/MaterialApi";
 import { CloseIcon } from "flowbite-react";
@@ -22,7 +21,6 @@ import * as XLSX from "xlsx-js-style";
 import MasterMaterialDetail from "./MasterMaterialDetail";
 
 export default function MasterMaterialList() {
-  const navigate = useNavigate();
   const [openRegister, setOpenRegister] = useState(false);
   const [filteredMaterials, setFilteredMaterials] = useState<MasterMtList[]>(
     []

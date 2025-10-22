@@ -23,7 +23,6 @@ import {
 import SearchBar from "../../common/SearchBar";
 import MasterCompany from "./MasterCompany";
 import CloseIcon from "@mui/icons-material/Close";
-import MasterOrderItemDetail from "./MasterOrderItemDetail";
 import MasterCompanyDetail from "./MasterCompanyDetail";
 
 export default function MasterCompanyList() {
