@@ -18,6 +18,7 @@ import { CloseIcon } from "flowbite-react";
 import { Select } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { getCompanyDetail, updateCompanyDetail } from "../api/companyApi";
+import type { MasterCpRegister } from "../type";
 
 const FormGrid = styled(Grid)(() => ({
   display: "flex",
@@ -30,19 +31,20 @@ interface Props {
 }
 
 export default function MasterCompanyDetail({ companyId, onClose }: Props) {
-  const [companyName, setCompanyName] = useState("");
-  const [businessNum, setBusinessNum] = useState("");
-  const [companyType, setCompanyType] = useState("");
-  const [ceoName, setCeoName] = useState("");
-  const [ceoPhone, setCeoPhone] = useState("");
-  const [managerName, setManagerName] = useState("");
-  const [managerPhone, setManagerPhone] = useState("");
-  const [managerEmail, setManagerEmail] = useState("");
-  const [remark, setRemark] = useState("");
-  const [zipcode, setZipcode] = useState("");
-  const [addressBase, setAddressBase] = useState("");
-  const [addressDetail, setAddressDetail] = useState("");
-
+  const [company, setCompany] = useState<MasterCpRegister>({
+    companyName: "",
+    companyType: "",
+    businessNum: "",
+    ceoName: "",
+    ceoPhone: "",
+    managerName: "",
+    managerPhone: "",
+    managerEmail: "",
+    zipcode: "",
+    addressBase: "",
+    addressDetail: "",
+    remark: "",
+  });
   const [openPostcode, setOpenPostcode] = useState(false);
 
   //상세 정보 가져오기
@@ -55,18 +57,7 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
       const response = await getCompanyDetail(companyId); // ← API 호출
 
       // 상태에 기존 값 채워 넣기
-      setCompanyName(response.companyName);
-      setBusinessNum(response.businessNum);
-      setCompanyType(response.companyType);
-      setCeoName(response.ceoName);
-      setCeoPhone(response.ceoPhone);
-      setManagerName(response.managerName);
-      setManagerPhone(response.managerPhone);
-      setManagerEmail(response.managerEmail);
-      setRemark(response.remark);
-      setZipcode(response.zipcode);
-      setAddressBase(response.addressBase);
-      setAddressDetail(response.addressDetail);
+      setCompany(response);
     } catch (error) {
       console.error("업체 정보 불러오기 실패:", error);
     }
@@ -84,23 +75,8 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
   };
 
   const handleUpdate = async () => {
-    const payload = {
-      companyName,
-      businessNum,
-      companyType,
-      ceoName,
-      ceoPhone,
-      managerName,
-      managerPhone,
-      managerEmail,
-      remark,
-      zipcode,
-      addressBase,
-      addressDetail,
-    };
-
     try {
-      await updateCompanyDetail(companyId, payload);
+      await updateCompanyDetail(companyId, company);
       alert("업체 정보가 수정되었습니다");
       onClose(true); // true 전달 → 테이블 갱신
     } catch (error) {
@@ -112,7 +88,7 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
   return (
     <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
       <Typography variant="h5" sx={{ mb: 1 }}>
-        {companyName}의 상세정보
+        {company.companyName}의 상세정보
       </Typography>
 
       <Box sx={{ height: 600, width: "100%" }}>
@@ -124,8 +100,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <OutlinedInput
               id="companyName"
               name="companyName"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
+              value={company.companyName}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, companyName: e.target.value }))
+              }
               type="text"
               placeholder="업체명"
               autoComplete="organization"
@@ -141,8 +119,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <Select
               id="companyType"
               name="companyType"
-              value={companyType}
-              onChange={(e) => setCompanyType(e.target.value)}
+              value={company.companyType}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, companyType: e.target.value }))
+              }
               displayEmpty
               input={<OutlinedInput />}
               size="small"
@@ -164,8 +144,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <OutlinedInput
               id="businessNum"
               name="businessNum"
-              value={businessNum}
-              onChange={(e) => setBusinessNum(e.target.value)}
+              value={company.businessNum}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, businessNum: e.target.value }))
+              }
               type="text"
               placeholder="사업자 등록번호"
               autoComplete="businessNum"
@@ -180,8 +162,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <OutlinedInput
               id="ceoName"
               name="ceoName"
-              value={ceoName}
-              onChange={(e) => setCeoName(e.target.value)}
+              value={company.ceoName}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, ceoName: e.target.value }))
+              }
               type="text"
               placeholder="홍길동"
               autoComplete="name"
@@ -196,8 +180,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <OutlinedInput
               id="ceoPhone"
               name="ceoPhone"
-              value={ceoPhone}
-              onChange={(e) => setCeoPhone(e.target.value)}
+              value={company.ceoPhone}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, ceoPhone: e.target.value }))
+              }
               type="text"
               placeholder="01012345678"
               autoComplete="tel"
@@ -212,8 +198,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <OutlinedInput
               id="managerName"
               name="managerName"
-              value={managerName}
-              onChange={(e) => setManagerName(e.target.value)}
+              value={company.managerName}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, managerName: e.target.value }))
+              }
               type="text"
               placeholder="홍길동"
               autoComplete="name"
@@ -228,8 +216,13 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <OutlinedInput
               id="managerPhone"
               name="managerPhone"
-              value={managerPhone}
-              onChange={(e) => setManagerPhone(e.target.value)}
+              value={company.managerPhone}
+              onChange={(e) =>
+                setCompany((prev) => ({
+                  ...prev,
+                  managerPhone: e.target.value,
+                }))
+              }
               type="text"
               placeholder="01012345678"
               autoComplete="managerPhone"
@@ -244,8 +237,13 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <OutlinedInput
               id="managerEmail"
               name="managerEmail"
-              value={managerEmail}
-              onChange={(e) => setManagerEmail(e.target.value)}
+              value={company.managerEmail}
+              onChange={(e) =>
+                setCompany((prev) => ({
+                  ...prev,
+                  managerEmail: e.target.value,
+                }))
+              }
               type="email"
               placeholder="example@gmail.com"
               autoComplete="email"
@@ -258,8 +256,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
             <OutlinedInput
               id="remark"
               name="remark"
-              value={remark}
-              onChange={(e) => setRemark(e.target.value)}
+              value={company.remark}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, remark: e.target.value }))
+              }
               type="text"
               placeholder="비고"
               autoComplete="off"
@@ -279,8 +279,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
                   type="text"
                   autoComplete="postal-code"
                   placeholder="우편번호"
-                  value={zipcode}
-                  onChange={(e) => setZipcode(e.target.value)}
+                  value={company.zipcode}
+                  onChange={(e) =>
+                    setCompany((prev) => ({ ...prev, zipcode: e.target.value }))
+                  }
                   required
                   size="small"
                 />
@@ -324,8 +326,10 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
               type="text"
               autoComplete="street-address"
               placeholder="주소"
-              value={addressBase}
-              onChange={(e) => setAddressBase(e.target.value)}
+              value={company.addressBase}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, addressBase: e.target.value }))
+              }
               readOnly
               required
               size="small"
@@ -337,8 +341,13 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
               name="addressDetail"
               type="text"
               placeholder="상세주소를 입력하세요"
-              value={addressDetail}
-              onChange={(e) => setAddressDetail(e.target.value)}
+              value={company.addressDetail}
+              onChange={(e) =>
+                setCompany((prev) => ({
+                  ...prev,
+                  addressDetail: e.target.value,
+                }))
+              }
               required
               size="small"
             />
