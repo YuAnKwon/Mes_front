@@ -18,7 +18,7 @@ import {
   Draggable,
   type DropResult,
 } from "react-beautiful-dnd";
-import type { imgType, MasterOrItRegister, MasterRouting } from "../type";
+import type { imgType, MasterRouting } from "../type";
 import { registerOrderItem } from "../api/OrderItemApi";
 import { FiCamera } from "react-icons/fi";
 import { getClientList } from "../api/companyApi";

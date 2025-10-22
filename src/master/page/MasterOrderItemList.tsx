@@ -11,7 +11,6 @@ import {
   Typography,
 } from "@mui/material";
 import Pagination from "../../common/Pagination";
-import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import { getMasterOrItList, updateOrItState } from "../api/OrderItemApi";
 import type { MasterOrItList } from "../type";
@@ -22,7 +21,6 @@ import MasterOrderItem from "./MasterOrderItem";
 import MasterOrderItemDetail from "./MasterOrderItemDetail";
 
 export default function MasterOrderItemList() {
-  const navigate = useNavigate();
   const [filteredMaterials, setFilteredMaterials] = useState<MasterOrItList[]>(
     []
   );

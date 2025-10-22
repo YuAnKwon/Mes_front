@@ -14,7 +14,11 @@ const FormGrid = styled(Grid)(() => ({
   flexDirection: "column",
 }));
 
-export default function MasterMaterialDetail() {
+interface Props {
+  itemId: number;
+  onClose: () => void;
+}
+export default function MasterMaterialDetail({ itemId, onClose }: Props) {
   const [materialCode, setMaterialCode] = useState("");
   const [materialName, setMaterialName] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -32,7 +36,7 @@ export default function MasterMaterialDetail() {
   useEffect(() => {
     const fetchMaterialDetail = async () => {
       try {
-        const response = await getMaterialDetail(id); // ← API 호출
+        const response = await getMaterialDetail(itemId); // ← API 호출
 
         // 상태에 기존 값 채워 넣기
         setMaterialCode(response.materialCode);
@@ -50,7 +54,7 @@ export default function MasterMaterialDetail() {
     };
 
     fetchMaterialDetail();
-  }, [id]);
+  }, [itemId]);
 
   const handleUpdate = async () => {
     const payload = {
@@ -68,7 +72,7 @@ export default function MasterMaterialDetail() {
     try {
       await updateMaterialDetail(id, payload);
       alert("원자재 수정 완료!");
-      navigate("/master/material/list");
+      onClose();
     } catch (error) {
       console.error("원자재 등록 실패", error);
       alert("등록 실패");
