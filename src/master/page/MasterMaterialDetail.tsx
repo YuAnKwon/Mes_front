@@ -6,7 +6,6 @@ import { Box, MenuItem } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import { Select } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
 import { getMaterialDetail, updateMaterialDetail } from "../api/MaterialApi";
 
 const FormGrid = styled(Grid)(() => ({
@@ -16,8 +15,9 @@ const FormGrid = styled(Grid)(() => ({
 
 interface Props {
   itemId: number;
-  onClose: () => void;
+  onClose: (refresh?: boolean) => void; // refresh 옵션 추가
 }
+
 export default function MasterMaterialDetail({ itemId, onClose }: Props) {
   const [materialCode, setMaterialCode] = useState("");
   const [materialName, setMaterialName] = useState("");
@@ -28,10 +28,6 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
   const [scale, setScale] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [remark, setRemark] = useState("");
-
-  const navigate = useNavigate();
-
-  const { id } = useParams();
 
   useEffect(() => {
     const fetchMaterialDetail = async () => {
@@ -70,9 +66,9 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
     };
 
     try {
-      await updateMaterialDetail(id, payload);
+      await updateMaterialDetail(itemId, payload);
       alert("원자재 수정 완료!");
-      onClose();
+      onClose(true); // true 전달 → 테이블 갱신
     } catch (error) {
       console.error("원자재 등록 실패", error);
       alert("등록 실패");

@@ -16,7 +16,7 @@ import DaumPostcode from "react-daum-postcode";
 import { useEffect, useState } from "react";
 import { CloseIcon } from "flowbite-react";
 import { Select } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getCompanyDetail, updateCompanyDetail } from "../api/companyApi";
 
 const FormGrid = styled(Grid)(() => ({
@@ -26,7 +26,7 @@ const FormGrid = styled(Grid)(() => ({
 
 interface Props {
   companyId: number;
-  onClose: () => void;
+  onClose: (refresh?: boolean) => void; // refresh 옵션 추가
 }
 
 export default function MasterCompanyDetail({ companyId, onClose }: Props) {
@@ -100,10 +100,9 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
     };
 
     try {
-      await updateCompanyDetail(Number(companyId), payload);
+      await updateCompanyDetail(companyId, payload);
       alert("업체 정보가 수정되었습니다");
-      onClose();
-      fetchCompanyDetail();
+      onClose(true); // true 전달 → 테이블 갱신
     } catch (error) {
       console.error(error);
       alert("수정 실패");

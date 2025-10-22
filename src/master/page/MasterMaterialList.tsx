@@ -92,6 +92,7 @@ export default function MasterMaterialList() {
       console.error("업체 데이터 조회 실패", error); //수정
     }
   };
+
   useEffect(() => {
     loadData();
   }, []);
@@ -305,9 +306,13 @@ export default function MasterMaterialList() {
     setOpenDetail(true);
   };
 
-  const handleCloseDetail = () => {
+  const handleCloseDetail = async (refresh = false) => {
     setSelectedItemId(null);
     setOpenDetail(false);
+
+    if (refresh) {
+      await loadData(); // 모달 수정 후 테이블 갱신
+    }
   };
 
   return (
