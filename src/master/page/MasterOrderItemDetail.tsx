@@ -476,10 +476,16 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
                         {/* 삭제 버튼 */}
                         <button
                           onClick={() => handleRemoveImage(index)}
-                          className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full bg-black/50 text-white text-sm hover:bg-red-600 transition"
+                          style={{
+                            left: "9rem",
+                            top: "0.25rem",
+                            backgroundColor: "transparent",
+                            fontWeight: "bold",
+                          }}
+                          className="absolute w-6 h-6 flex items-center justify-center rounded-full text-black hover:bg-red-600 focus:outline-none transition"
                           title="이미지 삭제"
                         >
-                          x
+                          X
                         </button>
                       </div>
                     )}

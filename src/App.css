@@ -1,3 +1,6 @@
+/* 앱 내부 특정 영역 또는 컴포넌트 전용 CSS */
+/* Tailwind를 쓰더라도 추가 커스텀 스타일 */
+
 #root {
   max-width: 1280px;
   /* margin: 0 auto; */

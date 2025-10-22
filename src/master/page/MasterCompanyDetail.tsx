@@ -16,7 +16,6 @@ import DaumPostcode from "react-daum-postcode";
 import { useEffect, useState } from "react";
 import { CloseIcon } from "flowbite-react";
 import { Select } from "@mui/material";
-import { useParams } from "react-router-dom";
 import { getCompanyDetail, updateCompanyDetail } from "../api/companyApi";
 import type { MasterCpRegister } from "../type";
 
@@ -63,11 +62,14 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
     }
   };
 
-  const handleComplete = (data) => {
-    //data는 주소 검색 전체 결과 객체
-    setZipcode(data.zonecode);
-    setAddressBase(data.address); // 기본 주소에 저장
-    setOpenPostcode(false); // 검색창 닫기
+  const handleComplete = (data: any) => {
+    // data는 주소 검색 전체 결과 객체
+    setCompany((prev) => ({
+      ...prev,
+      zipcode: data.zonecode,
+      addressBase: data.address,
+    }));
+    setOpenPostcode(false); // 모달 닫기
   };
 
   const handleClickAddress = () => {

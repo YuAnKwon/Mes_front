@@ -1,3 +1,5 @@
+/* 전체 프로젝트에 공통으로 적용되는 글로벌 스타일 */
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
