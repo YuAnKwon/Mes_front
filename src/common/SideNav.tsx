@@ -22,8 +22,13 @@ import {
   RiInboxUnarchiveFill,
   RiInboxUnarchiveLine,
 } from "react-icons/ri";
+import { useLocation } from "react-router-dom";
 
 export function SideNav() {
+  const location = useLocation(); // 현재 URL 정보
+  const pathname = location.pathname;
+  const isActive = (href: string) => pathname === href; // 활성 상태 판단
+
   return (
     <Sidebar
       aria-label="Sidebar with multi-level dropdown example "
@@ -31,9 +36,7 @@ export function SideNav() {
     >
       <SidebarItems>
         <SidebarItemGroup>
-          <SidebarItem href="/" icon={HiChartPie} style={{ color: "black" }}>
-            대시보드
-          </SidebarItem>
+          {/* 현재 페이지이면 파랑 */}
           <SidebarCollapse
             icon={HiClipboardList}
             label="수주대상 입출고 관리"
@@ -42,28 +45,36 @@ export function SideNav() {
             <SidebarItem
               href="/"
               icon={RiInboxArchiveLine}
-              style={{ color: "black" }}
+              style={{ color: isActive("/") ? "blue" : "black" }}
             >
               입고 등록
             </SidebarItem>
             <SidebarItem
               href="/orderitem/inbound/list"
               icon={RiInboxArchiveFill}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/orderitem/inbound/list") ? "blue" : "black",
+              }}
             >
               입고 조회
             </SidebarItem>
             <SidebarItem
               href="/orderitem/outbound/register"
               icon={RiInboxUnarchiveLine}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/orderitem/outbound/register")
+                  ? "blue"
+                  : "black",
+              }}
             >
               출고 등록
             </SidebarItem>
             <SidebarItem
               href="/orderitem/outbound/list"
               icon={RiInboxUnarchiveFill}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/orderitem/outbound/list") ? "blue" : "black",
+              }}
             >
               출고 조회
             </SidebarItem>
@@ -72,35 +83,49 @@ export function SideNav() {
             <SidebarItem
               href="/material/inbound/register"
               icon={RiInboxArchiveLine}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/material/inbound/register")
+                  ? "blue"
+                  : "black",
+              }}
             >
               입고 등록
             </SidebarItem>
             <SidebarItem
               href="/material/inbound/list"
               icon={RiInboxArchiveFill}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/material/inbound/list") ? "blue" : "black",
+              }}
             >
               입고 조회
             </SidebarItem>
             <SidebarItem
               href="/material/outbound/register"
               icon={RiInboxUnarchiveLine}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/material/outbound/register")
+                  ? "blue"
+                  : "black",
+              }}
             >
               출고 등록
             </SidebarItem>
             <SidebarItem
               href="/material/outbound/list"
               icon={RiInboxUnarchiveFill}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/material/outbound/list") ? "blue" : "black",
+              }}
             >
               출고 조회
             </SidebarItem>
             <SidebarItem
               href="/material/totalstock"
               icon={FaBoxArchive}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/material/totalstock") ? "blue" : "black",
+              }}
             >
               재고 현황
             </SidebarItem>
@@ -109,28 +134,36 @@ export function SideNav() {
             <SidebarItem
               href="/master/orderitem/list"
               icon={HiClipboard}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/master/orderitem/list") ? "blue" : "black",
+              }}
             >
               수주대상품목
             </SidebarItem>
             <SidebarItem
               href="/master/material/list"
               icon={HiCube}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/master/material/list") ? "blue" : "black",
+              }}
             >
               원자재품목
             </SidebarItem>
             <SidebarItem
               href="/master/routing/list"
               icon={HiOutlineArrowsUpDown}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/master/routing/list") ? "blue" : "black",
+              }}
             >
               라우팅
             </SidebarItem>
             <SidebarItem
               href="/master/company/list"
               icon={HiMiniBuildingLibrary}
-              style={{ color: "black" }}
+              style={{
+                color: isActive("/master/company/list") ? "blue" : "black",
+              }}
             >
               업체
             </SidebarItem>
