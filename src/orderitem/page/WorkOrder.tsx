@@ -85,28 +85,31 @@ export default function WorkOrder({ id, lotNum }: Props) {
     const pageWidth = 794; // A4 width at 96dpi
     const pageHeight = 1123; // A4 height at 96dpi
 
-    // 가로·세로 비율 중 더 작은 쪽으로 축소
     const scale = Math.min(pageWidth / areaWidth, pageHeight / areaHeight);
 
     const style = document.createElement("style");
     style.innerHTML = `
-    @media print {
-      @page { size: A4; margin: 8mm; }
-      body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      body * { visibility: hidden; }
-      #print-area, #print-area * { visibility: visible; }
-      #print-area {
-        position: absolute; left: 0; top: 0;
-        transform: scale(${scale});
-        transform-origin: top left;
-        width: ${areaWidth}px;
-      }
-      table, tr, td, th { page-break-inside: avoid !important; }
-    }
-  `;
+@media print {
+  @page { size: A4; margin: 8mm; }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    margin: 0;
+    padding: 0;
+  }
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area {
+    position: relative;
+    margin: 0 auto;
+    transform: scale(${scale});
+    transform-origin: top left;
+    width: ${areaWidth}px;
+  }
+  table, tr, td, th { page-break-inside: avoid !important; }
+}
+`;
+
     document.head.appendChild(style);
     window.print();
     document.head.removeChild(style);

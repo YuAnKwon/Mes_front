@@ -76,11 +76,9 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
   };
 
   return (
-    <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
-      <h2>원자재 등록</h2>
-
-      <Box sx={{ height: 600, width: "100%" }}>
-        <Grid container spacing={3} sx={{ mt: 4 }}>
+    <Box sx={{ p: 2, maxWidth: 900, mx: "auto" }}>
+      <Box sx={{ width: "100%" }}>
+        <Grid container spacing={3} sx={{ mt: 1 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="companyName" required>
               매입처명
@@ -241,7 +239,7 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2,
+          mt: 4,
         }}
       >
         {/* 버튼 영역 */}

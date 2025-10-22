@@ -80,6 +80,7 @@ export default function MasterMaterialList() {
       const materialNames = Array.from(
         new Set(mcList.map((m) => m.materialName))
       ); //수정
+      const useYns = Array.from(new Set(mcList.map((m) => m.useYn)));
 
       setFilteredMaterials(mappedRows); //초기값
 
@@ -87,6 +88,7 @@ export default function MasterMaterialList() {
         companyName: companies, //수정
         materialCode: materialCodes, //수정
         materialName: materialNames, //수정
+        useYn: useYns,
       });
     } catch (error) {
       console.error("업체 데이터 조회 실패", error); //수정
@@ -239,21 +241,12 @@ export default function MasterMaterialList() {
       renderCell: (params) => (
         <Box
           sx={{
-            width: "100%",
-            height: "100%",
-            overflowX: "auto", // 가로 스크롤
-            overflowY: "hidden",
+            whiteSpace: "normal", // 줄바꿈 허용
+            wordBreak: "break-word", // 단어 단위 줄바꿈 허용
+            px: 0.5,
           }}
         >
-          <Box
-            sx={{
-              display: "inline-block", // 실제 내용 길이만큼 폭 확장
-              whiteSpace: "nowrap", // 줄바꿈 방지
-              px: 0.5,
-            }}
-          >
-            {params.value}
-          </Box>
+          {params.value}
         </Box>
       ),
     },
@@ -338,6 +331,7 @@ export default function MasterMaterialList() {
               { label: "거래처명", value: "companyName" }, //수정
               { label: "품목코드", value: "materialCode" }, //수정
               { label: "품목명", value: "materialName" }, //수정
+              { label: "거래상태", value: "useYn" },
             ]}
             autoCompleteMap={autoCompleteMap}
             onSearch={handleSearch}
@@ -411,7 +405,7 @@ export default function MasterMaterialList() {
         // fullWidth
       >
         <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
-          수주대상품목 상세정보
+          원자재 상세정보
           <IconButton onClick={handleCloseDetail}>
             <CloseIcon />
           </IconButton>
