@@ -21,6 +21,7 @@ interface Props {
 
 export default function MasterMaterialDetail({ itemId, onClose }: Props) {
   const [scaleError, setScaleError] = useState(false);
+  const [specError, setSpecError] = useState(false);
 
   const [material, setMaterial] = useState<MasterMtRegister>({
     materialName: "",
@@ -184,19 +185,32 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
               id="spec"
               name="spec"
               value={material.spec}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
+
+                // 숫자만 허용
+                const valid = /^[0-9]*$/;
+
                 setMaterial((prev) => ({
                   ...prev,
-                  spec: Number(e.target.value),
-                }))
-              }
+                  spec: value, // 문자열 그대로 저장
+                }));
+
+                setSpecError(!valid.test(value));
+              }}
               type="text"
               placeholder="규격"
               autoComplete="on"
               required
               size="small"
             />
+            {specError && (
+              <span style={{ color: "red", fontSize: "0.75rem" }}>
+                숫자만 입력해주세요.
+              </span>
+            )}
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 3 }}>
             <FormLabel htmlFor="scale" required>
               규격단위
