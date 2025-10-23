@@ -4,7 +4,7 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#6C5DD3", // 보라 톤
+      main: "#466ba6", // 등록 버튼
     },
     secondary: {
       main: "#FF6B6B", // 핑크 레드 톤
@@ -19,15 +19,26 @@ const theme = createTheme({
       main: "#4D96FF",
     },
     success: {
-      main: "#42C38C",
+      main: "#46a66f", //엑셀쪽 버튼
     },
     background: {
-      default: "#F8F9FA",
+      default: "#f0f4fa", //배경색
       paper: "#FFFFFF",
     },
   },
   typography: {
     fontFamily: "'Noto Sans KR', sans-serif",
+  },
+  components: {
+    MuiDataGrid: {
+      styleOverrides: {
+        row: {
+          "&:hover": {
+            backgroundColor: "#f0f4fa",
+          },
+        },
+      },
+    },
   },
 });
 

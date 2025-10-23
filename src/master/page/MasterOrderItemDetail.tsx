@@ -22,7 +22,7 @@ const FormGrid = styled(Grid)(() => ({
 
 interface Props {
   itemId: number;
-  onClose: () => void;
+  onClose: (refresh?: boolean) => void; // refresh 옵션 추가
 }
 
 export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
@@ -77,7 +77,7 @@ export default function MasterOrderItemDetail({ itemId, onClose }: Props) {
     try {
       await updateOrItDetail(orderItem.id!, formData); // API 호출
       alert("수정 완료!");
-      onClose();
+      onClose(true);
     } catch (error) {
       if (error.response?.data?.message?.includes("이미 존재하는 품목번호")) {
         alert("이미 존재하는 품목번호입니다.");

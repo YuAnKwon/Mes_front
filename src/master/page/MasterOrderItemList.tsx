@@ -375,7 +375,7 @@ export default function MasterOrderItemList() {
         {/* 버튼 영역 */}
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Button
-            variant="outlined"
+            variant="contained"
             color="success"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleExcelDownload}
@@ -383,7 +383,7 @@ export default function MasterOrderItemList() {
             엑셀 다운로드
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleOpenRegister}

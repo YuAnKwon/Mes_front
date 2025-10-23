@@ -35,8 +35,9 @@ function App() {
           </div>
 
           {/* 본문 (오른쪽 영역) */}
-          <div className="flex-1 overflow-auto p-6 flex justify-center">
-            <div className="w-full max-w-6xl">
+          <div className="flex-1 p-6 flex justify-center">
+            {/* w-full 제거, max-w-6xl + mx-auto 로 너비 제약 및 중앙 정렬 */}
+            <div className="main-content-wrapper">
               <Routes>
                 {/* 수주대상품목 */}
                 <Route path="/" element={<OrderInboundRegister />} />
