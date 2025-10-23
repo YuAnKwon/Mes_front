@@ -60,16 +60,18 @@ export default function MasterMaterialList() {
     try {
       const mcList = await getMasterMtList(); //수정
 
-      const mappedRows: MasterMtList[] = mcList.map((item: any) => ({
-        id: item.id,
-        materialCode: item.materialCode, // API code → 타입 materialCode
-        materialName: item.materialName, // API name → 타입 materialName
-        companyName: item.companyName, // API company → 타입 companyName
-        type: item.type,
-        color: item.color,
-        useYn: item.useYn,
-        remark: item.remark,
-      }));
+      const mappedRows: MasterMtList[] = mcList
+        .map((item: any) => ({
+          id: item.id,
+          materialCode: item.materialCode, // API code → 타입 materialCode
+          materialName: item.materialName, // API name → 타입 materialName
+          companyName: item.companyName, // API company → 타입 companyName
+          type: item.type,
+          color: item.color,
+          useYn: item.useYn,
+          remark: item.remark,
+        }))
+        .sort((a, b) => b.id - a.id);
       setRows(mappedRows); //수정
 
       // ✅ 각 필드별 중복 없는 자동완성 리스트 만들기
@@ -104,7 +106,7 @@ export default function MasterMaterialList() {
   const columns: GridColDef[] = [
     {
       field: "id",
-      headerName: "id",
+      headerName: "No",
       width: 150,
       headerAlign: "center",
       align: "center",
@@ -125,7 +127,7 @@ export default function MasterMaterialList() {
     {
       field: "materialName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => (

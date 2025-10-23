@@ -205,7 +205,7 @@ export default function OrderOutboundList() {
     {
       field: "itemName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -282,7 +282,7 @@ export default function OrderOutboundList() {
     {
       field: "actions",
       headerName: "수정 / 삭제",
-      width: 140,
+      width: 170,
       headerAlign: "center",
       align: "center",
       renderCell: (params: GridRenderCellParams) => {
@@ -437,7 +437,7 @@ export default function OrderOutboundList() {
               position: "absolute",
               right: 6,
               top: 6,
-              fontSize: "12px",
+              fontSize: "18px",
               color: "#999",
             },
             "& .MuiDataGrid-cell--editing::after": {

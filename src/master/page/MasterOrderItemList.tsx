@@ -141,9 +141,16 @@ export default function MasterOrderItemList() {
   const apiRef = useGridApiRef();
   const columns: GridColDef[] = [
     {
+      field: "id",
+      headerName: "No",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
       field: "itemName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       //언더바(상세 페이지)
@@ -346,6 +353,7 @@ export default function MasterOrderItemList() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          mt: 4,
           mb: 2,
           gap: 2,
         }}
@@ -391,7 +399,6 @@ export default function MasterOrderItemList() {
           columns={columns}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
-          checkboxSelection
           pageSizeOptions={[10, 20, 30]}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },

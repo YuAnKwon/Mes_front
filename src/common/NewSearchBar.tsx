@@ -57,6 +57,7 @@ export default function NewSearchBar({
           "& .MuiSelect-select": {
             display: "flex",
             alignItems: "center",
+            justifyContent: "center",
             height: "100%",
             pl: 1.5,
           },

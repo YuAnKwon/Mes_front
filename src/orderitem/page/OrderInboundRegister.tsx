@@ -17,7 +17,6 @@ import { getOrderItemInRegiList, registerInboundItem } from "../api/OrderInApi";
 import type { OrderItemList, OrderItemInRegister } from "../type";
 import { createStyledWorksheet } from "../../common/ExcelUtils";
 import NewSearchBar from "../../common/NewSearchBar";
-import OrderDetailModal from "./OrderDetail";
 import OrderDetail from "./OrderDetail";
 import { CloseIcon } from "flowbite-react";
 
@@ -107,7 +106,7 @@ export default function OrderInboundRegister() {
     {
       field: "itemName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -269,7 +268,15 @@ export default function OrderInboundRegister() {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box
+      sx={{
+        mx: "auto", // 가운데 정렬
+        p: 2,
+        display: "flex",
+        flexDirection: "column", // 세로로 쌓이도록
+      }}
+    >
+      {" "}
       <Typography variant="h5" sx={{ mb: 3 }}>
         수주대상 품목 입고 등록
       </Typography>
@@ -335,6 +342,17 @@ export default function OrderInboundRegister() {
               },
             },
           }}
+          experimentalFeatures={{ newEditingApi: true }} // 👈 추가
+          processRowUpdate={(newRow, oldRow) => {
+            // inAmount 또는 inDate가 입력되면 자동 체크
+            if (
+              (newRow.inAmount !== undefined && newRow.inAmount !== null) ||
+              (newRow.inDate && newRow.inDate !== "")
+            ) {
+              apiRef.current?.selectRow(newRow.id, true, false); // 기존 선택 유지
+            }
+            return newRow;
+          }}
           //연필아이콘
           sx={{
             "& .MuiDataGrid-columnHeaders": {
@@ -348,7 +366,7 @@ export default function OrderInboundRegister() {
               position: "absolute",
               right: 6,
               top: 6,
-              fontSize: "12px",
+              fontSize: "18px",
               color: "#999",
             },
             "& .MuiDataGrid-cell--editing::after": {

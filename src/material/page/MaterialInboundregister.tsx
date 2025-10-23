@@ -118,7 +118,7 @@ export function MaterialInboundregister() {
     {
       field: "materialName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -145,14 +145,14 @@ export function MaterialInboundregister() {
     {
       field: "specAndScale",
       headerName: "원자재 규격",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "manufacturer",
       headerName: "제조사",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       type: "string",
@@ -160,7 +160,7 @@ export function MaterialInboundregister() {
     {
       field: "inAmount",
       headerName: "입고 수량",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       editable: true,
@@ -178,7 +178,7 @@ export function MaterialInboundregister() {
     {
       field: "manufactureDate",
       headerName: "제조 일자",
-      width: 250,
+      width: 150,
       headerAlign: "center",
       align: "left",
       editable: true,
@@ -261,6 +261,17 @@ export function MaterialInboundregister() {
           checkboxSelection
           pagination
           pageSizeOptions={[10, 20, 30]}
+          experimentalFeatures={{ newEditingApi: true }} // 👈 추가
+          processRowUpdate={(newRow, oldRow) => {
+            // inAmount 또는 inDate가 입력되면 자동 체크
+            if (
+              (newRow.inAmount !== undefined && newRow.inAmount !== null) ||
+              (newRow.inDate && newRow.inDate !== "")
+            ) {
+              apiRef.current?.selectRow(newRow.id, true, false); // 기존 선택 유지
+            }
+            return newRow;
+          }}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
           }}
@@ -283,7 +294,7 @@ export function MaterialInboundregister() {
               position: "absolute",
               right: 6,
               top: 6,
-              fontSize: "12px",
+              fontSize: "18px",
               color: "#999",
             },
             "& .MuiDataGrid-cell--editing::after": {

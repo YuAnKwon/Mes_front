@@ -26,7 +26,7 @@ export function MaterialOutboundRegister() {
     {
       field: "inNum",
       headerName: "입고번호",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -39,7 +39,7 @@ export function MaterialOutboundRegister() {
     {
       field: "materialName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -66,7 +66,7 @@ export function MaterialOutboundRegister() {
     {
       field: "stock",
       headerName: "재고량",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       type: "number",
@@ -74,7 +74,7 @@ export function MaterialOutboundRegister() {
     {
       field: "manufacturer",
       headerName: "제조사",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       type: "string",
@@ -82,7 +82,7 @@ export function MaterialOutboundRegister() {
     {
       field: "outAmount",
       headerName: "출고 수량",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       editable: true,
@@ -178,7 +178,7 @@ export function MaterialOutboundRegister() {
           inAmount: item.inAmount, // 입고수량 (남은 재고량 판단용)
           stock: Number(item.totalStock) || 0, // 총 재고량
           manufacturer: item.manufacturer,
-          outAmount: 0, // 출고 수량 초기값
+          outAmount: undefined, // 출고 수량 초기값
           outDate: "", // 출고일자 초기값
         }));
 
@@ -221,7 +221,7 @@ export function MaterialOutboundRegister() {
       품목명: item.materialName,
       품목번호: item.materialCode,
       매입처명: item.companyName,
-      "재고량(개)": item.stock,
+      재고량: item.stock,
       제조사: item.manufacturer,
 
       // "거래처명": item.companyName ?? "", // null 방지
@@ -290,6 +290,17 @@ export function MaterialOutboundRegister() {
           checkboxSelection
           pagination
           pageSizeOptions={[10, 20, 30]}
+          experimentalFeatures={{ newEditingApi: true }} // 👈 추가
+          processRowUpdate={(newRow, oldRow) => {
+            // inAmount 또는 inDate가 입력되면 자동 체크
+            if (
+              (newRow.inAmount !== undefined && newRow.inAmount !== null) ||
+              (newRow.inDate && newRow.inDate !== "")
+            ) {
+              apiRef.current?.selectRow(newRow.id, true, false); // 기존 선택 유지
+            }
+            return newRow;
+          }}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
           }}
@@ -312,7 +323,7 @@ export function MaterialOutboundRegister() {
               position: "absolute",
               right: 6,
               top: 6,
-              fontSize: "12px",
+              fontSize: "18px",
               color: "#999",
             },
             "& .MuiDataGrid-cell--editing::after": {
