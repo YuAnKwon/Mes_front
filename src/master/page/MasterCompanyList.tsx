@@ -20,7 +20,6 @@ import {
   getSupplierList,
   updateCompanyState,
 } from "../api/companyApi";
-import SearchBar from "../../common/SearchBar";
 import MasterCompany from "./MasterCompany";
 import CloseIcon from "@mui/icons-material/Close";
 import MasterCompanyDetail from "./MasterCompanyDetail";

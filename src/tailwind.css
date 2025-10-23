@@ -10,7 +10,7 @@
   }
 
   .main-content {
-    @apply w-full max-w-5xl;
+    @apply mx-auto  w-full;
   }
 
   .main-content h2 {
