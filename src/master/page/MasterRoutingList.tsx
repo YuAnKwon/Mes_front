@@ -18,7 +18,8 @@ export default function MasterRoutingList() {
   const loadData = async () => {
     try {
       const routingList = await getRoutingList();
-      setRows(routingList);
+      const sortedList = routingList.sort((a, b) => b.id - a.id);
+      setRows(sortedList);
     } catch (error) {
       console.error("공정 데이터 로딩 실패", error);
     }
@@ -139,8 +140,8 @@ export default function MasterRoutingList() {
   const commonColumns: GridColDef[] = [
     {
       field: "id",
-      headerName: "",
-      width: 100,
+      headerName: "No",
+      width: 150,
       headerAlign: "center",
       align: "center",
     },
@@ -160,7 +161,7 @@ export default function MasterRoutingList() {
     {
       field: "processName",
       headerName: "공정명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
     },

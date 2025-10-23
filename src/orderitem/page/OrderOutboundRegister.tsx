@@ -142,7 +142,7 @@ export default function OrderOutboundRegister() {
     {
       field: "itemName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -162,7 +162,7 @@ export default function OrderOutboundRegister() {
     {
       field: "company",
       headerName: "거래처명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
     },
@@ -192,19 +192,22 @@ export default function OrderOutboundRegister() {
     {
       field: "isProcessCompleted",
       headerName: "공정진행상태",
-      width: 150,
+      width: 250,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
         const value = params.value;
-        // 공정 상태에 따른 색상
         const colorMap: Record<
           string,
           { text: string; bg: string; textColor: string }
         > = {
-          Y: { text: "공정 완료", bg: "#E6F4EA", textColor: "#2E7D32" }, // 연두/초록
-          N: { text: "진행 중", bg: "#FFF4E5", textColor: "#FF9800" }, // 주황/연한 주황
-          default: { text: "-", bg: "#F5F5F5", textColor: "#9E9E9E" }, // 회색
+          Y: { text: "공정 완료", bg: "#E6F4EA", textColor: "#2E7D32" },
+          N: {
+            text: "진행 중 (출고 불가)",
+            bg: "#FFF4E5",
+            textColor: "#FF9800",
+          },
+          default: { text: "-", bg: "#F5F5F5", textColor: "#9E9E9E" },
         };
 
         const { text, bg, textColor } = colorMap[value] || colorMap.default;
@@ -245,6 +248,10 @@ export default function OrderOutboundRegister() {
       align: "center",
       editable: true,
       type: "number",
+      renderCell: (params) => {
+        const value = params.value;
+        return <span>{value === 0 || value == null ? "" : value}</span>;
+      },
     },
     {
       field: "outDate",
@@ -398,6 +405,22 @@ export default function OrderOutboundRegister() {
           checkboxSelection
           isRowSelectable={(params) => params.row.isProcessCompleted === "Y"}
           pageSizeOptions={[10, 20, 30]}
+          experimentalFeatures={{ newEditingApi: true }} // 👈 추가
+          processRowUpdate={(newRow, oldRow) => {
+            // ✅ 공정 미완료이면 입력 막기
+            if (newRow.isProcessCompleted === "N") {
+              alert("모든 공정이 끝나야 출고 할 수 있습니다.");
+              return oldRow; // 이전 값 유지
+            }
+            // inAmount 또는 inDate가 입력되면 자동 체크
+            if (
+              (newRow.inAmount !== undefined && newRow.inAmount !== null) ||
+              (newRow.inDate && newRow.inDate !== "")
+            ) {
+              apiRef.current?.selectRow(newRow.id, true, false); // 기존 선택 유지
+            }
+            return newRow;
+          }}
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 20 } },
             sorting: { sortModel: [{ field: "lotNum", sort: "desc" }] },
@@ -420,7 +443,7 @@ export default function OrderOutboundRegister() {
               position: "absolute",
               right: 6,
               top: 6,
-              fontSize: "12px",
+              fontSize: "18px",
               color: "#999",
             },
             "& .MuiDataGrid-cell--editing::after": { content: '""' },

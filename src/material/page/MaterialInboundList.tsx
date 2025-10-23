@@ -186,7 +186,7 @@ export function MaterialInboundList() {
     {
       field: "inNum",
       headerName: "입고번호",
-      width: 180,
+      width: 200,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -199,7 +199,7 @@ export function MaterialInboundList() {
     {
       field: "materialName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -226,14 +226,14 @@ export function MaterialInboundList() {
     {
       field: "specAndScale",
       headerName: "원자재 규격",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "manufacturer",
       headerName: "제조사",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       type: "number",
@@ -241,7 +241,7 @@ export function MaterialInboundList() {
     {
       field: "inAmount",
       headerName: "입고수량",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       editable: true,
@@ -264,7 +264,7 @@ export function MaterialInboundList() {
     {
       field: "inDate",
       headerName: "입고일자",
-      width: 200,
+      width: 150,
       headerAlign: "center",
       editable: true,
       align: "center",
@@ -283,7 +283,7 @@ export function MaterialInboundList() {
     {
       field: "manufactureDate",
       headerName: "제조일자",
-      width: 200,
+      width: 150,
       headerAlign: "center",
       editable: true,
       align: "center",
@@ -302,7 +302,7 @@ export function MaterialInboundList() {
     {
       field: "actions",
       headerName: "수정 / 삭제",
-      width: 140,
+      width: 170,
       headerAlign: "center",
       align: "center",
       renderCell: (params: GridRenderCellParams) => {
@@ -460,7 +460,7 @@ export function MaterialInboundList() {
               position: "absolute",
               right: 6,
               top: 6,
-              fontSize: "12px",
+              fontSize: "18px",
               color: "#999",
             },
             "& .MuiDataGrid-cell--editing::after": {

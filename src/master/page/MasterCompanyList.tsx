@@ -20,7 +20,6 @@ import {
   getSupplierList,
   updateCompanyState,
 } from "../api/companyApi";
-import SearchBar from "../../common/SearchBar";
 import MasterCompany from "./MasterCompany";
 import CloseIcon from "@mui/icons-material/Close";
 import MasterCompanyDetail from "./MasterCompanyDetail";
@@ -38,15 +37,17 @@ export default function MasterCompanyList() {
       else if (currentTab === 1) data = await getClientList();
       else if (currentTab === 2) data = await getSupplierList();
 
-      const mappedRows = data.map((item) => ({
-        id: item.id,
-        companyName: item.companyName,
-        companyType: item.companyType,
-        ceoName: item.ceoName,
-        address: item.address,
-        remark: item.remark,
-        businessYn: item.businessYn,
-      }));
+      const mappedRows = data
+        .map((item) => ({
+          id: item.id,
+          companyName: item.companyName,
+          companyType: item.companyType,
+          ceoName: item.ceoName,
+          address: item.address,
+          remark: item.remark,
+          businessYn: item.businessYn,
+        }))
+        .sort((a, b) => b.id - a.id);
 
       setRows(mappedRows);
     } catch (error) {
@@ -82,8 +83,8 @@ export default function MasterCompanyList() {
   const columns: GridColDef[] = [
     {
       field: "id",
-      headerName: "id",
-      width: 100,
+      headerName: "No",
+      width: 150,
       headerAlign: "center",
       align: "center",
     },
@@ -97,7 +98,7 @@ export default function MasterCompanyList() {
     {
       field: "companyName",
       headerName: "거래처명",
-      width: 150,
+      width: 200,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -135,7 +136,7 @@ export default function MasterCompanyList() {
     {
       field: "address",
       headerName: "기업 주소",
-      width: 300,
+      width: 350,
       headerAlign: "center",
       align: "center",
     },
@@ -237,17 +238,6 @@ export default function MasterCompanyList() {
   const tabList = ["전체", "거래처", "매입처"];
   const handleTabChange = (_e, newValue: number) => setCurrentTab(newValue);
 
-  const sampleData = ["회사1", "회사2", "품목A", "품목B"];
-  const searchOptions = [
-    { label: "매입처명", value: "companyName" },
-    { label: "품목번호", value: "materialCode" },
-    { label: "품목명", value: "materialName" },
-  ];
-
-  const handleSearch = (criteria: string, query: string) => {
-    console.log("검색 실행:", { criteria, query });
-  };
-
   const filteredRows =
     currentTab === 0
       ? rows
@@ -276,21 +266,8 @@ export default function MasterCompanyList() {
         업체 조회
       </Typography>
 
-      {/* 검색 + 버튼 */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        <Box sx={{ flex: 1 }}>
-          <SearchBar
-            searchOptions={searchOptions}
-            autoCompleteData={sampleData}
-            onSearch={handleSearch}
-          />
-        </Box>
-        <Button
-          variant="outlined"
-          color="primary"
-          sx={{ height: 40, fontWeight: 500, px: 2.5, ml: 2 }}
-          onClick={handleOpenRegister}
-        >
+      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button variant="outlined" onClick={handleOpenRegister}>
           업체 등록
         </Button>
       </Box>
@@ -303,7 +280,7 @@ export default function MasterCompanyList() {
       </Tabs>
 
       {/* 테이블 */}
-      <Box sx={{}}>
+      <Box>
         <DataGrid
           apiRef={apiRef}
           rows={filteredRows}

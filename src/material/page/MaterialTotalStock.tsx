@@ -51,7 +51,7 @@ export function MaterialTotalStock() {
     {
       field: "materialName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {

@@ -20,6 +20,8 @@ interface Props {
 }
 
 export default function MasterMaterialDetail({ itemId, onClose }: Props) {
+  const [scaleError, setScaleError] = useState(false);
+
   const [material, setMaterial] = useState<MasterMtRegister>({
     materialName: "",
     materialCode: "",
@@ -64,7 +66,7 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
   };
 
   return (
-    <Box sx={{ p: 2, maxWidth: 900, mx: "auto" }}>
+    <Box sx={{ p: 2, maxWidth: 800, mx: "auto" }}>
       <Box sx={{ width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 1 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
@@ -203,16 +205,36 @@ export default function MasterMaterialDetail({ itemId, onClose }: Props) {
               id="scale"
               name="scale"
               value={material.scale}
-              onChange={(e) =>
-                setMaterial((prev) => ({ ...prev, scale: e.target.value }))
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+
+                // 한글 조합 중일 때는 검사하지 않음 (예: 'ㄱ' → '가')
+                if (e.nativeEvent.isComposing) return;
+
+                // 한글 또는 영문만 허용
+                const valid = /^[\p{L}]+$/u;
+
+                setMaterial((prev) => ({ ...prev, scale: value }));
+
+                if (value === "" || valid.test(value)) {
+                  setScaleError(false);
+                } else {
+                  setScaleError(true);
+                }
+              }}
               type="text"
               placeholder="규격단위"
               autoComplete="on"
               required
               size="small"
             />
+            {scaleError && (
+              <span style={{ color: "red", fontSize: "0.75rem" }}>
+                문자만 입력해주세요.
+              </span>
+            )}
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="manufacturer" required>
               제조사

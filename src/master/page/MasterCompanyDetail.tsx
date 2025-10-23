@@ -88,7 +88,7 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
   };
 
   return (
-    <Box sx={{ p: 2, maxWidth: 1200, mx: "auto" }}>
+    <Box sx={{ p: 2, maxWidth: 850, mx: "auto" }}>
       <Typography variant="h5" sx={{ mb: 1 }}>
         {company.companyName}의 상세정보
       </Typography>
@@ -151,7 +151,7 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
                 setCompany((prev) => ({ ...prev, businessNum: e.target.value }))
               }
               type="text"
-              placeholder="사업자 등록번호"
+              placeholder="123-45-67890"
               autoComplete="businessNum"
               required
               size="small"
@@ -187,7 +187,7 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
                 setCompany((prev) => ({ ...prev, ceoPhone: e.target.value }))
               }
               type="text"
-              placeholder="01012345678"
+              placeholder="010-1234-5678"
               autoComplete="tel"
               required
               size="small"
@@ -226,7 +226,7 @@ export default function MasterCompanyDetail({ companyId, onClose }: Props) {
                 }))
               }
               type="text"
-              placeholder="01012345678"
+              placeholder="010-1234-5678"
               autoComplete="managerPhone"
               required
               size="small"

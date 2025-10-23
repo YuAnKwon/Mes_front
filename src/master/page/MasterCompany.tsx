@@ -169,7 +169,7 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
               value={businessNum}
               onChange={(e) => setBusinessNum(e.target.value)}
               type="text"
-              placeholder="사업자 등록번호"
+              placeholder="123-45-67890"
               autoComplete="off"
               required
               size="small"

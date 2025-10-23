@@ -153,7 +153,7 @@ export function MaterialOutboundList() {
     {
       field: "materialName",
       headerName: "품목명",
-      width: 150,
+      width: 180,
       headerAlign: "center",
       align: "center",
       sortComparator: (a, b) => {
@@ -173,14 +173,14 @@ export function MaterialOutboundList() {
     {
       field: "companyName",
       headerName: "매입처명",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "manufacturer",
       headerName: "제조사",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       type: "string",
@@ -188,7 +188,7 @@ export function MaterialOutboundList() {
     {
       field: "outAmount",
       headerName: "출고 수량",
-      width: 120,
+      width: 150,
       headerAlign: "center",
       align: "center",
       editable: true,
@@ -215,7 +215,7 @@ export function MaterialOutboundList() {
     {
       field: "actions",
       headerName: "수정 / 삭제",
-      width: 140,
+      width: 170,
       headerAlign: "center",
       align: "center",
       renderCell: (params: GridRenderCellParams) => {
@@ -404,7 +404,7 @@ export function MaterialOutboundList() {
               position: "absolute",
               right: 6,
               top: 6,
-              fontSize: "12px",
+              fontSize: "18px",
               color: "#999",
             },
             "& .MuiDataGrid-cell--editing::after": {

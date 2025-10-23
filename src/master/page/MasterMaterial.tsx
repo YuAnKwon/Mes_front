@@ -31,6 +31,7 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
   const [manufacturer, setManufacturer] = useState("");
   const [remark, setRemark] = useState("");
   const [companyList, setCompanyList] = useState<string[]>([]); // 자동완성용 리스트
+  const [scaleError, setScaleError] = useState(false);
 
   useEffect(() => {
     // 매입처 리스트 가져오기
@@ -95,7 +96,7 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
   };
 
   return (
-    <Box sx={{ p: 2, maxWidth: 900, mx: "auto" }}>
+    <Box sx={{ p: 2, maxWidth: 800, mx: "auto" }}>
       <Box sx={{ width: "100%" }}>
         <Grid container spacing={3} sx={{ mt: 4 }}>
           <FormGrid size={{ xs: 12, md: 6 }}>
@@ -272,14 +273,30 @@ export default function MasterMaterial({ onRegisterComplete }: Props) {
               id="scale"
               name="scale"
               value={scale}
-              onChange={(e) => setScale(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setScale(value);
+
+                // 문자(한글, 영어 등)만 허용. 숫자나 특수문자 있으면 에러
+                if (/^[\p{L}]*$/u.test(value) || value === "") {
+                  setScaleError(false);
+                } else {
+                  setScaleError(true);
+                }
+              }}
               type="text"
               placeholder="규격단위"
               autoComplete="on"
               required
               size="small"
             />
+            {scaleError && (
+              <span style={{ color: "red", fontSize: "0.75rem" }}>
+                문자만 입력해주세요.
+              </span>
+            )}
           </FormGrid>
+
           <FormGrid size={{ xs: 12, md: 6 }}>
             <FormLabel htmlFor="manufacturer" required>
               제조사
