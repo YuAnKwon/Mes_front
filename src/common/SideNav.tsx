@@ -59,7 +59,7 @@ export function SideNav() {
         collapse: {
           // SidebarCollapse(접었다 펼치는 메뉴) 관련 스타일
           button:
-            "flex items-center justify-between w-full p-2 text-black rounded-lg hover:bg-gray-700 bg-transparent",
+            "flex items-center justify-between w-full p-2 text-black rounded-lg  bg-transparent",
           // - button 전체 영역 스타일
           // - flex, items-center, justify-between: 아이템 수평 정렬
           // - w-full: 버튼 너비 100%
@@ -116,7 +116,7 @@ export function SideNav() {
         },
 
         item: {
-          base: "flex items-center p-2 text-black rounded-lg hover:bg-gray-700 bg-transparent",
+          base: "flex items-center p-2 text-black rounded-lg  bg-transparent",
           // SidebarItem 기본 스타일
           // - flex, items-center: 수평 중앙 정렬
           // - p-2: padding
@@ -165,7 +165,7 @@ export function SideNav() {
             <SidebarItem
               href="/"
               icon={RiInboxArchiveLine}
-              style={{ color: isActive("/") ? "#2d547e" : "black" }}
+              style={{ color: isActive("/") ? "#5477b0" : "black" }}
             >
               입고 등록
             </SidebarItem>
@@ -174,7 +174,7 @@ export function SideNav() {
               icon={RiInboxArchiveFill}
               style={{
                 color: isActive("/orderitem/inbound/list")
-                  ? "#2d547e"
+                  ? "#5477b0"
                   : "black",
               }}
             >
@@ -185,7 +185,7 @@ export function SideNav() {
               icon={RiInboxUnarchiveLine}
               style={{
                 color: isActive("/orderitem/outbound/register")
-                  ? "blue"
+                  ? "#5477b0"
                   : "black",
               }}
             >
@@ -195,7 +195,9 @@ export function SideNav() {
               href="/orderitem/outbound/list"
               icon={RiInboxUnarchiveFill}
               style={{
-                color: isActive("/orderitem/outbound/list") ? "blue" : "black",
+                color: isActive("/orderitem/outbound/list")
+                  ? "#5477b0"
+                  : "black",
               }}
             >
               출고 조회
@@ -212,7 +214,7 @@ export function SideNav() {
               icon={RiInboxArchiveLine}
               style={{
                 color: isActive("/material/inbound/register")
-                  ? "blue"
+                  ? "#5477b0"
                   : "black",
               }}
             >
@@ -222,7 +224,7 @@ export function SideNav() {
               href="/material/inbound/list"
               icon={RiInboxArchiveFill}
               style={{
-                color: isActive("/material/inbound/list") ? "blue" : "black",
+                color: isActive("/material/inbound/list") ? "#5477b0" : "black",
               }}
             >
               입고 조회
@@ -232,7 +234,7 @@ export function SideNav() {
               icon={RiInboxUnarchiveLine}
               style={{
                 color: isActive("/material/outbound/register")
-                  ? "blue"
+                  ? "#5477b0"
                   : "black",
               }}
             >
@@ -242,7 +244,9 @@ export function SideNav() {
               href="/material/outbound/list"
               icon={RiInboxUnarchiveFill}
               style={{
-                color: isActive("/material/outbound/list") ? "blue" : "black",
+                color: isActive("/material/outbound/list")
+                  ? "#5477b0"
+                  : "black",
               }}
             >
               출고 조회
@@ -251,7 +255,7 @@ export function SideNav() {
               href="/material/totalstock"
               icon={FaBoxArchive}
               style={{
-                color: isActive("/material/totalstock") ? "blue" : "black",
+                color: isActive("/material/totalstock") ? "#5477b0" : "black",
               }}
             >
               재고 현황
@@ -267,7 +271,7 @@ export function SideNav() {
               href="/master/orderitem/list"
               icon={HiClipboard}
               style={{
-                color: isActive("/master/orderitem/list") ? "blue" : "black",
+                color: isActive("/master/orderitem/list") ? "#5477b0" : "black",
               }}
             >
               수주대상품목
@@ -276,7 +280,7 @@ export function SideNav() {
               href="/master/material/list"
               icon={HiCube}
               style={{
-                color: isActive("/master/material/list") ? "blue" : "black",
+                color: isActive("/master/material/list") ? "#5477b0" : "black",
               }}
             >
               원자재품목
@@ -285,7 +289,7 @@ export function SideNav() {
               href="/master/routing/list"
               icon={HiOutlineArrowsUpDown}
               style={{
-                color: isActive("/master/routing/list") ? "blue" : "black",
+                color: isActive("/master/routing/list") ? "#5477b0" : "black",
               }}
             >
               라우팅
@@ -294,7 +298,7 @@ export function SideNav() {
               href="/master/company/list"
               icon={HiMiniBuildingLibrary}
               style={{
-                color: isActive("/master/company/list") ? "blue" : "black",
+                color: isActive("/master/company/list") ? "#5477b0" : "black",
               }}
             >
               업체

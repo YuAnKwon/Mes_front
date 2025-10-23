@@ -399,7 +399,7 @@ export default function OrderInboundList() {
         {/* 버튼 영역 */}
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Button
-            variant="outlined"
+            variant="contained"
             color="success"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleExcelDownload}

@@ -4,7 +4,7 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "##e1e6ed", // 보라 톤
+      main: "#466ba6", // 등록 버튼
     },
     secondary: {
       main: "#FF6B6B", // 핑크 레드 톤
@@ -19,10 +19,10 @@ const theme = createTheme({
       main: "#4D96FF",
     },
     success: {
-      main: "#42C38C",
+      main: "#46a66f", //엑셀쪽 버튼
     },
     background: {
-      default: "#e1e6ed", //배경색
+      default: "#f0f4fa", //배경색
       paper: "#FFFFFF",
     },
   },

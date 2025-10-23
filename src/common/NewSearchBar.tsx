@@ -38,7 +38,7 @@ export default function NewSearchBar({
         display: "flex",
         alignItems: "center",
         gap: 1,
-        backgroundColor: "#f9f9f9",
+        // backgroundColor: "#f9f9f9",
         borderRadius: 2,
         height: 40,
         width: 500,
