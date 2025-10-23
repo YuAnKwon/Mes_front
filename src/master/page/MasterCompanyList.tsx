@@ -267,7 +267,7 @@ export default function MasterCompanyList() {
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button variant="outlined" onClick={handleOpenRegister}>
+        <Button variant="contained" onClick={handleOpenRegister}>
           업체 등록
         </Button>
       </Box>

@@ -254,7 +254,7 @@ export default function MasterRoutingList() {
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button variant="outlined" onClick={handleOpenModal}>
+        <Button variant="contained" onClick={handleOpenModal}>
           라우팅 등록
         </Button>
       </Box>

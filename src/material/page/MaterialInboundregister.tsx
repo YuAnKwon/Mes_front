@@ -242,7 +242,7 @@ export function MaterialInboundregister() {
             엑셀 다운로드
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             sx={{ height: 40, fontWeight: 500, px: 2.5 }}
             onClick={handleRegister}
