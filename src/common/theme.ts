@@ -29,6 +29,17 @@ const theme = createTheme({
   typography: {
     fontFamily: "'Noto Sans KR', sans-serif",
   },
+  components: {
+    MuiDataGrid: {
+      styleOverrides: {
+        row: {
+          "&:hover": {
+            backgroundColor: "#f0f4fa",
+          },
+        },
+      },
+    },
+  },
 });
 
 export default theme;

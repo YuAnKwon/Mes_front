@@ -2,10 +2,16 @@
 /* Tailwind를 쓰더라도 추가 커스텀 스타일 */
 
 #root {
-  max-width: 1280px;
-  /* margin: 0 auto; */
-  /* padding: 2rem; */
+  max-width: 100%;
+  /* margin: 0 auto;
+  padding: 2rem; */
   /* text-align: center; */
+}
+
+.main-content-wrapper {
+  padding: 2rem; /* 원하는 패딩 */
+  margin: 0 auto; /* 좌우 중앙 정렬 */
+  box-sizing: border-box; /* 패딩 포함해서 width 계산 */
 }
 
 .logo {
