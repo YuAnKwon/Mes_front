@@ -302,7 +302,7 @@ export function MaterialOutboundRegister() {
             return newRow;
           }}
           initialState={{
-            pagination: { paginationModel: { page: 0, pageSize: 20 } },
+            pagination: { paginationModel: { page: 0, pageSize: 15 } },
           }}
           slotProps={{
             basePagination: {

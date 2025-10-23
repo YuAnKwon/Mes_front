@@ -439,7 +439,7 @@ export function MaterialInboundList() {
           pagination
           pageSizeOptions={[10, 20, 30]}
           initialState={{
-            pagination: { paginationModel: { page: 0, pageSize: 20 } },
+            pagination: { paginationModel: { page: 0, pageSize: 15 } },
           }}
           slotProps={{
             basePagination: {

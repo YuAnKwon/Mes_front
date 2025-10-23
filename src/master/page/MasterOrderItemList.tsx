@@ -401,7 +401,7 @@ export default function MasterOrderItemList() {
           disableRowSelectionOnClick
           pageSizeOptions={[10, 20, 30]}
           initialState={{
-            pagination: { paginationModel: { page: 0, pageSize: 20 } },
+            pagination: { paginationModel: { page: 0, pageSize: 15 } },
           }}
           sortingOrder={["desc", "asc"]}
           // sortModel={[{ field: "id", sort: "desc" }]}
