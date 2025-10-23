@@ -10,9 +10,8 @@
   }
 
   .main-content {
-    @apply w-full max-w-5xl;
+    @apply w-full max-w-[4000px] mx-auto; /* 가로 최대 1280px, 좌우 중앙 */
   }
-
   .main-content h2 {
     @apply text-2xl font-semibold mb-4;
   }

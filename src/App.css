@@ -3,14 +3,16 @@
 
 #root {
   max-width: 100%;
-  /* margin: 0 auto;
-  padding: 2rem; */
+  /* margin: 0 auto;*/
+  padding: 0 1rem 1rem 1rem;
   /* text-align: center; */
 }
 
 .main-content-wrapper {
   padding: 2rem; /* 원하는 패딩 */
   margin: 0 auto; /* 좌우 중앙 정렬 */
+  width: 100%; /* 부모 너비만큼 꽉 채움 */
+  max-width: 4000px;
   box-sizing: border-box; /* 패딩 포함해서 width 계산 */
 }
 

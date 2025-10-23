@@ -38,72 +38,74 @@ function App() {
           <div className="flex-1 p-6 flex justify-center">
             {/* w-full 제거, max-w-6xl + mx-auto 로 너비 제약 및 중앙 정렬 */}
             <div className="main-content-wrapper">
-              <Routes>
-                {/* 수주대상품목 */}
-                <Route path="/" element={<OrderInboundRegister />} />
-                <Route
-                  path="/orderitem/inbound/list"
-                  element={<OrderInboundList />}
-                />
-                <Route
-                  path="/orderitem/outbound/register"
-                  element={<OrderOutboundRegister />}
-                />
-                <Route
-                  path="/orderitem/outbound/list"
-                  element={<OrderOutboundList />}
-                />
-                <Route
-                  path="/orderitem/process/:id"
-                  element={<OrderProcess />}
-                />
+              <div className="main-content">
+                <Routes>
+                  {/* 수주대상품목 */}
+                  <Route path="/" element={<OrderInboundRegister />} />
+                  <Route
+                    path="/orderitem/inbound/list"
+                    element={<OrderInboundList />}
+                  />
+                  <Route
+                    path="/orderitem/outbound/register"
+                    element={<OrderOutboundRegister />}
+                  />
+                  <Route
+                    path="/orderitem/outbound/list"
+                    element={<OrderOutboundList />}
+                  />
+                  <Route
+                    path="/orderitem/process/:id"
+                    element={<OrderProcess />}
+                  />
 
-                {/* 원자재 */}
-                <Route
-                  path="/material/inbound/register"
-                  element={<MaterialInboundregister />}
-                />
-                <Route
-                  path="/material/inbound/list"
-                  element={<MaterialInboundList />}
-                />
-                <Route
-                  path="/material/outbound/register"
-                  element={<MaterialOutboundRegister />}
-                />
-                <Route
-                  path="/material/outbound/list"
-                  element={<MaterialOutboundList />}
-                />
-                <Route
-                  path="/material/totalstock"
-                  element={<MaterialTotalStock />}
-                />
+                  {/* 원자재 */}
+                  <Route
+                    path="/material/inbound/register"
+                    element={<MaterialInboundregister />}
+                  />
+                  <Route
+                    path="/material/inbound/list"
+                    element={<MaterialInboundList />}
+                  />
+                  <Route
+                    path="/material/outbound/register"
+                    element={<MaterialOutboundRegister />}
+                  />
+                  <Route
+                    path="/material/outbound/list"
+                    element={<MaterialOutboundList />}
+                  />
+                  <Route
+                    path="/material/totalstock"
+                    element={<MaterialTotalStock />}
+                  />
 
-                {/* 기준정보관리 */}
-                <Route
-                  path="/master/company/list"
-                  element={<MasterCompanyList />}
-                />
+                  {/* 기준정보관리 */}
+                  <Route
+                    path="/master/company/list"
+                    element={<MasterCompanyList />}
+                  />
 
-                <Route
-                  path="/master/material/list"
-                  element={<MasterMaterialList />}
-                />
+                  <Route
+                    path="/master/material/list"
+                    element={<MasterMaterialList />}
+                  />
 
-                <Route
-                  path="/master/orderitem/list"
-                  element={<MasterOrderItemList />}
-                />
-                <Route
-                  path="/master/orderitem/register"
-                  element={<MasterOrderItem />}
-                />
-                <Route
-                  path="/master/routing/list"
-                  element={<MasterRoutingList />}
-                />
-              </Routes>
+                  <Route
+                    path="/master/orderitem/list"
+                    element={<MasterOrderItemList />}
+                  />
+                  <Route
+                    path="/master/orderitem/register"
+                    element={<MasterOrderItem />}
+                  />
+                  <Route
+                    path="/master/routing/list"
+                    element={<MasterRoutingList />}
+                  />
+                </Routes>
+              </div>
             </div>
           </div>
         </div>
