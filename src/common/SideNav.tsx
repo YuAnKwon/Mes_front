@@ -59,7 +59,7 @@ export function SideNav() {
         collapse: {
           // SidebarCollapse(접었다 펼치는 메뉴) 관련 스타일
           button:
-            "flex items-center justify-between w-full p-2 text-black rounded-lg hover:bg-gray-700",
+            "flex items-center justify-between w-full p-2 text-black rounded-lg hover:bg-gray-700 bg-transparent",
           // - button 전체 영역 스타일
           // - flex, items-center, justify-between: 아이템 수평 정렬
           // - w-full: 버튼 너비 100%
@@ -83,7 +83,7 @@ export function SideNav() {
 
           label: {
             // Collapse 라벨(텍스트) 관련
-            base: "ml-3 flex-1 whitespace-nowrap text-left",
+            base: "ml-3 flex-1 whitespace-nowrap text-left bg-transparent",
             // - ml-3: 왼쪽 마진
             // - flex-1: 가용 공간 채움
             // - whitespace-nowrap: 줄바꿈 방지
@@ -108,7 +108,7 @@ export function SideNav() {
         },
 
         itemGroup: {
-          base: "space-y-1 bg-transparent text-black",
+          base: "space-y-1 bg-transparent text-black bg-transparent",
           // SidebarItemGroup(아이템 그룹) 기본 스타일
           // - space-y-1: 아이템 간 간격
           // - bg-transparent: 배경 투명
@@ -116,7 +116,7 @@ export function SideNav() {
         },
 
         item: {
-          base: "flex items-center p-2 text-black rounded-lg hover:bg-gray-700",
+          base: "flex items-center p-2 text-black rounded-lg hover:bg-gray-700 bg-transparent",
           // SidebarItem 기본 스타일
           // - flex, items-center: 수평 중앙 정렬
           // - p-2: padding
@@ -159,6 +159,7 @@ export function SideNav() {
           <SidebarCollapse
             icon={HiClipboardList}
             label="수주대상 입출고 관리"
+            style={{ backgroundColor: "transparent" }} // 강제 투명
             open
           >
             <SidebarItem
@@ -200,7 +201,12 @@ export function SideNav() {
               출고 조회
             </SidebarItem>
           </SidebarCollapse>
-          <SidebarCollapse icon={HiCube} label="원자재 입출고 관리" open>
+          <SidebarCollapse
+            icon={HiCube}
+            label="원자재 입출고 관리"
+            style={{ backgroundColor: "transparent" }} // 강제 투명
+            open
+          >
             <SidebarItem
               href="/material/inbound/register"
               icon={RiInboxArchiveLine}
@@ -251,7 +257,12 @@ export function SideNav() {
               재고 현황
             </SidebarItem>
           </SidebarCollapse>
-          <SidebarCollapse icon={HiShoppingBag} label="기준 정보 관리" open>
+          <SidebarCollapse
+            icon={HiShoppingBag}
+            label="기준 정보 관리"
+            style={{ backgroundColor: "transparent" }} // 강제 투명
+            open
+          >
             <SidebarItem
               href="/master/orderitem/list"
               icon={HiClipboard}
