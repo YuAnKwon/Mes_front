@@ -32,8 +32,104 @@ export function SideNav() {
 
   return (
     <Sidebar
-      aria-label="Sidebar with multi-level dropdown example "
-      className="w-80"
+      aria-label="Sidebar with custom transparent style"
+      // ✅ Flowbite Sidebar의 테마 구조 (정확한 타입에 맞게 작성)
+      theme={{
+        root: {
+          // Sidebar 최상위 컨테이너
+          base: "h-full w-80 bg-transparent text-black rounded-none shadow-none border-none",
+          // - h-full: 높이 100%
+          // - w-80: 너비 80 (Tailwind 기준, 보통 320px)
+          // - bg-transparent: 배경 투명
+          // - text-white: 기본 텍스트 흰색
+          // - rounded-none: 모서리 둥글기 제거
+          // - shadow-none: 그림자 제거
+          // - border-none: 테두리 제거
+
+          inner:
+            "h-full overflow-y-auto overflow-x-hidden bg-transparent px-3 py-4 text-black",
+          // Sidebar 내부 컨테이너 스타일
+          // - overflow-y-auto: 세로 스크롤 자동
+          // - overflow-x-hidden: 가로 스크롤 숨김
+          // - px-3, py-4: padding
+          // - bg-transparent: 배경 투명
+          // - text-white: 텍스트 흰색
+        },
+
+        collapse: {
+          // SidebarCollapse(접었다 펼치는 메뉴) 관련 스타일
+          button:
+            "flex items-center justify-between w-full p-2 text-black rounded-lg hover:bg-gray-700",
+          // - button 전체 영역 스타일
+          // - flex, items-center, justify-between: 아이템 수평 정렬
+          // - w-full: 버튼 너비 100%
+          // - p-2: padding
+          // - text-white: 텍스트 색상
+          // - rounded-lg: 모서리 둥글기
+          // - hover:bg-gray-700: 마우스 올리면 배경 회색
+
+          icon: {
+            base: "h-5 w-5 text-gray-400 transition-transform duration-200",
+            // - Collapse 아이콘 기본 스타일
+            // - h-5 w-5: 크기
+            // - text-gray-400: 색상
+            // - transition-transform duration-200: 회전 애니메이션
+
+            open: { off: "", on: "rotate-180" },
+            // - open 상태일 때 아이콘 회전
+            // - off: 닫힘 상태
+            // - on: 열림 상태 (180도 회전)
+          },
+
+          label: {
+            // Collapse 라벨(텍스트) 관련
+            base: "ml-3 flex-1 whitespace-nowrap text-left",
+            // - ml-3: 왼쪽 마진
+            // - flex-1: 가용 공간 채움
+            // - whitespace-nowrap: 줄바꿈 방지
+            // - text-left: 왼쪽 정렬
+
+            title: "font-semibold",
+            // - 라벨 텍스트 강조
+
+            icon: {
+              base: "h-5 w-5 text-gray-400",
+              open: { off: "", on: "rotate-180" },
+              // 라벨 아이콘 회전 효과
+            },
+          },
+
+          list: "space-y-1 py-2 pl-4 text-black bg-transparent",
+          // Collapse 펼쳤을 때 하위 메뉴 리스트 스타일
+          // - space-y-1: 아이템 간 세로 간격
+          // - py-2, pl-4: padding
+          // - text-white: 텍스트 흰색
+          // - bg-transparent: 배경 투명
+        },
+
+        itemGroup: {
+          base: "space-y-1 bg-transparent text-black",
+          // SidebarItemGroup(아이템 그룹) 기본 스타일
+          // - space-y-1: 아이템 간 간격
+          // - bg-transparent: 배경 투명
+          // - text-white: 텍스트 흰색
+        },
+
+        item: {
+          base: "flex items-center p-2 text-black rounded-lg hover:bg-gray-700",
+          // SidebarItem 기본 스타일
+          // - flex, items-center: 수평 중앙 정렬
+          // - p-2: padding
+          // - text-white: 텍스트 흰색
+          // - rounded-lg: 모서리 둥글기
+          // - hover:bg-gray-700: 마우스 올리면 배경 회색
+
+          active: "bg-gray-800 text-blue-400",
+          // 활성화된 아이템 스타일
+          // - bg-gray-800: 배경 어둡게
+          // - text-blue-400: 텍스트 파랑
+        },
+      }}
     >
       {/* 로고 */}
       <Box
@@ -68,7 +164,7 @@ export function SideNav() {
             <SidebarItem
               href="/"
               icon={RiInboxArchiveLine}
-              style={{ color: isActive("/") ? "blue" : "black" }}
+              style={{ color: isActive("/") ? "#2d547e" : "black" }}
             >
               입고 등록
             </SidebarItem>
@@ -76,7 +172,9 @@ export function SideNav() {
               href="/orderitem/inbound/list"
               icon={RiInboxArchiveFill}
               style={{
-                color: isActive("/orderitem/inbound/list") ? "blue" : "black",
+                color: isActive("/orderitem/inbound/list")
+                  ? "#2d547e"
+                  : "black",
               }}
             >
               입고 조회

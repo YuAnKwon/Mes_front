@@ -4,7 +4,7 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#6C5DD3", // 보라 톤
+      main: "##e1e6ed", // 보라 톤
     },
     secondary: {
       main: "#FF6B6B", // 핑크 레드 톤
@@ -22,7 +22,7 @@ const theme = createTheme({
       main: "#42C38C",
     },
     background: {
-      default: "#F8F9FA", //배경색
+      default: "#e1e6ed", //배경색
       paper: "#FFFFFF",
     },
   },
