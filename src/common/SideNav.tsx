@@ -37,7 +37,7 @@ export function SideNav() {
       theme={{
         root: {
           // Sidebar 최상위 컨테이너
-          base: "h-full w-80 bg-transparent text-black rounded-none shadow-none border-none",
+          base: "h-screen w-80 bg-transparent text-black rounded-none shadow-none border-none overflow-hidden",
           // - h-full: 높이 100%
           // - w-80: 너비 80 (Tailwind 기준, 보통 320px)
           // - bg-transparent: 배경 투명
@@ -46,8 +46,7 @@ export function SideNav() {
           // - shadow-none: 그림자 제거
           // - border-none: 테두리 제거
 
-          inner:
-            "h-full overflow-y-auto overflow-x-hidden bg-transparent px-3 py-4 text-black",
+          inner: "h-screen overflow-hidden bg-transparent px-3 py-4 text-black",
           // Sidebar 내부 컨테이너 스타일
           // - overflow-y-auto: 세로 스크롤 자동
           // - overflow-x-hidden: 가로 스크롤 숨김
@@ -99,7 +98,7 @@ export function SideNav() {
             },
           },
 
-          list: "space-y-1 py-2 pl-4 text-black bg-transparent",
+          list: "space-y-1 py-2 pl-4 text-black bg-transparent max-h-full overflow-hidden",
           // Collapse 펼쳤을 때 하위 메뉴 리스트 스타일
           // - space-y-1: 아이템 간 세로 간격
           // - py-2, pl-4: padding
@@ -153,7 +152,7 @@ export function SideNav() {
         />
       </Box>
 
-      <SidebarItems>
+      <SidebarItems className="h-full overflow-hidden">
         <SidebarItemGroup>
           {/* 현재 페이지이면 파랑 */}
           <SidebarCollapse
