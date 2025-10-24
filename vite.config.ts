@@ -4,7 +4,8 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: "localhost",
+    host: "172.20.20.2",
+    port: 80,
     proxy: {
       "/api": {
         // 프론트에서 "/api"로 시작하는 요청이 들어오면
