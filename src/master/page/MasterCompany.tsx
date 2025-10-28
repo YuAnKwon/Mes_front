@@ -32,33 +32,20 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
   const [address, setAddress] = useState("");
   const [openPostcode, setOpenPostcode] = useState(false);
 
-  const handleComplete = (data) => {
-    //data는 주소 검색 전체 결과 객체
-    setZipcode(data.zonecode);
-    setAddress(data.address); // 선택된 주소 저장
-    setAddressBase(data.address); // 기본 주소에 저장
-    setOpenPostcode(false); // 검색창 닫기
-  };
-
-  const handleClickAddress = () => {
-    setOpenPostcode(true);
-  };
-
-  const validateEmail = (email: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  const [companyName, setCompanyName] = useState("");
-  const [businessNum, setBusinessNum] = useState("");
-  const [companyType, setCompanyType] = useState("");
-  const [ceoName, setCeoName] = useState("");
-  const [ceoPhone, setCeoPhone] = useState("");
-  const [managerName, setManagerName] = useState("");
-  const [managerPhone, setManagerPhone] = useState("");
-  const [managerEmail, setManagerEmail] = useState("");
-  const [remark, setRemark] = useState("");
-  const [zipcode, setZipcode] = useState("");
-  const [addressBase, setAddressBase] = useState("");
-  const [addressDetail, setAddressDetail] = useState("");
+  const [company, setCompany] = useState<MasterCpRegister>({
+    companyName: "",
+    companyType: "",
+    businessNum: "",
+    ceoName: "",
+    ceoPhone: "",
+    managerName: "",
+    managerPhone: "",
+    managerEmail: "",
+    zipcode: "",
+    addressBase: "",
+    addressDetail: "",
+    remark: "",
+  });
 
   const handleSave = async () => {
     if (
@@ -108,6 +95,21 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
     }
   };
 
+  const handleComplete = (data) => {
+    //data는 주소 검색 전체 결과 객체
+    setZipcode(data.zonecode);
+    setAddress(data.address); // 선택된 주소 저장
+    setAddressBase(data.address); // 기본 주소에 저장
+    setOpenPostcode(false); // 검색창 닫기
+  };
+
+  const handleClickAddress = () => {
+    setOpenPostcode(true);
+  };
+
+  const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   return (
     <Box sx={{ p: 2, maxWidth: 850, mx: "auto" }}>
       <Box sx={{ height: 600, width: "100%" }}>
@@ -119,8 +121,10 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
             <OutlinedInput
               id="companyName"
               name="companyName"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
+              value={company.companyName}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, companyName: e.target.value }))
+              }
               type="text"
               placeholder="업체명"
               autoComplete="organization"
@@ -136,8 +140,10 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
             <Select
               id="companyType"
               name="companyType"
-              value={companyType}
-              onChange={(e) => setCompanyType(e.target.value)}
+              value={company.companyType}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, companyType: e.target.value }))
+              }
               displayEmpty
               input={<OutlinedInput />}
               size="small"
@@ -166,8 +172,10 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
             <OutlinedInput
               id="businessNum"
               name="businessNum"
-              value={businessNum}
-              onChange={(e) => setBusinessNum(e.target.value)}
+              value={company.businessNum}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, businessNum: e.target.value }))
+              }
               type="text"
               placeholder="123-45-67890"
               autoComplete="off"
@@ -182,8 +190,10 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
             <OutlinedInput
               id="ceoName"
               name="ceoName"
-              value={ceoName}
-              onChange={(e) => setCeoName(e.target.value)}
+              value={company.ceoName}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, ceoName: e.target.value }))
+              }
               type="text"
               placeholder="홍길동"
               autoComplete="name"
@@ -198,8 +208,10 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
             <TextField
               id="ceoPhone"
               name="ceoPhone"
-              value={ceoPhone}
-              onChange={(e) => setCeoPhone(e.target.value)}
+              value={company.ceoPhone}
+              onChange={(e) =>
+                setCompany((prev) => ({ ...prev, ceoPhone: e.target.value }))
+              }
               placeholder="010-1234-5678"
               size="small"
               required
@@ -212,8 +224,10 @@ export default function MasterCompany({ onRegisterComplete }: Props) {
             <OutlinedInput
               id="managerName"
               name="managerName"
-              value={managerName}
-              onChange={(e) => setManagerName(e.target.value)}
+              value={company.managerName}
+              onClick={(e) =>
+                setCompany((prev) => ({ ...prev, managerName: e.target.value }))
+              }
               type="text"
               placeholder="홍길동"
               autoComplete="name"
